@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup_logging.sh - Configuration du système de logs pour Nox API
-# Conforme à COPILOT_PLAN.md - Étape 6
+# Conforme à docs/planning/COPILOT_PLAN.md - Étape 6
 
 set -euo pipefail
 

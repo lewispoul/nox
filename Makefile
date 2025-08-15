@@ -1,5 +1,5 @@
 # Makefile for Nox API - Simple automation
-# Conforme à COPILOT_PLAN.md - Étapes 2, 4, 5
+# Conforme à docs/planning/COPILOT_PLAN.md - Étapes 2, 4, 5
 
 .PHONY: help install harden caddy-lan caddy-public nginx-public repair repair-v2 validate test demo logs install-logs debug clean
 

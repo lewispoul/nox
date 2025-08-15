@@ -3,7 +3,7 @@ set -euo pipefail
 
 # =============================================================================
 # Nox API - Script de réparation et maintenance (Version Robuste)
-# Conforme à COPILOT_PLAN.md - Étape 2
+# Conforme à docs/planning/COPILOT_PLAN.md - Étape 2
 # =============================================================================
 
 # Configuration des paramètres

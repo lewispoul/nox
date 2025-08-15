@@ -1,6 +1,6 @@
 #!/bin/bash
 # install_logging.sh - Installation complète du système de logs et rotation
-# Conforme à COPILOT_PLAN.md - Étape 6
+# Conforme à docs/planning/COPILOT_PLAN.md - Étape 6
 
 set -euo pipefail
 

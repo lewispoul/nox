@@ -3,7 +3,7 @@ set -euo pipefail
 
 # =============================================================================
 # Nox API - Script d'installation idempotent
-# Conforme à COPILOT_PLAN.md - Étape 1
+# Conforme à docs/planning/COPILOT_PLAN.md - Étape 1
 # =============================================================================
 
 echo "[NOX] Début d'installation Nox API"

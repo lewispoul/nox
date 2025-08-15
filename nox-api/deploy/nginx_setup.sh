@@ -3,7 +3,7 @@ set -euo pipefail
 
 # =============================================================================
 # Nox API - Configuration Nginx (Étape 4)
-# Conforme à COPILOT_PLAN.md - Étape 4
+# Conforme à docs/planning/COPILOT_PLAN.md - Étape 4
 # =============================================================================
 
 DOMAIN=${1:-}

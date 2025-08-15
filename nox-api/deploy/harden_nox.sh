@@ -3,7 +3,7 @@ set -euo pipefail
 
 # =============================================================================
 # Nox API - Script de durcissement (Étape 3)
-# Conforme à COPILOT_PLAN.md - Étape 3
+# Conforme à docs/planning/COPILOT_PLAN.md - Étape 3
 # =============================================================================
 
 # Configuration
