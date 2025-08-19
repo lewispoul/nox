@@ -104,41 +104,71 @@ def apply_patch(patch: str, allowlist, cfg) -> bool:
         except Exception:
             pass
 
-def run_once() -> bool:
+def run_once(dry_run: bool = False, no_pr: bool = False) -> bool:
+    """Run a single agent cycle."""
+    preflight_checks()
+    
     cfg = load_config()
     task = fs.pick_task("agent/tasks/backlog.yaml")
     ctx = fs.read_context(task)
     prompt = build_planner_prompt(ctx["task_yaml"], ctx["repo_tree"], ctx["file_snippets"])
 
-    plan_text = call_llm(prompt)  # Copilot to replace with real LLM
+    plan_text = call_llm(prompt)
     plan = plan_text
     try:
         plan_json = parse_planner_json(plan_text)
         plan = json.dumps(plan_json, indent=2)
-    except Exception:
+    except Exception as e:
+        print(f"ERROR: Failed to parse planner JSON: {e}")
+        if dry_run:
+            sys.exit(1)
         plan_json = {"patch": ""}
+
+    if dry_run:
+        # Dry-run: print redacted plan and diff, then exit
+        print("=== DRY RUN MODE ===")
+        print("Plan:")
+        print(redact(plan))
+        print("\nProposed diff:")
+        print(redact(plan_json.get("patch", "")))
+        return True
 
     branch = f"{cfg.get('branch_prefix','agent/')}{task.get('id','task')}"
     git.create_branch(branch)
 
-    patch_ok = apply_patch(plan_json.get("patch",""), cfg.get("files_allowlist", []))
+    patch_ok = apply_patch(plan_json.get("patch",""), cfg.get("files_allowlist", []), cfg)
     if patch_ok:
         git.commit_all(f"agent: apply patch for {task.get('id')}")
 
     tests_ok = tests.run_all()
-    report = summarize_run(task, plan, patch_ok, tests_ok, tests.last_output())
-    git.open_pr(title=f"agent: {task.get('id')} {task.get('title')}", body=report)
+    
+    if not no_pr:
+        report = redact(summarize_run(task, plan, patch_ok, tests_ok, tests.last_output()))
+        git.open_pr(title=f"agent: {task.get('id')} {task.get('title')}", body=report)
+    
     return tests_ok
 
 def main():
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description="Nox Agent - Safe AI-powered code changes")
     ap.add_argument("--once", action="store_true", help="Run a single cycle")
+    ap.add_argument("--dry-run", action="store_true", help="Plan and show diff without applying")
+    ap.add_argument("--no-pr", action="store_true", help="Apply patch but skip PR creation")
     args = ap.parse_args()
-    if args.once:
-        run_once()
-    else:
-        # one-shot by default for bootstrap to avoid infinite loops in CI
-        run_once()
+    
+    try:
+        if args.once or not args.dry_run:  # default behavior or explicit --once
+            success = run_once(dry_run=args.dry_run, no_pr=args.no_pr)
+            sys.exit(0 if success else 1)
+        else:
+            # one-shot by default for bootstrap to avoid infinite loops in CI
+            success = run_once(dry_run=args.dry_run, no_pr=args.no_pr)
+            sys.exit(0 if success else 1)
+    except KeyboardInterrupt:
+        print("\nAgent interrupted by user")
+        sys.exit(130)
+    except Exception as e:
+        print(f"ERROR: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
