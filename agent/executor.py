@@ -66,14 +66,14 @@ def redact(text: str) -> str:
     return text
 
 
-def preflight_checks() -> None:
+def preflight_checks(allow_main_branch: bool = False) -> None:
     """Run preflight checks to ensure safe operation."""
     # Check if on main branch
     try:
         current_branch = subprocess.check_output(
             "git rev-parse --abbrev-ref HEAD", shell=True, text=True
         ).strip()
-        if current_branch == "main":
+        if current_branch == "main" and not allow_main_branch:
             print("ERROR: Agent cannot run on main branch. Switch to a feature branch.")
             sys.exit(1)
     except subprocess.CalledProcessError:
@@ -159,9 +159,9 @@ def apply_patch(patch: str, allowlist, cfg) -> bool:
             pass
 
 
-def run_once(dry_run: bool = False, no_pr: bool = False) -> bool:
+def run_once(dry_run: bool = False, no_pr: bool = False, allow_main_branch: bool = False) -> bool:
     """Run a single agent cycle."""
-    preflight_checks()
+    preflight_checks(allow_main_branch=allow_main_branch)
 
     cfg = load_config()
     task = fs.pick_task("agent/tasks/backlog.yaml")
@@ -239,15 +239,19 @@ def main():
     ap.add_argument(
         "--no-pr", action="store_true", help="Apply patch but skip PR creation"
     )
+    ap.add_argument(
+        "--allow-main-branch", action="store_true", 
+        help="Allow running on main branch (for CI workflows)"
+    )
     args = ap.parse_args()
 
     try:
         if args.once or not args.dry_run:  # default behavior or explicit --once
-            success = run_once(dry_run=args.dry_run, no_pr=args.no_pr)
+            success = run_once(dry_run=args.dry_run, no_pr=args.no_pr, allow_main_branch=args.allow_main_branch)
             sys.exit(0 if success else 1)
         else:
             # one-shot by default for bootstrap to avoid infinite loops in CI
-            success = run_once(dry_run=args.dry_run, no_pr=args.no_pr)
+            success = run_once(dry_run=args.dry_run, no_pr=args.no_pr, allow_main_branch=args.allow_main_branch)
             sys.exit(0 if success else 1)
     except KeyboardInterrupt:
         print("\nAgent interrupted by user")

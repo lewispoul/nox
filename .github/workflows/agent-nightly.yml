@@ -16,9 +16,10 @@ jobs:
       - name: Install deps
         run: |
           pip install -r requirements.txt
+          pip install -r dev-requirements.txt
           pip install openai pyyaml rich pytest
       - name: Run agent loop (one-shot)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python -m agent.executor --once
+        run: python -m agent.executor --once --allow-main-branch
