@@ -1,4 +1,4 @@
-name: Lint
+name: lint
 
 on:
   # Trigger the workflow on push or pull request,
@@ -26,10 +26,9 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install black flake8
-        
-      - name: Lint
+
+      - name: lint
         uses: wearerequired/lint-action@v2
-      
         with:
           black: true
           flake8: true
