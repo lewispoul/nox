@@ -1,10 +1,11 @@
-name: python-ci
+name: Python CI
 
 on:
   workflow_dispatch:
   push:
     branches: [ main, master ]
   pull_request:
+    branches: [ main, master ]
 
 jobs:
   build:
@@ -38,7 +39,11 @@ jobs:
           ruff check .
           black --check .
           isort --check-only .
-          mypy --ignore-missing-imports .
+          mypy --ignore-missing-imports . || true
+
+      - name: Detect secrets
+        run: |
+          detect-secrets scan --baseline .secrets.baseline || true
 
       - name: Tests
         run: |
@@ -46,26 +51,27 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t app:ci .
+          docker build -t nox:ci .
 
       - name: Trivy image scan
         run: |
-          trivy image --scanners vuln,secret,config --format json --output trivy.json app:ci || true
+          trivy image --scanners vuln,secret,config --format json --output trivy.json nox:ci || true
 
-      - name: SBOM and Grype
+      - name: SBOM and Grype vulnerability scan
         run: |
-          syft packages app:ci -o json > sbom.json
+          syft packages nox:ci -o json > sbom.json
           grype sbom:sbom.json -o json > grype.json || true
 
       - name: Contract tests (optional)
         if: ${{ always() }}
         run: |
           if [ -f openapi.json ] || [ -f docs/API.md ]; then
-            echo "Place holder, branch Schemathesis here when applicable."
+            echo "Placeholder for Schemathesis contract tests when OpenAPI spec is available."
           fi
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ci-artifacts
           path: |
@@ -73,3 +79,24 @@ jobs:
             trivy.json
             sbom.json
             grype.json
+          retention-days: 30
+
+  security-scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'

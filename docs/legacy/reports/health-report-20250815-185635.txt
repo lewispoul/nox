@@ -1,0 +1,25 @@
+NOX API v8.0.0 Health Check Report
+Generated: Fri Aug 15 18:56:34 EDT 2025
+Application URL: https://your-domain.com
+
+System Information:
+- Hostname: LAPTOP-BQRV794S
+- OS: Linux 6.6.87.2-microsoft-standard-WSL2
+- Uptime: up 21 hours, 59 minutes
+
+Disk Usage: 2%
+Memory Usage: 9.3Gi/11Gi (84.5%)
+Load Average:  1.48, 1.19, 1.63
+
+Application Status: Unknown
+
+Docker Containers: 13 running
+
+Environment: production
+Database: Configured
+Redis: Configured
+
+OAuth Providers:
+- Google: Configured
+- GitHub: Configured
+- Microsoft: Configured
