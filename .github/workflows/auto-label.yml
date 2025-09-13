@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Checkout for file analysis
         if: github.event_name == 'pull_request'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
       - name: Label PR from Dependabot - dependencies
         if: github.actor == 'dependabot[bot]'
