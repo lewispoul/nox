@@ -10,7 +10,7 @@ fakeredis==2.31.0
 
 # Code quality and linting
 black==24.8.0
-isort==5.13.2
+isort==6.0.1
 flake8==7.1.1
 
 # Security scanning
