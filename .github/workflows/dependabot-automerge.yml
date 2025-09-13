@@ -1,19 +1,20 @@
 name: Dependabot auto-merge
+
 on:
   pull_request:
-    types:
-      - labeled
+    types: [labeled, synchronize, reopened]
 
 permissions:
-  pull-requests: write
   contents: write
+  pull-requests: write
 
 jobs:
-  automerge:
-    if: contains(github.event.pull_request.labels.*.name, 'automerge-candidate')
+  enable-automerge:
+    # Only for Dependabot PRs that carry the label
+    if: github.actor == 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'automerge-candidate')
     runs-on: ubuntu-latest
     steps:
-      - name: Merge Dependabot PR
+      - name: Enable PR auto-merge (squash)
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
