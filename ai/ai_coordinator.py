@@ -24,8 +24,8 @@ from psycopg2.extras import RealDictCursor
 from redis.cluster import RedisCluster
 
 from .biometric_auth import BiometricAuthenticationSystem, BiometricChallenge
-from .policy_engine import AccessRequest, BiometricType, IntelligentPolicyEngine
-
+from .policy_engine import (AccessRequest, BiometricType,
+                            IntelligentPolicyEngine)
 # Import AI components
 from .security_monitor import AISecurityMonitor, SecurityEvent
 
@@ -212,7 +212,7 @@ class AISystemCoordinator:
                 ai_components_used.append("policy_engine")
 
             # 3. Biometric verification if required
-            biometric_results = []
+            # No need to initialize biometric_results here as it's not used
             if biometric_data and "challenge_id" in biometric_data:
                 challenge_id = biometric_data["challenge_id"]
 
