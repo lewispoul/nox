@@ -15,42 +15,36 @@ jobs:
     steps:
       - name: Label PR from Dependabot
         if: github.actor == 'dependabot[bot]'
-        uses: actions-ecosystem/action-add-labels@v1
+        uses: actions/github-script@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: dependencies
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: ['dependencies']
+            });
 
-      - name: Label PRs with workflow changes - ci
-        if: contains(github.event.pull_request.changed_files, '.github/workflows/')
-        uses: actions-ecosystem/action-add-labels@v1
+      - name: Label PRs with workflow changes
+        if: contains(github.event.pull_request.title, 'workflow') || contains(github.event.pull_request.title, 'ci')
+        uses: actions/github-script@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: ci
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: ['ci', 'workflow']
+            });
 
-      - name: Label PRs with workflow changes - workflow
-        if: contains(github.event.pull_request.changed_files, '.github/workflows/')
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: workflow
-
-      - name: Label Hygiene PRs - hygiene
+      - name: Label Hygiene PRs
         if: contains(github.event.pull_request.title, 'hygiene')
-        uses: actions-ecosystem/action-add-labels@v1
+        uses: actions/github-script@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: hygiene
-
-      - name: Label Hygiene PRs - docs
-        if: contains(github.event.pull_request.title, 'hygiene')
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: docs
-
-      - name: Label Hygiene PRs - triage
-        if: contains(github.event.pull_request.title, 'hygiene')
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: triage
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: ['hygiene', 'docs', 'triage']
+            });
