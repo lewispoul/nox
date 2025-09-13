@@ -3,8 +3,8 @@
 NOX Backup & Restore CLI
 Lists available backups, allows creation of new backups, and restores from selected backup files.
 """
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 BACKUP_DIR = "/opt/nox/backups"
 APP_DIR = "/opt/nox/app"

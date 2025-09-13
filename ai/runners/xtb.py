@@ -1,9 +1,9 @@
 import json
-import subprocess
-import shlex
 import re
+import shlex
+import subprocess
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from api.services.settings import settings
 from nox.artifacts.cubes import generate_cubes_from_molden, validate_cube_file

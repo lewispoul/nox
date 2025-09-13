@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Test rapide du nouveau runner XTB avec parsing robuste"""
 
+import json
 import tempfile
 from pathlib import Path
-from ai.runners.xtb import _parse_xtbout_json, _parse_from_text
-import json
+
+from ai.runners.xtb import _parse_from_text, _parse_xtbout_json
 
 
 def test_json_parsing():

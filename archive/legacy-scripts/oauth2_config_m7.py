@@ -4,9 +4,10 @@ Supports Google, GitHub, and Microsoft OAuth2 authentication providers
 """
 
 import os
-from typing import Optional, List
-from pydantic import BaseModel
+from typing import List, Optional
+
 from authlib.integrations.starlette_client import OAuth
+from pydantic import BaseModel
 from starlette.config import Config
 
 

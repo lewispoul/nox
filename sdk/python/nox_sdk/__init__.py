@@ -83,11 +83,12 @@ Configuration:
 """
 
 from typing import Optional
-from .client import NoxClient, APIResponse
+
+from . import ai
 from .auth import AuthManager
+from .client import APIResponse, NoxClient
 from .models import *
 from .utils import *
-from . import ai
 
 # Version information
 __version__ = "8.0.0"

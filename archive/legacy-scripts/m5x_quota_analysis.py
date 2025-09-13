@@ -5,7 +5,7 @@ Based on load testing results, recommend optimal quota settings
 """
 
 import asyncio
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class QuotaAnalyzer:

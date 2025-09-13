@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
-from pathlib import Path
-from datetime import datetime
 from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
 
 # Configuration
 ROOT_DIR = Path("/home/lppoulin/nox-api-src")

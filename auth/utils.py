@@ -2,14 +2,14 @@
 Utilitaires pour l'authentification JWT et le hachage des mots de passe
 """
 
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
 import os
 import uuid
+from datetime import datetime, timedelta
+from typing import Any, Dict, Optional
 
+from fastapi import HTTPException, status
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import HTTPException, status
 
 from .models import User, UserRole
 from .schemas import TokenData

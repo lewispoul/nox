@@ -5,12 +5,13 @@ Tests quota enforcement under various load scenarios
 """
 
 import asyncio
-import aiohttp
-import time
 import json
 import statistics
-from typing import Dict, Any
+import time
 from dataclasses import dataclass
+from typing import Any, Dict
+
+import aiohttp
 
 
 @dataclass

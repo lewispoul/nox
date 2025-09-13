@@ -1,5 +1,6 @@
-import shutil
 import pathlib
+import shutil
+
 from nox.parsers.xtb_json import parse_xtbout_text
 
 

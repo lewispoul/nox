@@ -7,25 +7,27 @@ Orchestrates security monitoring, policy enforcement, biometric authentication,
 and distributed AI operations across the multi-node cluster architecture.
 """
 
-import os
-import json
-import time
 import asyncio
+import json
 import logging
-from typing import Dict, List, Optional, Any
+import os
+import time
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from dataclasses import dataclass, asdict
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
-# Import AI components
-from .security_monitor import AISecurityMonitor, SecurityEvent
-from .policy_engine import IntelligentPolicyEngine, AccessRequest, BiometricType
-from .biometric_auth import BiometricAuthenticationSystem, BiometricChallenge
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 # Redis and database imports
 from redis.cluster import RedisCluster
-import psycopg2
-from psycopg2.extras import RealDictCursor
+
+from .biometric_auth import BiometricAuthenticationSystem, BiometricChallenge
+from .policy_engine import (AccessRequest, BiometricType,
+                            IntelligentPolicyEngine)
+# Import AI components
+from .security_monitor import AISecurityMonitor, SecurityEvent
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -210,7 +212,7 @@ class AISystemCoordinator:
                 ai_components_used.append("policy_engine")
 
             # 3. Biometric verification if required
-            biometric_results = []
+            # No need to initialize biometric_results here as it's not used
             if biometric_data and "challenge_id" in biometric_data:
                 challenge_id = biometric_data["challenge_id"]
 
@@ -473,7 +475,7 @@ class AISystemCoordinator:
 
         risk_level = risk_assessment.get("risk_level", "medium")
         threat_indicators = risk_assessment.get("threat_indicators", [])
-        user_history = risk_assessment.get("user_history", {})
+        _user_history = risk_assessment.get("user_history", {})
 
         # Always require facial recognition for identity verification
         required_types.append(BiometricType.FACIAL_RECOGNITION)

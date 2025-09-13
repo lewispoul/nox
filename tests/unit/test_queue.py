@@ -2,8 +2,8 @@ import time
 
 import pytest
 
-from api.services.queue import submit_job
 from api.services.jobs_store import get_store
+from api.services.queue import submit_job
 
 
 def poll_state(job_id: str, timeout: float = 2.0):

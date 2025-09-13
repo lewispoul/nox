@@ -1,10 +1,11 @@
 # middleware.py - Middleware de métriques pour l'API Nox
 import time
 import uuid
+
+from metrics_chatgpt import LAT, REQS
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
-from metrics_chatgpt import REQS, LAT
 
 
 class MetricsMiddleware(BaseHTTPMiddleware):

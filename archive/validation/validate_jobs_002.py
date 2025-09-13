@@ -10,9 +10,10 @@ This script validates the complete implementation of JOBS-002:
 - Dramatiq background processing integration
 """
 
-import requests
-import time
 import sys
+import time
+
+import requests
 
 API_BASE = "http://127.0.0.1:8082"
 

@@ -1,9 +1,9 @@
 import asyncio
 import time
+
 import pytest
 from fastapi import FastAPI
-from httpx import AsyncClient
-from httpx import ASGITransport
+from httpx import ASGITransport, AsyncClient
 
 from api.routes.jobs import router as jobs_router
 
@@ -33,8 +33,9 @@ async def test_jobs_echo_flow_local_mode(monkeypatch):
 @pytest.mark.asyncio
 async def test_jobs_store_redis_via_fakeredis(monkeypatch):
     # Validate Redis store behavior without real Redis
-    from api.services import jobs_store as js
     import fakeredis
+
+    from api.services import jobs_store as js
 
     fake = fakeredis.FakeRedis()
     store = js.RedisJobsStore(fake)

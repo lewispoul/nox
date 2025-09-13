@@ -2,15 +2,16 @@
 Tests for cube file generation and handling.
 """
 
-import pytest
-from pathlib import Path
 import tempfile
+from pathlib import Path
+
+import pytest
 
 from nox.artifacts.cubes import (
-    generate_cubes_from_molden,
-    validate_cube_file,
-    get_cube_info,
     find_cube_tools,
+    generate_cubes_from_molden,
+    get_cube_info,
+    validate_cube_file,
 )
 
 

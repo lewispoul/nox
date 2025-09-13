@@ -1,11 +1,12 @@
 # dashboard/app_v24.py - Dashboard Streamlit avec OAuth2
-import streamlit as st
-import tempfile
 import os
+import tempfile
+
+import pandas as pd
+import plotly.express as px
+import streamlit as st
 from client_v23 import NoxAuthClient
 from oauth2_client import oauth2_client
-import plotly.express as px
-import pandas as pd
 
 # Configuration de la page
 st.set_page_config(
@@ -189,9 +190,9 @@ def run_python_code(code: str):
     try:
         # Get authentication headers
         if st.session_state.auth_method == "oauth2":
-            headers = oauth2_client.get_auth_headers()
+            _headers = oauth2_client.get_auth_headers()
         else:
-            headers = {
+            _headers = {
                 "Authorization": f"Bearer {st.session_state.access_token}",
                 "Content-Type": "application/json",
             }

@@ -6,17 +6,17 @@ Integrates with M6 audit system for comprehensive tracking
 
 import secrets
 import urllib.parse
-from typing import Dict, Any, Optional
 from datetime import datetime, timedelta
+from typing import Any, Dict, Optional
 
+import httpx
+from enhanced_oauth2_service import OAuth2Profile, oauth2_service
 from fastapi import APIRouter, HTTPException, Query, Request, Response
 from fastapi.responses import RedirectResponse
-import httpx
 from jose import jwt
 
 # Import OAuth2 configuration and service
-from oauth2_config_m7 import oauth2_settings, get_provider_by_name
-from enhanced_oauth2_service import oauth2_service, OAuth2Profile
+from oauth2_config_m7 import get_provider_by_name, oauth2_settings
 
 # Create router for OAuth2 endpoints
 oauth2_router = APIRouter(prefix="/auth", tags=["OAuth2 Authentication"])

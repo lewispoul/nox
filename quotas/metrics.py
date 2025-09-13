@@ -2,8 +2,9 @@
 Prometheus metrics for quota monitoring
 """
 
-from prometheus_client import Counter, Gauge, Histogram, CollectorRegistry
 import os
+
+from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram
 
 # Créer un registry custom pour éviter les conflits
 quota_registry = CollectorRegistry()

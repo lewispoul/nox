@@ -7,17 +7,17 @@ Manages database connections across primary-replica PostgreSQL cluster
 with automatic failover and load balancing for read/write operations.
 """
 
+import logging
 import os
 import time
-import logging
-from typing import Dict, List, Optional, Any, Tuple
 from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 import psycopg2
-from psycopg2.extras import RealDictCursor
 import psycopg2.extensions
+from psycopg2.extras import RealDictCursor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

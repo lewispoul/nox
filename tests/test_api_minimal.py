@@ -1,6 +1,6 @@
 import pytest
-from httpx import AsyncClient
-from httpx import ASGITransport
+from httpx import ASGITransport, AsyncClient
+
 from api.main import app
 
 
@@ -22,8 +22,6 @@ async def test_jobs_flow(monkeypatch):
 
     # Mock Redis client creation to use FakeRedis
     import redis
-
-    original_from_url = redis.from_url
 
     def fake_redis_from_url(url, **kwargs):
         return fakeredis.FakeStrictRedis.from_url(url, **kwargs)

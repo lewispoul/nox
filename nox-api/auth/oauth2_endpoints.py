@@ -9,7 +9,7 @@ from urllib.parse import urlencode
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import RedirectResponse
 
-from .oauth2_config import oauth, oauth2_settings, get_enabled_providers
+from .oauth2_config import get_enabled_providers, oauth, oauth2_settings
 from .oauth2_service import OAuth2Service
 
 # Initialize OAuth2 service
@@ -182,7 +182,7 @@ async def oauth2_token_exchange(provider: str, request: Request):
             )
 
         # Exchange code for token manually
-        redirect_uri = (
+        _redirect_uri = (
             f"{oauth2_settings.redirect_base_url}/auth/oauth2/{provider}/callback"
         )
 
