@@ -7,6 +7,17 @@ __pycache__/
 env/
 venv/
 
+# Testing and CI artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+bandit-report.json
+safety-report.json
+pip-audit-report.json
+sbom.json
+sbom.xml
+
 # Nox build/runtime (temporarily commented out for agent testing)
 # nox/
 sandbox/
