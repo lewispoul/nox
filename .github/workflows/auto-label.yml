@@ -19,21 +19,37 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           labels: dependencies
 
-      - name: Label PRs with workflow changes
+      - name: Label PRs with workflow changes - ci
         if: contains(github.event.pull_request.changed_files, '.github/workflows/')
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: |
-            ci
-            workflow
+          labels: ci
 
-      - name: Label Hygiene PRs
+      - name: Label PRs with workflow changes - workflow
+        if: contains(github.event.pull_request.changed_files, '.github/workflows/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: workflow
+
+      - name: Label Hygiene PRs - hygiene
         if: contains(github.event.pull_request.title, 'hygiene')
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: |
-            hygiene
-            docs
-            triage
+          labels: hygiene
+
+      - name: Label Hygiene PRs - docs
+        if: contains(github.event.pull_request.title, 'hygiene')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: docs
+
+      - name: Label Hygiene PRs - triage
+        if: contains(github.event.pull_request.title, 'hygiene')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: triage
