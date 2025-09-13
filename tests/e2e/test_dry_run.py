@@ -1,7 +1,8 @@
 # file: tests/e2e/test_dry_run.py
-import os
 import json
+import os
 import unittest.mock
+
 from agent.executor import run_once
 
 
@@ -37,7 +38,7 @@ def test_dry_run_with_mocked_llm():
 
             try:
                 result = run_once(dry_run=True)
-                assert result == True, "Dry run should return True"
+                assert result, "Dry run should return True"
 
                 # Check that dry-run output was produced
                 output = captured_output.getvalue()

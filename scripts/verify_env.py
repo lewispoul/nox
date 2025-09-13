@@ -9,10 +9,10 @@ and environment requirements before staging deployment.
 Usage: python3 scripts/verify_env.py
 """
 
-import os
-import sys
-import subprocess
 import importlib
+import os
+import subprocess
+import sys
 from typing import Optional
 
 

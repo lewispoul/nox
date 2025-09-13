@@ -7,10 +7,10 @@ import os
 
 os.environ["NOX_QUOTAS_ENABLED"] = "1"
 
+import pytest
+
 from quotas.database import QuotaDatabase
 from quotas.middleware import QuotaEnforcementMiddleware
-
-import pytest
 
 
 @pytest.mark.asyncio

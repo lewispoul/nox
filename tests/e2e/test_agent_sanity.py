@@ -1,6 +1,7 @@
 # file: tests/e2e/test_agent_sanity.py
-import yaml
 import pathlib
+
+import yaml
 
 
 def test_backlog_exists_and_has_tasks():

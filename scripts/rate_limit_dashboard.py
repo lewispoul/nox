@@ -4,6 +4,7 @@ NOX Rate Limiting Dashboard (CLI)
 Displays current rate limit status for all API endpoints using Redis metrics.
 """
 import os
+
 import redis
 from tabulate import tabulate
 

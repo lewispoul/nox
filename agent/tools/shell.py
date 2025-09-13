@@ -1,5 +1,6 @@
 # file: agent/tools/shell.py
 from __future__ import annotations
+
 import subprocess
 
 

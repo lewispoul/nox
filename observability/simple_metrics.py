@@ -5,12 +5,13 @@ Date: 13 août 2025
 Version simplifiée sans middleware complexe pour éviter les conflits
 """
 
-import time
-import uuid
 import os
 import sys
+import time
+import uuid
 from pathlib import Path
-from prometheus_client import Counter, Histogram, Gauge, Info, generate_latest
+
+from prometheus_client import Counter, Gauge, Histogram, Info, generate_latest
 
 # === MÉTRIQUES GLOBALES ===
 
@@ -91,7 +92,7 @@ def generate_request_id() -> str:
 
 def generate_metrics() -> str:
     """Génère les métriques Prometheus au format texte"""
-    from prometheus_client import generate_latest, REGISTRY
+    from prometheus_client import REGISTRY, generate_latest
 
     return generate_latest(REGISTRY)
 

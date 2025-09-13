@@ -4,6 +4,7 @@ NOX Metrics Dashboard (CLI)
 Displays key performance and health metrics from Redis and Prometheus endpoints.
 """
 import os
+
 import redis
 import requests
 from tabulate import tabulate

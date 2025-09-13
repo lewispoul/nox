@@ -1,9 +1,11 @@
 # file: agent/tools/fs.py
 from __future__ import annotations
+
 import os
 import pathlib
+from typing import Any, Dict
+
 import yaml
-from typing import Dict, Any
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 

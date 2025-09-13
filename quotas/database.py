@@ -2,12 +2,13 @@
 Database operations for quota management
 """
 
-import asyncpg
 import os
 import uuid
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
 
-from .models import UserQuota, UserUsage, QuotaViolation
+import asyncpg
+
+from .models import QuotaViolation, UserQuota, UserUsage
 
 
 class QuotaDatabase:

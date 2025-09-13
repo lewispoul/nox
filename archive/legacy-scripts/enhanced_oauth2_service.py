@@ -4,12 +4,12 @@ Handles OAuth2 authentication, token management, and profile synchronization
 Supports Google, GitHub, and Microsoft OAuth2 providers
 """
 
-import uuid
 import hashlib
-import secrets
 import json
-from typing import Optional, Dict, Any
+import secrets
+import uuid
 from datetime import datetime, timedelta
+from typing import Any, Dict, Optional
 
 import asyncpg
 import httpx

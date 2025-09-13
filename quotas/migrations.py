@@ -3,9 +3,10 @@ Database migrations for PostgreSQL quota system
 """
 
 import asyncio
-import asyncpg
 import os
 from typing import Optional
+
+import asyncpg
 
 
 class PostgreSQLMigrations:

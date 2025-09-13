@@ -3,7 +3,8 @@ import os
 import time
 
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
+
 from api.main import app
 
 TERMINAL = {"done", "completed", "failed"}

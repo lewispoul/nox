@@ -4,9 +4,10 @@ Handles OAuth2 authentication integration with Streamlit
 """
 
 import os
+from typing import Any, Dict
+
 import requests
 import streamlit as st
-from typing import Dict, Any
 
 
 class OAuth2Client:

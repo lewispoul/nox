@@ -4,11 +4,11 @@ Script d'audit pour le répertoire nox-api-src
 Génère un rapport Markdown complet selon les spécifications
 """
 
-import os
 import hashlib
-from pathlib import Path
-from datetime import datetime
+import os
 from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
 
 # Configuration
 ROOT_DIR = Path("/home/lppoulin/nox-api-src")

@@ -4,20 +4,20 @@ Incorporates comprehensive OAuth2 authentication, M6 audit system, and enhanced 
 Supports Google, GitHub, and Microsoft OAuth2 providers
 """
 
-import uvicorn
 import logging
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
-from fastapi import FastAPI, Request, Response, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 import asyncpg
+import uvicorn
 
 # Import core components
 from advanced_audit_middleware import AdvancedAuditMiddleware, SessionManager
-from oauth2_endpoints import oauth2_router
 from enhanced_oauth2_service import oauth2_service
+from fastapi import FastAPI, HTTPException, Query, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from oauth2_endpoints import oauth2_router
 
 # Configure logging
 logging.basicConfig(

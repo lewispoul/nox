@@ -1,8 +1,11 @@
 from __future__ import annotations
+
 import os
 import time
+from typing import Any, Dict
+
 import dramatiq
-from typing import Dict, Any
+
 from api.services.jobs_store import get_store
 
 # Set up Dramatiq broker
@@ -42,9 +45,9 @@ def enqueue_job(job_id: str, kind: str, payload: Dict[str, Any]):
 
 def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Execute XTB calculation with given parameters"""
+    from ai.runners.xtb import run_xtb_job
     from api.schemas.job import JobRequest
     from api.services.storage import job_dir
-    from ai.runners.xtb import run_xtb_job
 
     # Parse the job request
     job_request_json = payload.get("job_request", "{}")

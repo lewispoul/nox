@@ -1,9 +1,10 @@
 # dashboard/app_v23.py - Dashboard Streamlit avec authentification
-import streamlit as st
-import tempfile
 import os
-from client_v23 import NoxAuthClient
+import tempfile
+
 import pandas as pd
+import streamlit as st
+from client_v23 import NoxAuthClient
 
 # Configuration de la page
 st.set_page_config(

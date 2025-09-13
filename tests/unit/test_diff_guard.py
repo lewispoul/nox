@@ -1,5 +1,6 @@
 # file: tests/unit/test_diff_guard.py
 import pytest
+
 from agent.tools.codeedit import count_added_lines
 
 

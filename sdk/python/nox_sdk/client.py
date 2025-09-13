@@ -8,21 +8,21 @@ and intelligent error handling for the Nox API distributed platform.
 """
 
 import asyncio
-import time
 import logging
-from typing import Dict, Optional, Any, AsyncGenerator
+import time
+from dataclasses import dataclass
 from datetime import datetime
+from typing import Any, AsyncGenerator, Dict, Optional
+
 import aiohttp
 import httpx
-from dataclasses import dataclass
 
-from .auth import AuthManager
-from .ai.security import SecurityClient
 from .ai.biometric import BiometricClient
 from .ai.policy import PolicyClient
+from .ai.security import SecurityClient
+from .auth import AuthManager
 from .models.api import *
-from .utils import RetryConfig, ErrorHandler
-
+from .utils import ErrorHandler, RetryConfig
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

@@ -4,13 +4,13 @@ Handles OAuth2 user creation, authentication, and profile management
 """
 
 import uuid
-from typing import Optional, Dict, Any, Tuple
 from datetime import datetime, timedelta
+from typing import Any, Dict, Optional, Tuple
 
 import asyncpg
 import httpx
-from passlib.context import CryptContext
 from jose import jwt
+from passlib.context import CryptContext
 
 from .models import User, UserRole
 

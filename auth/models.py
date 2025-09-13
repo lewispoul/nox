@@ -2,11 +2,12 @@
 Modèles de données pour l'authentification et les utilisateurs
 """
 
-import aiosqlite
-from typing import Optional, Dict, Any, List
-from datetime import datetime
 import os
+from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import aiosqlite
 
 # Configuration de la base de données
 DB_PATH = Path(os.getenv("NOX_DB_PATH", f"{Path(__file__).parent.parent}/data/nox.db"))

@@ -5,8 +5,9 @@ Supports Google and GitHub authentication providers
 
 import os
 from typing import Optional
-from pydantic import BaseModel
+
 from authlib.integrations.starlette_client import OAuth
+from pydantic import BaseModel
 from starlette.config import Config
 
 

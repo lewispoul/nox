@@ -7,12 +7,12 @@ AI-powered biometric authentication integration for advanced
 user verification, behavioral biometrics, and adaptive authentication.
 """
 
-import logging
 import base64
-from typing import Dict, List, Optional, Any, Union
-from datetime import datetime
+import logging
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
