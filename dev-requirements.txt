@@ -2,7 +2,7 @@
 # Testing, linting, and development tools
 
 # Testing framework
-pytest==8.3.2
+pytest==8.4.2
 pytest-asyncio==0.24.0
 pytest-cov==5.0.0
 httpx==0.28.1
