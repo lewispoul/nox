@@ -3,18 +3,15 @@
 Simple CI validation test - validates that basic linting and testing tools work
 """
 
+
 def test_import_basic_modules():
     """Test that basic modules can be imported"""
-    try:
-        import pytest
-        import black
-        import isort
-        import bandit
-        print("✅ All linting tools are importable")
-        return True
-    except ImportError as e:
-        print(f"❌ Import failed: {e}")
-        return False
+    import bandit
+    import black
+    import isort
+    import pytest
+
+    print("✅ All linting tools are importable")
 
 
 def test_basic_functionality():
@@ -25,22 +22,22 @@ def test_basic_functionality():
 
 
 def test_fastapi_import():
-    """Test that FastAPI can be imported"""
+    """Test that FastAPI can be imported (optional)"""
     try:
         import fastapi
+
         print("✅ FastAPI is available")
-        return True
     except ImportError:
         print("⚠️  FastAPI not available (expected in CI without full deps)")
-        return True  # Don't fail CI if FastAPI isn't installed
+        # This is expected and shouldn't fail the test
 
 
 if __name__ == "__main__":
     print("🧪 Running CI validation tests...")
-    
+
     # Run manual tests
     test_import_basic_modules()
     test_basic_functionality()
     test_fastapi_import()
-    
+
     print("✅ All validation tests completed")
