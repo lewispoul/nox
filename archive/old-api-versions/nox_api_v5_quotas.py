@@ -3,17 +3,18 @@ Enhanced Nox API with Quota System - Milestone 5
 """
 
 import os
-import subprocess
-import shlex
 import pathlib
-import time
-from fastapi import FastAPI, UploadFile, File, HTTPException, Header, Query, Request
-from fastapi.responses import Response
-from pydantic import BaseModel
-from typing import Optional
+import shlex
+import subprocess
 
 # Import du middleware de sécurité Phase 2.1
 import sys
+import time
+from typing import Optional
+
+from fastapi import FastAPI, File, Header, HTTPException, Query, Request, UploadFile
+from fastapi.responses import Response
+from pydantic import BaseModel
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from rate_limit_and_policy import RateLimitAndPolicyMiddleware
@@ -30,12 +31,12 @@ from middleware import MetricsMiddleware
 # Import du système de quotas Milestone 5
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from quotas import (
-    QuotaEnforcementMiddleware,
     QuotaDatabase,
+    QuotaEnforcementMiddleware,
     admin_router,
-    user_router,
-    quota_metrics,
     get_quota_metrics_output,
+    quota_metrics,
+    user_router,
 )
 
 app = FastAPI(

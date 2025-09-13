@@ -7,9 +7,10 @@ is consistent between the API server and Dramatiq workers.
 
 import json
 import uuid
-from typing import Dict, Any, Optional
-import redis
 from datetime import datetime, timezone
+from typing import Any, Dict, Optional
+
+import redis
 
 from api.services.settings import settings
 

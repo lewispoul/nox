@@ -2,17 +2,18 @@
 Middleware for quota enforcement
 """
 
-import time
-import psutil
 import os
-from typing import Optional, Dict, Any
+import time
+from typing import Any, Dict, Optional
+
+import psutil
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
-from .models import QuotaType, QuotaCheckResult
-from .metrics import quota_metrics
 from .database import QuotaDatabase
+from .metrics import quota_metrics
+from .models import QuotaCheckResult, QuotaType
 
 
 class QuotaEnforcementMiddleware(BaseHTTPMiddleware):

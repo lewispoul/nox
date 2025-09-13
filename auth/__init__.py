@@ -2,19 +2,19 @@
 Module d'authentification pour l'API Nox
 """
 
-from .models import User, UserRole, Database, db
+from .dependencies import get_current_user, optional_auth, require_admin, require_role
+from .models import Database, User, UserRole, db
+from .routes import router as auth_router
 from .schemas import (
+    Token,
+    TokenData,
     UserCreate,
     UserLogin,
     UserOut,
-    Token,
-    TokenData,
-    UserUpdate,
     UserStats,
+    UserUpdate,
 )
 from .utils import AuthUtils, RoleChecker
-from .dependencies import get_current_user, require_role, require_admin, optional_auth
-from .routes import router as auth_router
 
 __all__ = [
     # Models

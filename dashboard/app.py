@@ -1,8 +1,9 @@
 # dashboard/app.py
 import os
-import streamlit as st
-import time
 import tempfile
+import time
+
+import streamlit as st
 from client import NoxClient
 
 st.set_page_config(page_title="Nox Dashboard", layout="wide")

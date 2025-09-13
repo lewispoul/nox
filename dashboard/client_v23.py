@@ -1,6 +1,7 @@
 # dashboard/client_v23.py - Client avec support authentification
+from typing import Any, Dict, Tuple
+
 import requests
-from typing import Dict, Any, Tuple
 
 
 class NoxAuthClient:

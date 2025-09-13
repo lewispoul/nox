@@ -3,10 +3,11 @@
 Test script pour l'API avec quotas - Milestone 5.3
 Test de l'enforcement middleware et des endpoints
 """
-import requests
 import json
 import time
 from urllib.parse import urljoin
+
+import requests
 
 API_BASE_URL = "http://127.0.0.1:8082"
 API_TOKEN = "test123"

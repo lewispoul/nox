@@ -1,7 +1,9 @@
 import json
 import pathlib
+
 import pytest
-from nox.parsers.xtb_json import parse_xtbout_text, XTBParseError
+
+from nox.parsers.xtb_json import XTBParseError, parse_xtbout_text
 
 DATA = pathlib.Path(__file__).parent / "data" / "xtbout.json"
 

@@ -2,8 +2,9 @@
 """Test de la logique XTB en mode synchrone (simule le worker Dramatiq)"""
 
 import uuid
+
+from api.routes.jobs import JOBS, run_job
 from api.schemas.job import JobRequest
-from api.routes.jobs import run_job, JOBS
 from api.services.storage import job_dir
 
 

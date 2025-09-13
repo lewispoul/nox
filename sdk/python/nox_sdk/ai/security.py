@@ -8,9 +8,9 @@ behavioral analysis, and intelligent security monitoring.
 """
 
 import logging
-from typing import Dict, List, Optional, Any
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

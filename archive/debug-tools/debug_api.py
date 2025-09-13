@@ -5,6 +5,7 @@ Désactive temporairement les middlewares de sécurité
 """
 import os
 import traceback
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 

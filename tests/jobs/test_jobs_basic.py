@@ -8,10 +8,11 @@ This module tests:
 4. Complete workflow: submit → poll → results
 """
 
-import pytest
 import uuid
-from httpx import AsyncClient, ASGITransport
+
+import pytest
 from fastapi import status
+from httpx import ASGITransport, AsyncClient
 
 from api.main import app
 

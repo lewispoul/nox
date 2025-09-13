@@ -6,11 +6,11 @@ v8.0.0 Developer Experience Enhancement
 Data models, response schemas, and utility classes for the Nox API platform.
 """
 
-from dataclasses import dataclass, asdict, field
-from typing import Dict, List, Optional, Any, Union
+import json
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
-import json
+from typing import Any, Dict, List, Optional, Union
 
 
 class ExecutionMode(Enum):
@@ -341,7 +341,7 @@ class ModelConverter:
             if hasattr(field_type, "__origin__") and field_type.__origin__ is Union:
                 # Get the non-None type from Optional
                 field_type = next(
-                    (t for t in field_type.__args__ if t != type(None)), field_type
+                    (t for t in field_type.__args__ if t is not type(None)), field_type
                 )
 
             # Convert enums

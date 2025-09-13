@@ -5,8 +5,9 @@ Scans all markdown files in docs/ and reports broken or unreachable links.
 """
 import os
 import re
-import requests
 from pathlib import Path
+
+import requests
 
 
 def find_markdown_files(root):

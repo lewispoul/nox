@@ -7,7 +7,7 @@ import json
 import os
 import stat
 import sys
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple

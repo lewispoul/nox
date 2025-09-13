@@ -10,15 +10,15 @@ Implémente:
 - Export format Prometheus
 """
 
-import time
-import uuid
 import os
 import sys
+import time
+import uuid
 from collections import Counter
 from pathlib import Path
 
-from prometheus_client import Counter, Histogram, Gauge, Info
 from fastapi import Request
+from prometheus_client import Counter, Gauge, Histogram, Info
 from starlette.middleware.base import BaseHTTPMiddleware
 
 

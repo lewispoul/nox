@@ -1,14 +1,15 @@
 import os
-import subprocess
-import shlex
 import pathlib
-import time
-from fastapi import FastAPI, UploadFile, File, HTTPException, Header, Request
-from fastapi.responses import Response
-from pydantic import BaseModel, Field
+import shlex
+import subprocess
 
 # Import du middleware de sécurité Phase 2.1
 import sys
+import time
+
+from fastapi import FastAPI, File, Header, HTTPException, Request, UploadFile
+from fastapi.responses import Response
+from pydantic import BaseModel, Field
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from rate_limit_and_policy import RateLimitAndPolicyMiddleware

@@ -4,25 +4,26 @@ Nox API v5 with Quotas - Production Ready Version
 Based on debug fixes from Milestone 5.3
 """
 import os
+import pathlib
 import subprocess
 import tempfile
-import pathlib
 import time
-from fastapi import FastAPI, UploadFile, File, HTTPException, Header, Request
-from fastapi.responses import Response
 
-# Import du middleware de sécurité Phase 2.1
-from rate_limit_and_policy import RateLimitAndPolicyMiddleware
+from fastapi import FastAPI, File, Header, HTTPException, Request, UploadFile
+from fastapi.responses import Response
 
 # Import des métriques Phase 2.2
 from metrics_chatgpt import metrics_response, update_sandbox_metrics
 from middleware import MetricsMiddleware
 
+# Import du middleware de sécurité Phase 2.1
+from rate_limit_and_policy import RateLimitAndPolicyMiddleware
+
 # Import du système de quotas Milestone 5
 from quotas.database import QuotaDatabase
-from quotas.routes import admin_router, user_router
-from quotas.middleware import QuotaEnforcementMiddleware
 from quotas.metrics import get_quota_metrics_output, quota_metrics
+from quotas.middleware import QuotaEnforcementMiddleware
+from quotas.routes import admin_router, user_router
 
 # Configuration globale
 NOX_QUOTAS_ENABLED = os.getenv("NOX_QUOTAS_ENABLED", "0") == "1"

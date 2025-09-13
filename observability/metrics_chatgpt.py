@@ -1,13 +1,14 @@
 # observability/metrics.py
+import pathlib
+
 from prometheus_client import (
-    Counter,
-    Histogram,
-    Gauge,
-    generate_latest,
     CONTENT_TYPE_LATEST,
     CollectorRegistry,
+    Counter,
+    Gauge,
+    Histogram,
+    generate_latest,
 )
-import pathlib
 
 # Utiliser un registre personnalisé pour éviter les doublons
 registry = CollectorRegistry()
