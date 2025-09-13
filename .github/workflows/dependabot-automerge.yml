@@ -1,21 +1,80 @@
 name: Dependabot auto-merge
 
 on:
-  pull_request:
+  # Use pull_request_target so the workflow has repo-level perms on PRs
+  pull_request_target:
     types: [labeled, synchronize, reopened]
+  check_suite:
+    types: [completed]  # re-evaluate when checks finish
 
 permissions:
-  contents: write
   pull-requests: write
+  contents: write
 
 jobs:
-  enable-automerge:
-    # Only for Dependabot PRs that carry the label
-    if: github.actor == 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'automerge-candidate')
+  enable:
+    # Only Dependabot PRs that carry the label
+    if: >
+      github.actor == 'dependabot[bot]' &&
+      contains(github.event.pull_request.labels.*.name, 'automerge-candidate')
     runs-on: ubuntu-latest
     steps:
-      - name: Enable PR auto-merge (squash)
-        uses: peter-evans/enable-pull-request-automerge@v3
+      - name: Enable auto-merge (idempotent)
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          merge-method: squash
+          script: |
+            const pr = context.payload.pull_request || (await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.check_suite?.pull_requests?.[0]?.number
+            })).data;
+
+            if (!pr) {
+              core.info('No pull_request context to act on. Skipping.');
+              return;
+            }
+
+            // Only act on Dependabot PRs with the label
+            const isDep = pr.user?.login === 'dependabot[bot]';
+            const hasLabel = pr.labels?.some(l => l.name === 'automerge-candidate');
+            if (!isDep || !hasLabel) {
+              core.info('Not a Dependabot PR with automerge-candidate label. Skipping.');
+              return;
+            }
+
+            // Enable auto-merge via GraphQL; ignore "already enabled" / "not mergeable yet"
+            const { data: { repository } } = await github.graphql(`
+              query($owner:String!, $repo:String!, $number:Int!) {
+                repository(owner:$owner, name:$repo) {
+                  pullRequest(number:$number) { id, number, isDraft }
+                }
+              }
+            `, { owner: context.repo.owner, repo: context.repo.repo, number: pr.number });
+
+            if (repository.pullRequest.isDraft) {
+              core.info('PR is draft; cannot enable auto-merge yet. Skipping.');
+              return;
+            }
+
+            try {
+              await github.graphql(`
+                mutation($pullRequestId:ID!){
+                  enablePullRequestAutoMerge(input:{
+                    mergeMethod:SQUASH,
+                    pullRequestId:$pullRequestId
+                  }){ clientMutationId }
+                }
+              `, { pullRequestId: repository.pullRequest.id });
+              core.info(`Auto-merge enabled for PR #${pr.number}.`);
+            } catch (e) {
+              const msg = String(e.message || e);
+              if (
+                msg.includes('already has auto-merge enabled') ||
+                msg.includes('Pull request is not mergeable') ||
+                msg.includes('Auto-merge is not allowed')    // e.g. pending required reviews
+              ) {
+                core.warning(`Non-fatal: ${msg}`);
+                return; // do not fail the job
+              }
+              core.setFailed(msg);
+            }
