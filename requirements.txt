@@ -11,7 +11,7 @@ psycopg2-binary==2.9.10
 
 # Authentication and OAuth2
 python-jose[cryptography]==3.5.0
-authlib==1.6.1
+authlib==1.6.3
 python-multipart==0.0.20
 passlib[bcrypt]==1.7.4
 
@@ -26,16 +26,16 @@ redis>=4.5.0
 cryptography>=41.0.0
 
 # Environment and configuration
-python-dotenv==1.0.1
+python-dotenv==1.1.1
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
 
 # Monitoring and metrics
-prometheus-client==0.21.1
+prometheus-client==0.22.1
 
 # Utilities
-python-dateutil==2.9.0
+python-dateutil==2.9.0.post0
 
 # Development and testing (optional)
-pytest==8.3.4
-pytest-asyncio==0.25.0
+pytest==8.4.2
+pytest-asyncio==1.2.0
