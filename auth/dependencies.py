@@ -143,7 +143,7 @@ class OptionalAuth:
         if self.fallback_to_legacy:
             auth_header = request.headers.get("Authorization")
             if auth_header and auth_header.startswith("Bearer "):
-                legacy_token = auth_header.removeprefix("Bearer ").strip()
+                _legacy_token = auth_header.removeprefix("Bearer ").strip()
                 # Ici vous pourriez vérifier l'ancien token NOX_API_TOKEN
                 # Pour l'instant, on retourne None pour forcer l'utilisation du nouveau système
                 pass

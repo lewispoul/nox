@@ -329,7 +329,7 @@ class IntelligentPolicyEngine:
             # Assess risk level
             risk_level = np.argmax(risk_probs)
             risk_confidence = risk_probs[risk_level]
-            risk_labels = ["low", "medium", "high"]
+            _risk_labels = ["low", "medium", "high"]
 
             # Apply risk-based modifications
             final_decision, risk_factors = await self._apply_risk_based_adjustments(

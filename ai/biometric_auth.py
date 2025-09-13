@@ -1054,7 +1054,7 @@ class BiometricAuthenticationSystem:
         # Mock implementation - would use actual face comparison in production
         try:
             # Decrypt stored template data
-            template_data = self._decrypt_template_data(stored_template.template_data)
+            _template_data = self._decrypt_template_data(stored_template.template_data)
 
             # Mock comparison logic
             base_score = 0.75
@@ -1079,7 +1079,7 @@ class BiometricAuthenticationSystem:
         # Mock implementation - would use actual voice comparison in production
         try:
             # Decrypt stored template data
-            template_data = self._decrypt_template_data(stored_template.template_data)
+            _template_data = self._decrypt_template_data(stored_template.template_data)
 
             # Mock comparison logic
             base_score = voice_result.speaker_verification_score

@@ -475,7 +475,7 @@ class AISystemCoordinator:
 
         risk_level = risk_assessment.get("risk_level", "medium")
         threat_indicators = risk_assessment.get("threat_indicators", [])
-        user_history = risk_assessment.get("user_history", {})
+        _user_history = risk_assessment.get("user_history", {})
 
         # Always require facial recognition for identity verification
         required_types.append(BiometricType.FACIAL_RECOGNITION)

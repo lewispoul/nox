@@ -14,7 +14,6 @@ import os
 import sys
 import time
 import uuid
-from collections import Counter
 from pathlib import Path
 
 from fastapi import Request

@@ -182,7 +182,7 @@ async def oauth2_token_exchange(provider: str, request: Request):
             )
 
         # Exchange code for token manually
-        redirect_uri = (
+        _redirect_uri = (
             f"{oauth2_settings.redirect_base_url}/auth/oauth2/{provider}/callback"
         )
 

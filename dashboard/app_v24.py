@@ -190,9 +190,9 @@ def run_python_code(code: str):
     try:
         # Get authentication headers
         if st.session_state.auth_method == "oauth2":
-            headers = oauth2_client.get_auth_headers()
+            _headers = oauth2_client.get_auth_headers()
         else:
-            headers = {
+            _headers = {
                 "Authorization": f"Bearer {st.session_state.access_token}",
                 "Content-Type": "application/json",
             }
