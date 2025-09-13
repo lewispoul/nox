@@ -1,0 +1,75 @@
+name: python-ci
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install project and tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . || true
+          pip install ruff mypy pytest pytest-cov black isort detect-secrets
+          pip install schemathesis requests
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Lint and type-check
+        run: |
+          ruff check .
+          black --check .
+          isort --check-only .
+          mypy --ignore-missing-imports .
+
+      - name: Tests
+        run: |
+          pytest --maxfail=1 --disable-warnings -q --cov=. --cov-report=xml
+
+      - name: Build Docker image
+        run: |
+          docker build -t app:ci .
+
+      - name: Trivy image scan
+        run: |
+          trivy image --scanners vuln,secret,config --format json --output trivy.json app:ci || true
+
+      - name: SBOM and Grype
+        run: |
+          syft packages app:ci -o json > sbom.json
+          grype sbom:sbom.json -o json > grype.json || true
+
+      - name: Contract tests (optional)
+        if: ${{ always() }}
+        run: |
+          if [ -f openapi.json ] || [ -f docs/API.md ]; then
+            echo "Place holder, branch Schemathesis here when applicable."
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-artifacts
+          path: |
+            coverage.xml
+            trivy.json
+            sbom.json
+            grype.json
