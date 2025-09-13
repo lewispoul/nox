@@ -18,12 +18,19 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/checkout@v4
         
-      - name: Label PR from Dependabot
+      - name: Label PR from Dependabot - dependencies
         if: github.actor == 'dependabot[bot]'
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           labels: dependencies
+
+      - name: Label PR from Dependabot - automerge-candidate
+        if: github.actor == 'dependabot[bot]'
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: automerge-candidate
 
       - name: Get changed files
         if: github.event_name == 'pull_request'
