@@ -3,6 +3,8 @@ name: Dependabot auto-merge
 on:
   pull_request_target:
     types: [labeled, synchronize, reopened]
+  check_suite:
+    types: [completed]
 
 permissions:
   contents: write
@@ -14,8 +16,55 @@ jobs:
     if: github.actor == 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'automerge-candidate')
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Enable PR auto-merge (squash)
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           merge-method: squash
+          pull-request-number: ${{ github.event.pull_request.number }}
+
+  auto-merge-on-success:
+    # Alternative job for check_suite completion events
+    if: github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Get PR for this commit
+        id: pr-info
+        run: |
+          PR_NUMBER=$(gh pr list --state open --head ${{ github.event.check_suite.head_branch }} --json number --jq '.[0].number')
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Check if PR is from Dependabot and has automerge label
+        id: check-conditions
+        if: steps.pr-info.outputs.pr_number != ''
+        run: |
+          AUTHOR=$(gh pr view ${{ steps.pr-info.outputs.pr_number }} --json author --jq '.author.login')
+          HAS_LABEL=$(gh pr view ${{ steps.pr-info.outputs.pr_number }} --json labels --jq '.labels[] | select(.name == "automerge-candidate") | .name')
+          
+          if [[ "$AUTHOR" == "dependabot[bot]" && "$HAS_LABEL" == "automerge-candidate" ]]; then
+            echo "should_merge=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_merge=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Enable auto-merge for successful Dependabot PR
+        if: steps.check-conditions.outputs.should_merge == 'true'
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          merge-method: squash
+          pull-request-number: ${{ steps.pr-info.outputs.pr_number }}
