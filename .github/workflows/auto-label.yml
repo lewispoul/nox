@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Checkout for file analysis
         if: github.event_name == 'pull_request'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
       - name: Label PR from Dependabot - dependencies
         if: github.actor == 'dependabot[bot]'
@@ -35,7 +35,7 @@ jobs:
       - name: Get changed files
         if: github.event_name == 'pull_request'
         id: changed-files
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v47
         with:
           files: .github/workflows/**
 
