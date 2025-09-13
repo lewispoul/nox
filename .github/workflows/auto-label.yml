@@ -1,0 +1,30 @@
+name: Auto Label Pull Requests
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  add-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label PR from Dependabot
+        if: github.actor == 'dependabot[bot]'
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: dependencies
+
+      - name: Label PRs with workflow changes
+        if: contains(github.event.pull_request.changed_files, '.github/workflows/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: ci, workflow
+
+      - name: Label Hygiene PRs
+        if: contains(github.event.pull_request.title, 'hygiene')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: hygiene, docs, triage
