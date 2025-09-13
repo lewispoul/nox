@@ -1,5 +1,6 @@
 # file: agent/executor.py
 from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -7,9 +8,10 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from agent.tools import fs, git, tests, codeedit
+
 from agent.planner import build_planner_prompt, parse_planner_json
 from agent.reporter import summarize_run
+from agent.tools import codeedit, fs, git, tests
 
 
 def apply_changes_via_files(changes, allowlist) -> str:
@@ -76,7 +78,9 @@ def preflight_checks() -> None:
         # Allow overriding the main-branch safeguard using an env var for controlled deployments
         allow_on_main = os.getenv("NOX_AGENT_ALLOW_ON_MAIN", "0")
         if current_branch == "main" and allow_on_main != "1":
-            print("ERROR: Agent cannot run on main branch. Switch to a feature branch or set NOX_AGENT_ALLOW_ON_MAIN=1 to override.")
+            print(
+                "ERROR: Agent cannot run on main branch. Switch to a feature branch or set NOX_AGENT_ALLOW_ON_MAIN=1 to override."
+            )
             sys.exit(1)
     except subprocess.CalledProcessError:
         print("ERROR: Failed to check current branch")

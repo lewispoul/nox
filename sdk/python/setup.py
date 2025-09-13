@@ -4,8 +4,9 @@ Setup script for Nox API Python SDK
 v8.0.0 Developer Experience Enhancement
 """
 
-from setuptools import setup, find_packages
 import os
+
+from setuptools import find_packages, setup
 
 
 # Read README for long description

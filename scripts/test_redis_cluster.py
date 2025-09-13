@@ -8,7 +8,6 @@ import time
 
 try:
     from redis.cluster import RedisCluster
-    import redis
 except ImportError:
     print("❌ Redis Python library not installed. Run: pip install redis")
     sys.exit(1)

@@ -1,7 +1,9 @@
+import json
 import pathlib
 import shutil
-import json
+
 import pytest
+
 from nox.runners.xtb import run_xtb
 
 DATA = pathlib.Path(__file__).parent / "data"

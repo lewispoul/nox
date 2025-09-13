@@ -3,8 +3,8 @@
 Simple CLI Documentation Search Tool for NOX Docs
 Searches all markdown files in docs/ for a keyword or phrase.
 """
-import sys
 import re
+import sys
 from pathlib import Path
 
 

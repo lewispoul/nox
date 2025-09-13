@@ -3,27 +3,39 @@ updates:
   # --- NPM (docs-interactive or any JS subfolders) ---
   - package-ecosystem: "npm"
     directory: "/"
-    schedule: { interval: "weekly" }
-    open-pull-requests-limit: 10
+    schedule: { interval: "monthly" }
+    open-pull-requests-limit: 5
     labels: ["dependencies", "automerge-candidate", "javascript"]
+    groups:
+      npm-dependencies:
+        patterns: ["*"]
 
   # --- Python (pip/pyproject) ---
   - package-ecosystem: "pip"
     directory: "/"
-    schedule: { interval: "weekly" }
-    open-pull-requests-limit: 10
+    schedule: { interval: "monthly" }
+    open-pull-requests-limit: 5
     labels: ["dependencies", "automerge-candidate", "python"]
+    groups:
+      python-dependencies:
+        patterns: ["*"]
 
   # --- GitHub Actions versions ---
   - package-ecosystem: "github-actions"
     directory: "/"
-    schedule: { interval: "weekly" }
-    open-pull-requests-limit: 10
+    schedule: { interval: "monthly" }
+    open-pull-requests-limit: 3
     labels: ["dependencies", "automerge-candidate", "ci"]
+    groups:
+      github-actions:
+        patterns: ["*"]
 
   # --- Dockerfiles (if present) ---
   - package-ecosystem: "docker"
     directory: "/"
-    schedule: { interval: "weekly" }
-    open-pull-requests-limit: 10
+    schedule: { interval: "monthly" }
+    open-pull-requests-limit: 3
     labels: ["dependencies", "automerge-candidate", "docker"]
+    groups:
+      docker-dependencies:
+        patterns: ["*"]

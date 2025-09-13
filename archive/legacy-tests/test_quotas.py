@@ -3,10 +3,11 @@
 Test script for quota system
 """
 import asyncio
-from quotas.database import QuotaDatabase
-from quotas.models import UserQuota
 
 import pytest
+
+from quotas.database import QuotaDatabase
+from quotas.models import UserQuota
 
 
 @pytest.mark.asyncio

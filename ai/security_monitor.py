@@ -8,25 +8,25 @@ behavioral analysis, and automated threat response across the
 distributed multi-node architecture.
 """
 
-import os
-import json
-import time
 import asyncio
+import json
 import logging
-from typing import Dict, List, Optional, Any
+import os
+import time
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from dataclasses import dataclass, asdict
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
-import numpy as np
-from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import StandardScaler
 import joblib
+import numpy as np
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 # Redis and database imports
 from redis.cluster import RedisCluster
-import psycopg2
-from psycopg2.extras import RealDictCursor
+from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import StandardScaler
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

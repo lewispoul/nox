@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Test complet de l'intégration XTB avec Dramatiq"""
 
-import pytest
-from httpx import AsyncClient, ASGITransport
-from api.main import app
 import time
+
+import pytest
+from httpx import ASGITransport, AsyncClient
+
+from api.main import app
 
 
 @pytest.mark.asyncio

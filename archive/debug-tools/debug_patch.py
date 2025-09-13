@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Debug patch format issues."""
 
-import tempfile
 import subprocess
+import tempfile
 
 # Create a simple test patch that should work
 test_patch = """diff --git a/test_file.py b/test_file.py

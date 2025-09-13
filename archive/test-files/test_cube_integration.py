@@ -4,7 +4,9 @@ Test cube generation integration with XTB job workflow.
 """
 
 import asyncio
-from httpx import AsyncClient, ASGITransport
+
+from httpx import ASGITransport, AsyncClient
+
 from api.main import app
 from tests.tests_xtb_e2e import wait_done
 

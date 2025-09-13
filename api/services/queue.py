@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 import os
 import threading
 import time
-from typing import Dict, Any
+from typing import Any, Dict
+
 from .jobs_store import get_store
 
 
@@ -99,9 +101,9 @@ def _default_xtb_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     Kept as an injectable callable so tests can replace it with a stub.
     """
+    from ai.runners.xtb import run_xtb_job
     from api.schemas.job import JobRequest
     from api.services.storage import job_dir
-    from ai.runners.xtb import run_xtb_job
 
     # Parse the job request
     job_request_json = payload.get("job_request", "{}")

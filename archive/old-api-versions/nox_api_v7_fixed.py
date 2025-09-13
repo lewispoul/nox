@@ -2,15 +2,15 @@
 Fixed Nox API v7.0.0 with proper middleware initialization
 """
 
-import uvicorn
 import logging
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
-from fastapi import FastAPI, Request, Response, HTTPException
+import asyncpg
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import asyncpg
 
 # Configure logging first
 logging.basicConfig(
@@ -20,8 +20,8 @@ logger = logging.getLogger("NoxAPI_v7.0.0")
 
 # Import after logging setup
 try:
-    from oauth2_endpoints import oauth2_router
     from enhanced_oauth2_service import oauth2_service
+    from oauth2_endpoints import oauth2_router
 except ImportError as e:
     logger.warning(f"OAuth2 import warning: {e}")
     oauth2_router = None

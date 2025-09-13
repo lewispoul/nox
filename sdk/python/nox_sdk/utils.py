@@ -7,14 +7,14 @@ Utility functions and helpers for the Nox API Python SDK.
 """
 
 import asyncio
+import base64
 import hashlib
 import hmac
-import base64
-import time
-import logging
 import json
+import logging
 import os
-from typing import Dict, Optional, Any, Callable, Union, BinaryIO
+import time
+from typing import Any, BinaryIO, Callable, Dict, Optional, Union
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)

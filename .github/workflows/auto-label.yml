@@ -3,28 +3,73 @@ name: Auto Label Pull Requests
 on:
   pull_request:
     types: [opened, synchronize]
+  pull_request_target:
+    types: [opened, synchronize]
 
+permissions:
+  issues: write
+  pull-requests: write
+  
 jobs:
   add-labels:
     runs-on: ubuntu-latest
     steps:
-      - name: Label PR from Dependabot
+      - name: Checkout for file analysis
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v5
+        
+      - name: Label PR from Dependabot - dependencies
         if: github.actor == 'dependabot[bot]'
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           labels: dependencies
 
-      - name: Label PRs with workflow changes
-        if: contains(github.event.pull_request.changed_files, '.github/workflows/')
+      - name: Label PR from Dependabot - automerge-candidate
+        if: github.actor == 'dependabot[bot]'
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: ci, workflow
+          labels: automerge-candidate
 
-      - name: Label Hygiene PRs
+      - name: Get changed files
+        if: github.event_name == 'pull_request'
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: .github/workflows/**
+
+      - name: Label PRs with workflow changes - ci
+        if: github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true'
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: ci
+
+      - name: Label PRs with workflow changes - workflow
+        if: github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true'
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: workflow
+
+      - name: Label Hygiene PRs - hygiene
         if: contains(github.event.pull_request.title, 'hygiene')
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: hygiene, docs, triage
+          labels: hygiene
+
+      - name: Label Hygiene PRs - docs
+        if: contains(github.event.pull_request.title, 'hygiene')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: docs
+
+      - name: Label Hygiene PRs - triage
+        if: contains(github.event.pull_request.title, 'hygiene')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: triage

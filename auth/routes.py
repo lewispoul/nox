@@ -2,14 +2,15 @@
 Routes d'authentification pour l'API Nox
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPBearer
 from typing import List
 
-from .models import db, User, UserRole
-from .schemas import UserCreate, UserLogin, UserOut, Token, UserUpdate, UserStats
-from .utils import AuthUtils
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPBearer
+
 from .dependencies import get_current_user, require_role
+from .models import User, UserRole, db
+from .schemas import Token, UserCreate, UserLogin, UserOut, UserStats, UserUpdate
+from .utils import AuthUtils
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 security = HTTPBearer()

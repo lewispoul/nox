@@ -2,9 +2,11 @@
 Schémas Pydantic pour l'authentification et les utilisateurs
 """
 
-from pydantic import BaseModel, EmailStr, Field, validator
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, EmailStr, Field, validator
+
 from .models import UserRole
 
 

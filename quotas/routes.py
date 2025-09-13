@@ -2,13 +2,14 @@
 Admin routes for quota management
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Query, Request
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
-from .models import UserQuota
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+
 from .database import QuotaDatabase
-from .metrics import quota_metrics, get_quota_metrics_output
+from .metrics import get_quota_metrics_output, quota_metrics
+from .models import UserQuota
 
 # Instance de base de données
 quota_db = QuotaDatabase()

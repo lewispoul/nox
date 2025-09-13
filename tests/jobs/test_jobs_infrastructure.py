@@ -4,13 +4,14 @@ Tests for NOX Jobs Infrastructure
 Tests the job management infrastructure including states, storage, and manager.
 """
 
-import pytest
-import tempfile
 import shutil
+import tempfile
 
-from nox.jobs.states import JobState, is_valid_transition, is_terminal_state
-from nox.jobs.storage import JobStorage
+import pytest
+
 from nox.jobs.manager import JobManager
+from nox.jobs.states import JobState, is_terminal_state, is_valid_transition
+from nox.jobs.storage import JobStorage
 
 
 class TestJobStates:

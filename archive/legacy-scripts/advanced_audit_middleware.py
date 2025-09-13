@@ -10,17 +10,17 @@ This middleware implements comprehensive audit logging with:
 - Database persistence for all audit events
 """
 
+import asyncio
+import hashlib
+import logging
 import time
 import uuid
-import asyncio
-import psutil
-import logging
-import hashlib
+from collections import defaultdict
 from datetime import datetime
 from typing import Dict, Optional
-from collections import defaultdict
 
 import asyncpg
+import psutil
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 

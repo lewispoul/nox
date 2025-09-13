@@ -31,7 +31,7 @@ def main():
     print("This tool will help you set up your environment for NOX development.")
     print("---")
     name = prompt("Enter your name")
-    email = prompt("Enter your email")
+    _email = prompt("Enter your email")
     print(f"Welcome, {name}!")
     print("Step 1: Checking environment file...")
     check_env_file()

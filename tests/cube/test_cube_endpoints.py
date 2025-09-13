@@ -2,9 +2,10 @@
 End-to-end tests for XTB cube generation via API.
 """
 
-import pytest
-from pathlib import Path
 import tempfile
+from pathlib import Path
+
+import pytest
 
 
 # Test the cube endpoint integration

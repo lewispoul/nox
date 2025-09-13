@@ -1,8 +1,7 @@
 import time
 
-
-from api.services.queue import submit_job, set_xtb_runner
 from api.services.jobs_store import get_store
+from api.services.queue import set_xtb_runner, submit_job
 
 
 def fake_runner_success(payload):

@@ -13,12 +13,14 @@ Contract:
 
 Error modes: returns success=false with stderr populated.
 """
+
 from __future__ import annotations
+
 import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 def load_bundle(path: str) -> Dict[str, Any]:
@@ -43,10 +45,22 @@ def run_bundle(bundle: Dict[str, Any], timeout: int = 600) -> Dict[str, Any]:
     meta = bundle.get("metadata", {}) or {}
 
     if not content:
-        return {"success": True, "stdout": "", "stderr": "", "returncode": 0, "metadata": meta}
+        return {
+            "success": True,
+            "stdout": "",
+            "stderr": "",
+            "returncode": 0,
+            "metadata": meta,
+        }
 
     if t == "noop":
-        return {"success": True, "stdout": "NOOP", "stderr": "", "returncode": 0, "metadata": meta}
+        return {
+            "success": True,
+            "stdout": "NOOP",
+            "stderr": "",
+            "returncode": 0,
+            "metadata": meta,
+        }
 
     if t == "shell":
         # run via /bin/bash -c
@@ -65,7 +79,13 @@ def run_bundle(bundle: Dict[str, Any], timeout: int = 600) -> Dict[str, Any]:
                 "metadata": meta,
             }
         except subprocess.TimeoutExpired as e:
-            return {"success": False, "stdout": e.stdout or "", "stderr": "timeout", "returncode": 124, "metadata": meta}
+            return {
+                "success": False,
+                "stdout": e.stdout or "",
+                "stderr": "timeout",
+                "returncode": 124,
+                "metadata": meta,
+            }
 
     if t == "python":
         # run python snippet in a subprocess to isolate environment
@@ -84,9 +104,21 @@ def run_bundle(bundle: Dict[str, Any], timeout: int = 600) -> Dict[str, Any]:
                 "metadata": meta,
             }
         except subprocess.TimeoutExpired as e:
-            return {"success": False, "stdout": e.stdout or "", "stderr": "timeout", "returncode": 124, "metadata": meta}
+            return {
+                "success": False,
+                "stdout": e.stdout or "",
+                "stderr": "timeout",
+                "returncode": 124,
+                "metadata": meta,
+            }
 
-    return {"success": False, "stdout": "", "stderr": f"Unknown bundle type: {t}", "returncode": 2, "metadata": meta}
+    return {
+        "success": False,
+        "stdout": "",
+        "stderr": f"Unknown bundle type: {t}",
+        "returncode": 2,
+        "metadata": meta,
+    }
 
 
 def run_path(path: str, timeout: int = 600) -> Dict[str, Any]:

@@ -7,43 +7,41 @@ Provides facial recognition, voice authentication, behavioral biometrics,
 and multi-factor biometric verification for the distributed architecture.
 """
 
-import os
-import json
-import time
 import asyncio
-import logging
-import hashlib
 import base64
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
-from dataclasses import dataclass, asdict
-from enum import Enum
+import hashlib
 import io
+import json
+import logging
+import os
+import time
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 import numpy as np
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from redis.cluster import RedisCluster
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Azure AI imports (placeholder for actual Azure SDK)
 try:
-    from azure.cognitiveservices.vision.face import FaceClient
     from azure.cognitiveservices.speech import (
-        SpeechConfig,
         AudioConfig,
+        SpeechConfig,
         SpeechRecognizer,
     )
+    from azure.cognitiveservices.vision.face import FaceClient
     from msrest.authentication import CognitiveServicesCredentials
 except ImportError:
     logger.warning(
         "Azure Cognitive Services SDK not available - using mock implementation"
     )
-
-# Redis and database imports
-from redis.cluster import RedisCluster
-import psycopg2
-from psycopg2.extras import RealDictCursor
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 class BiometricType(Enum):
@@ -1056,7 +1054,7 @@ class BiometricAuthenticationSystem:
         # Mock implementation - would use actual face comparison in production
         try:
             # Decrypt stored template data
-            template_data = self._decrypt_template_data(stored_template.template_data)
+            _template_data = self._decrypt_template_data(stored_template.template_data)
 
             # Mock comparison logic
             base_score = 0.75
@@ -1081,7 +1079,7 @@ class BiometricAuthenticationSystem:
         # Mock implementation - would use actual voice comparison in production
         try:
             # Decrypt stored template data
-            template_data = self._decrypt_template_data(stored_template.template_data)
+            _template_data = self._decrypt_template_data(stored_template.template_data)
 
             # Mock comparison logic
             base_score = voice_result.speaker_verification_score

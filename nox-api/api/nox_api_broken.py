@@ -1,25 +1,27 @@
 import os
-import subprocess
-import shlex
 import pathlib
-from fastapi import FastAPI, UploadFile, File, HTTPException, Header, Request
-from fastapi.responses import Response
-from pydantic import BaseModel
+import shlex
+import subprocess
+import sys
 
 # Solution rapide ChatGPT pour les imports
 from pathlib import Path
-import sys
+
+from fastapi import FastAPI, File, Header, HTTPException, Request, UploadFile
+from fastapi.responses import Response
+from pydantic import BaseModel
 
 # ROOT = nox-api-src/
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from rate_limit_and_policy import RateLimitAndPolicyMiddleware
-from observability.metrics_chatgpt import metrics_response, update_sandbox_metrics
-from observability.middleware import subprocess, shlex, pathlib
-
 # Import du middleware de sécurité Phase 2.1
 import sys
+
+from rate_limit_and_policy import RateLimitAndPolicyMiddleware
+
+from observability.metrics_chatgpt import metrics_response, update_sandbox_metrics
+from observability.middleware import pathlib, shlex, subprocess
 
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
