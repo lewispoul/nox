@@ -2,7 +2,7 @@
 # Optimized for production with security hardening
 
 # ===== BUILD STAGE =====
-FROM python:3.11-alpine AS builder
+FROM python:3.13-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache \
@@ -29,7 +29,7 @@ RUN pip install --no-cache-dir --upgrade pip wheel setuptools && \
     pip install --no-cache-dir -r requirements.txt
 
 # ===== RUNTIME STAGE =====
-FROM python:3.11-alpine AS runtime
+FROM python:3.13-alpine AS runtime
 
 # Install runtime dependencies only
 RUN apk add --no-cache \
