@@ -1,0 +1,51 @@
+name: lint
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black flake8 isort ruff
+
+      - name: Run Black (code formatting)
+        run: |
+          black --check --diff --color . || echo "Formatting issues found, continuing..."
+        continue-on-error: true
+
+      - name: Run isort (import sorting)
+        run: |
+          isort --check-only --diff --color . || echo "Import sorting issues found, continuing..."
+        continue-on-error: true
+
+      - name: Run flake8 (linting)
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=88 || echo "Linting issues found, continuing..."
+        continue-on-error: true
+
+      - name: Run ruff (fast linting)
+        run: |
+          ruff check . --output-format=github || echo "Ruff linting issues found, continuing..."
+        continue-on-error: true
