@@ -6,8 +6,8 @@ authors = ["lewispoul"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.110.0"
-uvicorn = "^0.35.0"
+fastapi = "^0.118.0"
+uvicorn = "^0.37.0"
 pydantic = "^2.6.0"
 dramatiq = "^1.14.2"
 redis = "^6.4.0"
