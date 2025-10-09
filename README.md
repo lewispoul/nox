@@ -1,4 +1,6 @@
-# NOX API
+# NOX API (LEGACY)
+
+> **⚠️ LEGACY STATUS**: This directory contains the legacy Nox API prototype. It is excluded from linting, type checking, and testing. The active API surface has been moved to `nox/api/`.
 
 A secure, sandboxed execution platform built on **FastAPI** for autonomous computational chemistry workflows.
 
@@ -7,6 +9,7 @@ A secure, sandboxed execution platform built on **FastAPI** for autonomous compu
 NOX API combines secure Python/shell execution with advanced AI agent capabilities, designed for computational chemistry research and automation.
 
 **Key Features:**
+
 - 🤖 **NOX Agent**: Autonomous coding system with file operations and LLM integration
 - ⚗️ **XTB Integration**: Quantum chemistry computation workflows with JSON parsing
 - 🔒 **Secure Execution**: Sandboxed environment with comprehensive safety guardrails
@@ -18,12 +21,14 @@ NOX API combines secure Python/shell execution with advanced AI agent capabiliti
 All documentation has been comprehensively organized in the [`docs/`](./docs/) directory.
 
 **Quick Start:**
+
 - 📖 **[Documentation Index](./docs/README.md)** - Complete documentation overview
 - 🎯 **[Current Project Status](./docs/PROJECT_STATUS_2025-08-19.md)** - Latest development status
 - 📋 **[Latest Session Summary](./docs/SESSION_SUMMARY_2025-08-19.md)** - Recent achievements
 - 🚀 **[Deployment Guides](./docs/deployment-guides/)** - Production setup instructions
 
 **Recent Major Achievements (August 19, 2025):**
+
 - ✅ **File-Operations System v0.2** - Revolutionary 24x performance improvement
 - ✅ **XTBA-001 XTB Integration** - Complete quantum chemistry workflow automation
 - ✅ **Offline Plan Injection** - Deterministic execution without external API dependencies
@@ -67,6 +72,7 @@ For detailed status, see [PROJECT_STATUS_2025-08-19.md](./docs/PROJECT_STATUS_20
 ## 🔒 Security & Safety
 
 NOX API implements comprehensive security measures:
+
 - Sandboxed execution environments with path restrictions
 - Bearer token authentication with configurable permissions
 - File operation allowlists and size limits
