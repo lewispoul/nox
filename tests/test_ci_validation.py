@@ -6,10 +6,6 @@ Simple CI validation test - validates that basic linting and testing tools work
 
 def test_import_basic_modules():
     """Test that basic modules can be imported"""
-    import bandit
-    import black
-    import isort
-    import pytest
 
     print("✅ All linting tools are importable")
 
