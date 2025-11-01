@@ -6,20 +6,20 @@ pytest==8.4.2
 pytest-asyncio==1.2.0
 pytest-cov==7.0.0
 httpx==0.28.1
-fakeredis==2.31.1
+fakeredis==2.32.0
 
 # Code quality and linting
-black==25.1.0
-isort==6.0.1
+black==25.9.0
+isort==7.0.0
 flake8==7.3.0
 
 # Security scanning
-safety==3.6.1
+safety==3.6.2
 bandit==1.8.6
 
 # Development utilities
-pyyaml==6.0.2
-rich==14.1.0
+pyyaml==6.0.3
+rich==14.2.0
 
 # AI integration for agent
-openai==1.107.2
+openai==2.6.1
