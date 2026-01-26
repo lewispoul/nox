@@ -41,16 +41,26 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
                 # Reject absolute paths and path traversal attempts
                 # Use normpath to resolve encoded and complex traversal attempts
                 try:
-                    import os.path
-
                     normalized = os.path.normpath(art)
-                    # Reject if absolute, starts with .., or normalization changes it significantly
-                    # (indicating traversal attempts like ....// or encoded forms)
-                    if (
+                    # Reject if:
+                    # - Absolute path after normalization
+                    # - Starts with .. (parent directory traversal)
+                    # - Normalization significantly changed the path (indicates obfuscation)
+                    is_safe = (
                         not os.path.isabs(normalized)
                         and not normalized.startswith("..")
                         and not normalized.startswith("/")
-                    ):
+                    )
+                    
+                    # Additional check: if normalization removed components, reject it
+                    # (e.g., "foo/../../etc" -> "../etc" or "....//etc" -> "../etc")
+                    if is_safe and normalized != art:
+                        # Allow simple normalization like "./foo" -> "foo"
+                        # but reject if parent directory components were resolved
+                        if normalized.startswith("..") or ".." in normalized.split(os.sep):
+                            is_safe = False
+                    
+                    if is_safe:
                         safe_artifacts.append(art)
                     else:
                         logger.warning(
