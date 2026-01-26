@@ -58,7 +58,7 @@ def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
     job_request_json = payload.get("job_request", "{}")
     try:
         JR = JobRequest.model_validate_json(job_request_json)
-    except Exception as e:
+    except (ValueError, TypeError) as e:
         raise ValueError(f"Invalid job request: {e}")
 
     job_id = payload.get("job_id", "unknown")
@@ -103,7 +103,7 @@ def run_psi4_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
     job_request_json = payload.get("job_request", "{}")
     try:
         JR = Psi4JobRequest.model_validate_json(job_request_json)
-    except Exception as e:
+    except (ValueError, TypeError) as e:
         raise ValueError(f"Invalid Psi4 job request: {e}") from e
 
     job_id = payload.get("job_id", "unknown")

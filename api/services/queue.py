@@ -29,7 +29,7 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
                 try:
                     energy = float(result[k])
                     break
-                except Exception:
+                except (ValueError, TypeError):
                     # Ignore values that cannot be converted to float and try next key
                     pass
         if energy is not None:

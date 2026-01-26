@@ -84,9 +84,10 @@ multiplicity {multiplicity}
     # Choose a small memory footprint by default
     try:
         psi4.set_memory("1 GiB")
-    except Exception:
-        # Ignore if memory setting fails
-        pass
+    except Exception as e:
+        # Ignore if memory setting fails - may not be critical for all calculations
+        import logging
+        logging.debug(f"Failed to set Psi4 memory: {e}")
 
     # Build method/basis label
     label = f"{method}/{basis}" if "/" not in method else method

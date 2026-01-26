@@ -66,9 +66,10 @@ async def create_job(body: JobRequestUnion):
             )
 
     except ValidationError as e:
-        raise HTTPException(422, f"Invalid job request format: {e}")
+        # Don't expose internal validation details
+        raise HTTPException(422, "Invalid job request format")
     except Exception as e:
-        raise HTTPException(400, f"Invalid request: {str(e)}")
+        raise HTTPException(400, "Invalid request")
 
 
 @router.post("/jobs/simple")
