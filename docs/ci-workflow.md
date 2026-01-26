@@ -63,6 +63,25 @@ The workflow runs automatically on:
 - Pull requests to `main` branch
 - Manual workflow dispatch
 
+### Skipping Lint Action
+
+You can skip the code quality and linting checks in several ways:
+
+1. **Via Commit Message**: Include `[skip lint]` or `[no lint]` in your commit message
+   ```bash
+   git commit -m "Quick fix [skip lint]"
+   ```
+
+2. **Via Manual Workflow Dispatch**: When manually triggering the workflow from GitHub Actions UI, check the "Skip lint action" option
+
+**Note**: When lint is skipped, the test job will still run to ensure code functionality. The CI pipeline will note that code quality checks were skipped in the summary.
+
+**Use Cases for Skipping Lint**:
+- Urgent hotfixes that need quick deployment
+- Work-in-progress commits to development branches
+- Documentation-only changes
+- When linting issues are being addressed in a separate PR
+
 ## Customization
 
 To adapt the workflow:

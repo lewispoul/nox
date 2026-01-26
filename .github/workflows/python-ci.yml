@@ -9,6 +9,12 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      skip_lint:
+        description: 'Skip lint action'
+        required: false
+        type: boolean
+        default: false
 
 env:
   PYTHON_VERSION: '3.11'
@@ -18,6 +24,11 @@ jobs:
   code-quality:
     name: Code Quality & Security
     runs-on: ubuntu-latest
+    # Skip if workflow input is true OR commit message contains [skip lint] or [no lint]
+    if: |
+      github.event.inputs.skip_lint != 'true' &&
+      !contains(github.event.head_commit.message, '[skip lint]') &&
+      !contains(github.event.head_commit.message, '[no lint]')
     
     steps:
     - name: Checkout Code
@@ -96,6 +107,8 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-latest
     needs: code-quality
+    # Run if code-quality succeeded OR was skipped
+    if: always() && (needs.code-quality.result == 'success' || needs.code-quality.result == 'skipped')
     
     services:
       postgres:
@@ -191,7 +204,10 @@ jobs:
     name: Generate SBOM
     runs-on: ubuntu-latest
     needs: [code-quality, test]
-    if: github.ref == 'refs/heads/main'
+    # Run on main branch if test job succeeded (code-quality can be skipped)
+    if: |
+      github.ref == 'refs/heads/main' &&
+      needs.test.result == 'success'
     
     steps:
     - name: Checkout Code
@@ -253,9 +269,13 @@ jobs:
         echo "  • Tests: ${{ needs.test.result }}"
         echo "  • SBOM: ${{ needs.sbom.result }}"
         echo ""
-        if [[ "${{ needs.code-quality.result }}" == "success" && "${{ needs.test.result }}" == "success" ]]; then
+        # Success if tests pass (code-quality can be skipped)
+        if [[ ("${{ needs.code-quality.result }}" == "success" || "${{ needs.code-quality.result }}" == "skipped") && "${{ needs.test.result }}" == "success" ]]; then
           echo "✅ CI Pipeline: SUCCESS"
           echo "🚀 Code is ready for deployment"
+          if [[ "${{ needs.code-quality.result }}" == "skipped" ]]; then
+            echo "ℹ️  Note: Code quality checks were skipped"
+          fi
         else
           echo "❌ CI Pipeline: FAILURE"
           echo "🔧 Please check the failed jobs and fix issues"

@@ -4,6 +4,20 @@ This directory contains the GitHub Actions workflows for the Nox project.
 
 ## Active Workflows
 
+### 🐍 python-ci.yml
+**Purpose**: Python code quality and testing pipeline
+- **Triggers**: Push to main/develop branches, pull requests to main, manual dispatch
+- **Jobs**:
+  - `code-quality`: Code formatting (Black), import sorting (isort), linting (flake8), and security scanning (Bandit, Safety, pip-audit)
+  - `test`: Unit tests with PostgreSQL and Redis services, coverage reporting
+  - `sbom`: Software Bill of Materials generation (main branch only)
+  - `ci-summary`: Pipeline results aggregation and reporting
+- **Features**: 
+  - Lint skipping via commit message (`[skip lint]` or `[no lint]`)
+  - Manual lint skip option in workflow dispatch
+  - Focused on `api/` and `tests/` directories
+- **Outputs**: Security reports, test coverage, SBOM artifacts
+
 ### 🔧 docker-build.yml
 **Purpose**: Primary CI/CD pipeline for building, testing, and publishing Docker images
 - **Triggers**: Push to main/develop branches, pull requests to main, version tags
