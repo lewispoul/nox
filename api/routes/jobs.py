@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Union
+from typing import Annotated, Any, Dict, Union
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 from api.schemas.job import JobRequest, JobStatus
 from api.schemas.psi4_job import Psi4JobRequest
@@ -19,8 +19,11 @@ class SimpleJobRequest(BaseModel):
     payload: Dict[str, Any] = {}
 
 
+# Use discriminated union based on the presence of 'engine' field vs 'kind' field
+# Since SimpleJobRequest has 'kind' but no 'engine', and the other two have 'engine',
+# we can use a manual check or parse raw body
 @router.post("/jobs")
-async def create_job(body: Union[SimpleJobRequest, Psi4JobRequest, JobRequest]):
+async def create_job(body: Dict[str, Any]):
     """Create a job - supports simple, XTB, and Psi4 job formats.
     
     Provide one of:
@@ -29,32 +32,52 @@ async def create_job(body: Union[SimpleJobRequest, Psi4JobRequest, JobRequest]):
     - JobRequest: {engine: "xtb" or default, ...xtb fields}
     """
     try:
-        # SimpleJobRequest
-        if isinstance(body, SimpleJobRequest):
-            job_id = submit_job(body.kind, body.payload)
+        # Determine type based on structure
+        if "kind" in body and "payload" in body and "engine" not in body:
+            # SimpleJobRequest
+            req = SimpleJobRequest(**body)
+            job_id = submit_job(req.kind, req.payload)
             j = get_store().get(job_id)
             if j is None:
                 raise HTTPException(500, "Failed to create job")
             return {"job_id": job_id, "state": j.state}
-
-        # Psi4JobRequest
-        if isinstance(body, Psi4JobRequest):
-            payload = {"job_request": body.model_dump_json()}
-            job_id = submit_job("psi4", payload)
-            return JobStatus(
-                job_id=job_id,
-                state="pending",
-                message="Psi4 job queued for processing",
-            )
-
-        # JobRequest (XTB or default)
-        if isinstance(body, JobRequest):
-            payload = {"job_request": body.model_dump_json()}
+        
+        elif "engine" in body:
+            engine = body.get("engine", "xtb")
+            if engine == "psi4":
+                # Psi4JobRequest
+                req = Psi4JobRequest(**body)
+                payload = {"job_request": req.model_dump_json()}
+                job_id = submit_job("psi4", payload)
+                return JobStatus(
+                    job_id=job_id,
+                    state="pending",
+                    message="Psi4 job queued for processing",
+                )
+            else:
+                # JobRequest (XTB or default)
+                req = JobRequest(**body)
+                payload = {"job_request": req.model_dump_json()}
+                job_id = submit_job("xtb", payload)
+                return JobStatus(
+                    job_id=job_id,
+                    state="pending",
+                    message="Job queued for processing",
+                )
+        elif "inputs" in body:
+            # Assume JobRequest if inputs is present but no engine specified
+            req = JobRequest(**body)
+            payload = {"job_request": req.model_dump_json()}
             job_id = submit_job("xtb", payload)
             return JobStatus(
                 job_id=job_id,
                 state="pending",
                 message="Job queued for processing",
+            )
+        else:
+            raise HTTPException(
+                422,
+                "Invalid job request format. Provide either {kind, payload} for simple jobs or {engine, inputs} for XTB/Psi4 jobs"
             )
 
     except ValidationError as e:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections import OrderedDict
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Request
@@ -13,7 +14,27 @@ from api.services.queue import submit_job
 
 router = APIRouter()
 
-_conversations: Dict[str, Dict[str, Any]] = {}
+# LRU cache for conversation history with max size to prevent unbounded growth
+_MAX_CONVERSATIONS = 1000
+_conversations: OrderedDict[str, Dict[str, Any]] = OrderedDict()
+
+
+def _get_conversation(session_id: str) -> Dict[str, Any]:
+    """Get or create a conversation with LRU eviction policy."""
+    if session_id in _conversations:
+        # Move to end (most recently used)
+        _conversations.move_to_end(session_id)
+        return _conversations[session_id]
+    
+    # Create new conversation
+    convo = {"history": []}
+    _conversations[session_id] = convo
+    
+    # Evict oldest if at capacity
+    if len(_conversations) > _MAX_CONVERSATIONS:
+        _conversations.popitem(last=False)
+    
+    return convo
 
 
 def _session_id(req: Request) -> str:
@@ -57,7 +78,7 @@ async def agent_ask(request: Request, body: AgentAskRequest) -> Dict[str, Any]:
     params = body.params
 
     sid = _session_id(request)
-    convo = _conversations.setdefault(sid, {"history": []})
+    convo = _get_conversation(sid)
     convo["history"].append({"role": "user", "q": question})
 
     job_id: Optional[str] = None

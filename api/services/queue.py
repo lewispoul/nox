@@ -6,6 +6,8 @@ import time
 from typing import Any, Dict
 
 from .jobs_store import get_store
+
+
 def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
     """Normalize a remote IAM response into Nox result shape.
 
@@ -29,9 +31,9 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
                 try:
                     energy = float(result[k])
                     break
-                except Exception:
+                except (TypeError, ValueError):
                     # Ignore values that cannot be converted to float and try next key
-                    pass
+                    continue
         if energy is not None:
             scalars = {"E_total_hartree": energy}
 
@@ -145,6 +147,7 @@ def _default_xtb_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     Kept as an injectable callable so tests can replace it with a stub.
     """
+    import asyncio
     from ai.runners.xtb import run_xtb_job
     from api.schemas.job import JobRequest
     from api.services.storage import job_dir
@@ -164,7 +167,7 @@ def _default_xtb_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
         from ai.iam_client import IAMClient
 
         client = IAMClient(base_url=settings.iam_base_url)
-        result = _normalize_remote_result(client.run_xtb(JR.model_dump()))
+        result = _normalize_remote_result(asyncio.run(client.run_xtb(JR.model_dump())))
         # Assume IAM returns compatible structure; otherwise adapt here
     else:
         result = run_xtb_job(
@@ -207,6 +210,7 @@ def set_xtb_runner(runner_callable):
 
 
 def _default_psi4_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
+    import asyncio
     from api.schemas.psi4_job import Psi4JobRequest
     from api.services.storage import job_dir
     from ai.runners.psi4 import run_psi4_job
@@ -225,7 +229,7 @@ def _default_psi4_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
         from ai.iam_client import IAMClient
 
         client = IAMClient(base_url=settings.iam_base_url)
-        result = _normalize_remote_result(client.run_psi4(JR.model_dump()))
+        result = _normalize_remote_result(asyncio.run(client.run_psi4(JR.model_dump())))
     else:
         result = run_psi4_job(
             jd,

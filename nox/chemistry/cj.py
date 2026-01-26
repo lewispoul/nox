@@ -7,8 +7,6 @@ from typing import Any, Dict
 
 
 def _has_cantera() -> bool:
-    if shutil.which("python") is None:
-        return False
     try:
         import importlib
 

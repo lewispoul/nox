@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-import json
+import logging
 import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class Psi4Unavailable(RuntimeError):
@@ -86,17 +88,20 @@ multiplicity {multiplicity}
     try:
         psi4.set_memory("1 GiB")
     except Exception:
+        # If setting memory fails, continue with Psi4's default memory settings.
         pass
 
     # Build method/basis label
     label = f"{method}/{basis}" if "/" not in method else method
 
     if do_opt:
+        opt_success = False
         try:
             psi4.optimize(label, molecule=mol)
-        except Exception:
+            opt_success = True
+        except Exception as e:
             # Continue to attempt energies even if opt fails
-            pass
+            logger.warning(f"Optimization failed: {e}")
 
         try:
             optimized_xyz = mol.save_string_xyz()
@@ -148,9 +153,12 @@ multiplicity {multiplicity}
             }
         )
 
-    return {
+    result = {
         "scalars": scalars,
         "series": {"vibfreq_cm^-1": vibfreqs} if vibfreqs else {},
         "artifacts": artifacts,
         "returncode": 0 if energy is not None else 1,
     }
+    if do_opt:
+        result["opt_success"] = opt_success
+    return result

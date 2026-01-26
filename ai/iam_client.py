@@ -16,26 +16,26 @@ class IAMClient:
             raise RuntimeError("IAM_BASE_URL not configured")
         return f"{self.base_url}{path}"
 
-    def run_xtb(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        with httpx.Client(timeout=self.timeout) as c:
-            r = c.post(self._url("/run_xtb"), json=payload)
+    async def run_xtb(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        async with httpx.AsyncClient(timeout=self.timeout) as c:
+            r = await c.post(self._url("/run_xtb"), json=payload)
             r.raise_for_status()
             return r.json()
 
-    def run_psi4(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        with httpx.Client(timeout=self.timeout) as c:
-            r = c.post(self._url("/run_psi4"), json=payload)
+    async def run_psi4(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        async with httpx.AsyncClient(timeout=self.timeout) as c:
+            r = await c.post(self._url("/run_psi4"), json=payload)
             r.raise_for_status()
             return r.json()
 
-    def predict_vod(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        with httpx.Client(timeout=self.timeout) as c:
-            r = c.post(self._url("/predict/vod"), json=payload)
+    async def predict_vod(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        async with httpx.AsyncClient(timeout=self.timeout) as c:
+            r = await c.post(self._url("/predict/vod"), json=payload)
             r.raise_for_status()
             return r.json()
 
-    def predict_cj(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        with httpx.Client(timeout=self.timeout) as c:
-            r = c.post(self._url("/predict/cj"), json=payload)
+    async def predict_cj(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        async with httpx.AsyncClient(timeout=self.timeout) as c:
+            r = await c.post(self._url("/predict/cj"), json=payload)
             r.raise_for_status()
             return r.json()

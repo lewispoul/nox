@@ -47,6 +47,7 @@ async def test_agent_run_and_ask_with_mocks(monkeypatch):
             await asyncio.sleep(0.05)
             r2 = await client.get(f"/jobs/{job_id}")
             state = r2.json()["state"]
+        assert time.time() < deadline, "Job did not complete within timeout"
         assert state == "done"
 
         # agent.ask with psi4 keyword
@@ -74,4 +75,5 @@ async def test_agent_run_and_ask_with_mocks(monkeypatch):
             await asyncio.sleep(0.05)
             r4 = await client.get(f"/jobs/{job_id2}")
             state = r4.json()["state"]
+        assert time.time() < deadline, "Job did not complete within timeout"
         assert state == "done"

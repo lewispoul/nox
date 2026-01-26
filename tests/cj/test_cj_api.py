@@ -41,4 +41,5 @@ async def test_predict_cj_with_mock_runner(monkeypatch):
             await asyncio.sleep(0.05)
             r2 = await client.get(f"/jobs/{job_id}")
             state = r2.json()["state"]
+        assert time.time() < deadline, "Job did not complete within timeout"
         assert state == "done"
