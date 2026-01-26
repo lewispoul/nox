@@ -16,7 +16,7 @@ async def test_jobs_echo_flow_local_mode(monkeypatch):
     app.include_router(jobs_router)
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        r = await client.post("/jobs", json={"kind": "echo", "payload": {"x": 1}})
+        r = await client.post("/jobs", json={"request_type": "simple", "kind": "echo", "payload": {"x": 1}})
         assert r.status_code == 200
         job = r.json()
         job_id = job["job_id"]

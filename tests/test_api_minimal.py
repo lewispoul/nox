@@ -32,6 +32,7 @@ async def test_jobs_flow(monkeypatch):
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         # 1. POST /jobs
         job_req = {
+            "request_type": "xtb",
             "engine": "xtb",
             "kind": "opt_properties",
             "inputs": {

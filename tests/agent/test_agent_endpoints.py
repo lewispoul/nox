@@ -29,6 +29,7 @@ async def test_agent_run_and_ask_with_mocks(monkeypatch):
             json={
                 "intent": "xtb.opt",
                 "params": {
+                    "request_type": "xtb",
                     "engine": "xtb",
                     "kind": "opt_properties",
                     "inputs": {
@@ -56,6 +57,7 @@ async def test_agent_run_and_ask_with_mocks(monkeypatch):
             json={
                 "q": "please run psi4 on this xyz",
                 "params": {
+                    "request_type": "psi4",
                     "engine": "psi4",
                     "kind": "opt_scf_freq",
                     "inputs": {

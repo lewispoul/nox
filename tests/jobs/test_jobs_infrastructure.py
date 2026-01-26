@@ -158,7 +158,7 @@ class TestJobManager:
 
     def test_create_job(self, temp_manager):
         """Test job creation"""
-        job_request = {"engine": "xtb", "inputs": {"xyz": "H 0 0 0"}}
+        job_request = {"request_type": "xtb", "engine": "xtb", "inputs": {"xyz": "H 0 0 0"}}
 
         job_id = temp_manager.create_job(job_request)
         assert len(job_id) == 32  # UUID hex format

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -19,6 +21,7 @@ class JobInputs(BaseModel):
 
 
 class JobRequest(BaseModel):
+    request_type: Literal["xtb"] = "xtb"
     engine: str = "xtb"
     kind: str = "opt_properties"
     inputs: JobInputs

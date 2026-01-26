@@ -25,6 +25,7 @@ async def test_job_creation():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         job_request = {
+            "request_type": "xtb",
             "engine": "xtb",
             "kind": "opt_properties",
             "inputs": {
@@ -57,6 +58,7 @@ async def test_job_status_polling():
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         # Create job first
         job_request = {
+            "request_type": "xtb",
             "engine": "xtb",
             "kind": "opt_properties",
             "inputs": {
@@ -100,6 +102,7 @@ async def test_artifacts_not_ready():
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         # Create job
         job_request = {
+            "request_type": "xtb",
             "engine": "xtb",
             "kind": "opt_properties",
             "inputs": {
@@ -125,6 +128,7 @@ async def test_job_with_cube_generation():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         job_request = {
+            "request_type": "xtb",
             "engine": "xtb",
             "kind": "opt_properties",
             "inputs": {

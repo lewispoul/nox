@@ -32,6 +32,7 @@ async def test_e2e_echo_local_mode(monkeypatch):
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as c:
         payload = {
+            "request_type": "simple",
             "kind": "echo",
             "payload": {"x": 42, "msg": "hello"},
         }  # Adjusted to match SimpleJobRequest
@@ -56,6 +57,7 @@ async def test_e2e_xtb_with_cubes(monkeypatch):
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as c:
         job_req = {
+            "request_type": "xtb",
             "engine": "xtb",
             "kind": "opt_properties",
             "inputs": {

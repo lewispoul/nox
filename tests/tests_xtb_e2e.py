@@ -55,6 +55,7 @@ async def test_xtb_job_e2e():
     async with httpx.AsyncClient() as client:
         # Submit job
         payload = {
+            "request_type": "xtb",
             "engine": "xtb",
             "kind": "opt_properties",
             "inputs": {
@@ -118,6 +119,7 @@ H 0 0 0.74
 
     async with httpx.AsyncClient() as client:
         payload = {
+            "request_type": "xtb",
             "engine": "xtb",
             "kind": "opt_properties",
             "inputs": {

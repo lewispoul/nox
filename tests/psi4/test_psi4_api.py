@@ -29,6 +29,7 @@ async def test_submit_psi4_job_with_mock_runner(monkeypatch):
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         req = {
+            "request_type": "psi4",
             "engine": "psi4",
             "kind": "opt_scf_freq",
             "inputs": {
