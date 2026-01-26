@@ -14,7 +14,7 @@ from api.services import queue as q
 async def test_predict_cj_with_mock_runner(monkeypatch):
     monkeypatch.delenv("REDIS_URL", raising=False)
 
-    def fake_cj(payload):
+    def fake_cj(_payload):
         return {
             "scalars": {"Pcj_Pa": 2.0e9, "Tcj_K": 3000.0, "Dcj_m_per_s": 8000.0},
             "series": {"composition": [["H2O", 0.5], ["CO2", 0.5]]},

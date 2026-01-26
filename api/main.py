@@ -16,14 +16,17 @@ def health():
 try:
     app.include_router(jobs.router)
 except Exception:
+    # Ignore router import errors to allow partial API functionality
     pass
 
 try:
     app.include_router(predict.router)
 except Exception:
+    # Ignore router import errors to allow partial API functionality
     pass
 
 try:
     app.include_router(agent.router)
 except Exception:
+    # Ignore router import errors to allow partial API functionality
     pass

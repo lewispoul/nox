@@ -14,7 +14,7 @@ async def test_submit_psi4_job_with_mock_runner(monkeypatch):
     # Force local queue mode
     monkeypatch.delenv("REDIS_URL", raising=False)
 
-    def fake_runner(payload):
+    def fake_runner(_payload):
         return {
             "scalars": {"E_total_hartree": -40.0},
             "series": {"vibfreq_cm^-1": [1000.0, 1500.0]},

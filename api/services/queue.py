@@ -6,6 +6,8 @@ import time
 from typing import Any, Dict
 
 from .jobs_store import get_store
+
+
 def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
     """Normalize a remote IAM response into Nox result shape.
 
@@ -211,7 +213,10 @@ def _default_psi4_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
     from api.services.settings import settings
 
     job_request_json = payload.get("job_request", "{}")
-    JR = Psi4JobRequest.model_validate_json(job_request_json)
+    try:
+        JR = Psi4JobRequest.model_validate_json(job_request_json)
+    except Exception as e:
+        raise ValueError(f"Invalid Psi4 job request: {e}")
 
     job_id = payload.get("job_id", "unknown")
     jd = job_dir(job_id)

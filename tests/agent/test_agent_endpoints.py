@@ -14,8 +14,8 @@ from api.services import queue as q
 async def test_agent_run_and_ask_with_mocks(monkeypatch):
     monkeypatch.delenv("REDIS_URL", raising=False)
 
-    q.set_xtb_runner(lambda payload: {"scalars": {"E_total_hartree": -1.0}, "series": {}, "artifacts": [], "returncode": 0})
-    q.set_psi4_runner(lambda payload: {"scalars": {"E_total_hartree": -2.0}, "series": {}, "artifacts": [], "returncode": 0})
+    q.set_xtb_runner(lambda _payload: {"scalars": {"E_total_hartree": -1.0}, "series": {}, "artifacts": [], "returncode": 0})
+    q.set_psi4_runner(lambda _payload: {"scalars": {"E_total_hartree": -2.0}, "series": {}, "artifacts": [], "returncode": 0})
 
     app = FastAPI()
     app.include_router(agent_router)
