@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Union
+from typing import Annotated, Any, Dict, Union
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 from api.schemas.job import JobRequest, JobStatus
 from api.schemas.psi4_job import Psi4JobRequest
@@ -17,16 +17,31 @@ router = APIRouter()
 class SimpleJobRequest(BaseModel):
     kind: str = "echo"
     payload: Dict[str, Any] = {}
+    # Add a discriminator field to distinguish from engine-based requests
+    request_type: str = Field(default="simple", const=True)
+
+
+# Use discriminated union for clearer API schema and validation
+JobRequestUnion = Annotated[
+    Union[Psi4JobRequest, JobRequest, SimpleJobRequest],
+    Field(discriminator="engine"),
+]
 
 
 @router.post("/jobs")
 async def create_job(body: Union[SimpleJobRequest, Psi4JobRequest, JobRequest]):
     """Create a job - supports simple, XTB, and Psi4 job formats.
     
-    Provide one of:
+    The request type is automatically determined by the request body:
     - SimpleJobRequest: {kind: str, payload: dict}
-    - Psi4JobRequest: {engine: "psi4", ...psi4 fields}
-    - JobRequest: {engine: "xtb" or default, ...xtb fields}
+    - Psi4JobRequest: {engine: "psi4", kind: str, inputs: {...}}
+    - JobRequest: {engine: "xtb", kind: str, inputs: {...}}
+    
+    Note: FastAPI will attempt to validate against each type in order.
+    For clearer validation errors, consider using the specific endpoints:
+    - POST /jobs/simple for simple jobs
+    - POST /jobs with engine="psi4" for Psi4 jobs
+    - POST /jobs with engine="xtb" for XTB jobs
     """
     try:
         # SimpleJobRequest
@@ -39,7 +54,7 @@ async def create_job(body: Union[SimpleJobRequest, Psi4JobRequest, JobRequest]):
 
         # Psi4JobRequest
         if isinstance(body, Psi4JobRequest):
-            payload = {"job_request": body.model_dump_json()}
+            payload = {"job_request": body.model_dump()}
             job_id = submit_job("psi4", payload)
             return JobStatus(
                 job_id=job_id,
@@ -49,7 +64,7 @@ async def create_job(body: Union[SimpleJobRequest, Psi4JobRequest, JobRequest]):
 
         # JobRequest (XTB or default)
         if isinstance(body, JobRequest):
-            payload = {"job_request": body.model_dump_json()}
+            payload = {"job_request": body.model_dump()}
             job_id = submit_job("xtb", payload)
             return JobStatus(
                 job_id=job_id,

@@ -11,7 +11,9 @@ from api.services import queue as q
 
 @pytest.mark.asyncio
 async def test_submit_psi4_job_with_mock_runner(monkeypatch):
-    # Force local queue mode
+    # Force local queue mode by removing REDIS_URL
+    # Note: pytest's monkeypatch fixture automatically restores environment
+    # variables after the test completes, ensuring test isolation
     monkeypatch.delenv("REDIS_URL", raising=False)
 
     def fake_runner(payload):

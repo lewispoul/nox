@@ -21,6 +21,51 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
     artifacts = result.get("artifacts") or []
     rc = result.get("returncode")
 
+    # Validate artifacts is a list and contains only safe paths
+    if not isinstance(artifacts, list):
+        import logging
+
+        logging.getLogger(__name__).warning(
+            "Invalid artifacts type in remote result, expected list",
+            extra={"type": type(artifacts).__name__},
+        )
+        artifacts = []
+    else:
+        # Filter out potentially malicious paths (absolute paths, path traversal)
+        safe_artifacts = []
+        for art in artifacts:
+            if isinstance(art, str):
+                # Reject absolute paths and path traversal attempts
+                if not art.startswith("/") and ".." not in art:
+                    safe_artifacts.append(art)
+                else:
+                    import logging
+
+                    logging.getLogger(__name__).warning(
+                        "Rejected unsafe artifact path",
+                        extra={"path": art},
+                    )
+        artifacts = safe_artifacts
+
+    # Validate scalars and series are dicts
+    if not isinstance(scalars, dict):
+        import logging
+
+        logging.getLogger(__name__).warning(
+            "Invalid scalars type in remote result, expected dict",
+            extra={"type": type(scalars).__name__},
+        )
+        scalars = {}
+
+    if not isinstance(series, dict):
+        import logging
+
+        logging.getLogger(__name__).warning(
+            "Invalid series type in remote result, expected dict",
+            extra={"type": type(series).__name__},
+        )
+        series = {}
+
     # Infer energy if provided under other keys
     if not scalars:
         energy = None
@@ -68,7 +113,15 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
     def _run_local():
         try:
             store.set_state(job_id, "running")
-            # Small delay to ensure immediate follow-up reads see a non-final state
+            # Brief delay after state transition to handle race condition where
+            # API clients may immediately query job artifacts. The artifacts
+            # endpoint should return 404 for jobs not in a terminal state
+            # (completed/failed), but some clients poll aggressively right after
+            # submission. This delay ensures the "running" state is visible before
+            # the job completes, giving clients time to see the intermediate state.
+            # TODO: Consider removing this delay and instead ensuring the artifacts
+            # endpoint properly checks job state and returns 404/409 for non-terminal
+            # states, or use proper synchronization primitives (locks/events).
             time.sleep(0.05)
             if kind == "echo":
                 result = echo_worker(payload)
@@ -160,16 +213,25 @@ def _default_xtb_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
     from api.services.settings import settings
 
     # Parse the job request
-    job_request_json = payload.get("job_request", "{}")
+    job_request_data = payload.get("job_request", {})
     try:
-        JR = JobRequest.model_validate_json(job_request_json)
+        if isinstance(job_request_data, str):
+            # Support legacy JSON string format for backwards compatibility
+            JR = JobRequest.model_validate_json(job_request_data)
+        else:
+            # Prefer dict format to avoid unnecessary serialization
+            JR = JobRequest.model_validate(job_request_data)
     except Exception as e:
         raise ValueError(f"Invalid job request: {e}")
 
     job_id = payload.get("job_id", "unknown")
     jd = job_dir(job_id)
 
-    if settings.iam_use_remote and settings.iam_base_url:
+    if settings.iam_use_remote:
+        if not settings.iam_base_url:
+            raise ValueError(
+                "iam_use_remote is enabled but iam_base_url is not configured"
+            )
         from ai.iam_client import IAMClient
 
         try:
@@ -231,20 +293,39 @@ def _default_psi4_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
     from ai.runners.psi4 import run_psi4_job
     from api.services.settings import settings
 
-    job_request_json = payload.get("job_request", "{}")
+    job_request_data = payload.get("job_request", {})
     try:
-        JR = Psi4JobRequest.model_validate_json(job_request_json)
+        if isinstance(job_request_data, str):
+            # Support legacy JSON string format for backwards compatibility
+            JR = Psi4JobRequest.model_validate_json(job_request_data)
+        else:
+            # Prefer dict format to avoid unnecessary serialization
+            JR = Psi4JobRequest.model_validate(job_request_data)
     except Exception as exc:
         raise ValueError(f"Invalid Psi4 job_request payload: {exc}") from exc
 
     job_id = payload.get("job_id", "unknown")
     jd = job_dir(job_id)
 
-    if settings.iam_use_remote and settings.iam_base_url:
+    if settings.iam_use_remote:
+        if not settings.iam_base_url:
+            raise ValueError(
+                "iam_use_remote is enabled but iam_base_url is not configured"
+            )
         from ai.iam_client import IAMClient
 
-        client = IAMClient(base_url=settings.iam_base_url)
-        result = _normalize_remote_result(client.run_psi4(JR.model_dump()))
+        try:
+            client = IAMClient(base_url=settings.iam_base_url)
+            result = _normalize_remote_result(client.run_psi4(JR.model_dump()))
+        except Exception as e:
+            # Normalize IAM errors into a failure result so caller logic remains consistent
+            result = {
+                "scalars": {},
+                "series": {},
+                "artifacts": [],
+                "returncode": 1,
+                "error": f"IAM Psi4 invocation failed: {e}",
+            }
     else:
         result = run_psi4_job(
             jd,

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-import shutil
+import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class Psi4Unavailable(RuntimeError):
@@ -17,9 +19,7 @@ def _ensure_xyz(text: str) -> str:
 
 
 def _has_psi4() -> bool:
-    # Accept either Python module or a cli shim
-    if shutil.which("psi4"):
-        return True
+    # Check for Python module only, since that's what we actually use
     try:
         import importlib
 
@@ -94,20 +94,34 @@ multiplicity {multiplicity}
     if do_opt:
         try:
             psi4.optimize(label, molecule=mol)
-        except Exception:
-            # Continue to attempt energies even if opt fails
-            pass
+        except Exception as e:
+            # Log optimization failure; continue to attempt energies even if opt fails
+            logger.warning(
+                "Psi4 optimization failed",
+                extra={"method": label, "error": str(e)},
+                exc_info=True,
+            )
 
         try:
             optimized_xyz = mol.save_string_xyz()
             (job_dir / "optimized.xyz").write_text(optimized_xyz, encoding="utf-8")
-        except Exception:
+        except Exception as e:
+            logger.warning(
+                "Failed to save optimized structure",
+                extra={"error": str(e)},
+                exc_info=True,
+            )
             optimized_xyz = None
 
     # Single-point energy
     try:
         energy = float(psi4.energy(label, molecule=mol))
-    except Exception:
+    except Exception as e:
+        logger.warning(
+            "Psi4 energy calculation failed",
+            extra={"method": label, "error": str(e)},
+            exc_info=True,
+        )
         energy = None
 
     if do_freq:
@@ -118,9 +132,19 @@ multiplicity {multiplicity}
             try:
                 arr = wfn.frequency_analysis["omega"].data.to_array()
                 vibfreqs = [float(x) for x in arr.flatten().tolist()]
-            except Exception:
+            except Exception as e:
+                logger.warning(
+                    "Failed to extract frequencies from wavefunction",
+                    extra={"error": str(e)},
+                    exc_info=True,
+                )
                 vibfreqs = []
-        except Exception:
+        except Exception as e:
+            logger.warning(
+                "Psi4 frequency analysis failed",
+                extra={"method": label, "error": str(e)},
+                exc_info=True,
+            )
             vibfreqs = []
 
     scalars: Dict[str, Any] = {}
