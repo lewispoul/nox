@@ -65,41 +65,7 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
         # If payload is not a mutable dict for any reason, ignore
         pass
 
-    # Check Redis URL dynamically to support test monkeypatching
-    redis_url = os.getenv("REDIS_URL")
-
-    # Allow explicit env override for local mode (used by tests)
-    jfl_env = os.getenv("JOBS_FORCE_LOCAL")
-    if jfl_env is not None and jfl_env.lower() in ("1", "true", "yes"):
-        redis_url = None
-    else:
-        # Prefer local mode when settings request it (explicit config)
-        try:
-            from api.services.settings import settings
-
-            if getattr(settings, "jobs_force_local", False):
-                redis_url = None
-        except Exception:
-            # If settings import fails or has no attribute, ignore
-            pass
-
-    if redis_url:
-        # Publish to Dramatiq actor; worker will update Redis-backed store
-        # We import inside to avoid dramatiq dep at import time in CI
-        from workers.jobs_worker import enqueue_job
-
-        # Dispatch send in background to avoid synchronous execution when
-        # using a stub broker which may run actors immediately. This keeps
-        # POST semantics predictable (queued) for tests that inspect state
-        # immediately after submission.
-        threading.Thread(
-            target=lambda: enqueue_job.send(job_id, kind, payload),
-            daemon=True,
-        ).start()
-        return job_id
-
-    # Local thread mode for CI or dev without Redis
-    def _runner():
+    def _run_local():
         try:
             store.set_state(job_id, "running")
             # Small delay to ensure immediate follow-up reads see a non-final state
@@ -136,7 +102,44 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
         except Exception as e:  # noqa: BLE001
             store.set_state(job_id, "failed", error=str(e))
 
-    threading.Thread(target=_runner, daemon=True).start()
+    # Check Redis URL dynamically to support test monkeypatching
+    redis_url = os.getenv("REDIS_URL")
+
+    # Allow explicit env override for local mode (used by tests)
+    jfl_env = os.getenv("JOBS_FORCE_LOCAL")
+    if jfl_env is not None and jfl_env.lower() in ("1", "true", "yes"):
+        redis_url = None
+    else:
+        # Prefer local mode when settings request it (explicit config)
+        try:
+            from api.services.settings import settings
+
+            if getattr(settings, "jobs_force_local", False):
+                redis_url = None
+        except Exception:
+            # If settings import fails or has no attribute, ignore
+            pass
+
+    if redis_url:
+        # Publish to Dramatiq actor; worker will update Redis-backed store
+        # We import inside to avoid dramatiq dep at import time in CI
+        from workers.jobs_worker import enqueue_job
+
+        # Dispatch send in background to avoid synchronous execution when
+        # using a stub broker which may run actors immediately. This keeps
+        # POST semantics predictable (queued) for tests that inspect state
+        # immediately after submission.
+        def _send_or_fallback():
+            try:
+                enqueue_job.send(job_id, kind, payload)
+            except Exception:
+                _run_local()
+
+        threading.Thread(target=_send_or_fallback, daemon=True).start()
+        return job_id
+
+    # Local thread mode for CI or dev without Redis
+    threading.Thread(target=_run_local, daemon=True).start()
     return job_id
 
 
