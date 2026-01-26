@@ -6,6 +6,44 @@ import time
 from typing import Any, Dict
 
 from .jobs_store import get_store
+def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize a remote IAM response into Nox result shape.
+
+    Expected shape: {scalars, series, artifacts, returncode}. If missing,
+    infer from common fields like 'energy' and add defaults.
+    """
+    if not isinstance(resp, dict):
+        return {"scalars": {}, "series": {}, "artifacts": [], "returncode": 1}
+
+    result = dict(resp)
+    scalars = result.get("scalars") or {}
+    series = result.get("series") or {}
+    artifacts = result.get("artifacts") or []
+    rc = result.get("returncode")
+
+    # Infer energy if provided under other keys
+    if not scalars:
+        energy = None
+        for k in ("energy", "E_total_hartree", "etot", "total_energy"):
+            if k in result:
+                try:
+                    energy = float(result[k])
+                    break
+                except Exception:
+                    # Ignore values that cannot be converted to float and try next key
+                    pass
+        if energy is not None:
+            scalars = {"E_total_hartree": energy}
+
+    if rc is None:
+        rc = 0 if scalars else 1
+
+    return {
+        "scalars": scalars,
+        "series": series,
+        "artifacts": artifacts,
+        "returncode": rc,
+    }
 
 
 # Simple demo work; replace with real task kinds
@@ -69,6 +107,10 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
             elif kind == "xtb":
                 # For local mode, run XTB calculation directly
                 result = _xtb_runner(payload)
+            elif kind == "psi4":
+                result = _psi4_runner(payload)
+            elif kind == "cj":
+                result = _cj_runner(payload)
             else:
                 result = {"echo": payload}
             # If runner returned a returncode, treat non-success as failure
@@ -104,6 +146,7 @@ def _default_xtb_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
     from ai.runners.xtb import run_xtb_job
     from api.schemas.job import JobRequest
     from api.services.storage import job_dir
+    from api.services.settings import settings
 
     # Parse the job request
     job_request_json = payload.get("job_request", "{}")
@@ -115,13 +158,20 @@ def _default_xtb_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
     job_id = payload.get("job_id", "unknown")
     jd = job_dir(job_id)
 
-    result = run_xtb_job(
-        jd,
-        JR.inputs.xyz,
-        JR.inputs.charge,
-        JR.inputs.multiplicity,
-        JR.inputs.params.model_dump(),
-    )
+    if settings.iam_use_remote and settings.iam_base_url:
+        from ai.iam_client import IAMClient
+
+        client = IAMClient(base_url=settings.iam_base_url)
+        result = _normalize_remote_result(client.run_xtb(JR.model_dump()))
+        # Assume IAM returns compatible structure; otherwise adapt here
+    else:
+        result = run_xtb_job(
+            jd,
+            JR.inputs.xyz,
+            JR.inputs.charge,
+            JR.inputs.multiplicity,
+            JR.inputs.params.model_dump(),
+        )
 
     # Include the original payload in the result
     result["payload"] = payload
@@ -152,3 +202,68 @@ def set_xtb_runner(runner_callable):
     """
     global _xtb_runner
     _xtb_runner = runner_callable
+
+
+def _default_psi4_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
+    from api.schemas.psi4_job import Psi4JobRequest
+    from api.services.storage import job_dir
+    from ai.runners.psi4 import run_psi4_job
+    from api.services.settings import settings
+
+    job_request_json = payload.get("job_request", "{}")
+    try:
+        JR = Psi4JobRequest.model_validate_json(job_request_json)
+    except Exception as e:
+        raise ValueError(f"Invalid Psi4 job request: {e}") from e
+
+    job_id = payload.get("job_id", "unknown")
+    jd = job_dir(job_id)
+
+    if settings.iam_use_remote and settings.iam_base_url:
+        from ai.iam_client import IAMClient
+
+        client = IAMClient(base_url=settings.iam_base_url)
+        result = _normalize_remote_result(client.run_psi4(JR.model_dump()))
+    else:
+        result = run_psi4_job(
+            jd,
+            JR.inputs.xyz,
+            JR.inputs.charge,
+            JR.inputs.multiplicity,
+            JR.inputs.params.model_dump(),
+        )
+
+    result["payload"] = payload
+
+    rc = result.get("returncode")
+    if rc != 0:
+        raise RuntimeError(f"Psi4 calculation failed, returncode={rc}")
+    return result
+
+
+_psi4_runner = _default_psi4_runner
+
+
+def set_psi4_runner(runner_callable):
+    global _psi4_runner
+    _psi4_runner = runner_callable
+
+
+def _default_cj_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
+    # Light wrapper around optional Cantera-based CJ module
+    from api.services.storage import job_dir
+    from nox.chemistry.cj import run_cj  # lazy import; file will handle availability
+
+    jd = job_dir(payload.get("job_id", "unknown"))
+    req = payload.get("cj_request", {})
+    res = run_cj(jd, req)
+    res["payload"] = payload
+    return res
+
+
+_cj_runner = _default_cj_runner
+
+
+def set_cj_runner(runner_callable):
+    global _cj_runner
+    _cj_runner = runner_callable

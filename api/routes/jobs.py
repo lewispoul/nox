@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Annotated, Any, Dict, Union
 
-from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel, ValidationError
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field, ValidationError
 
 from api.schemas.job import JobRequest, JobStatus
+from api.schemas.psi4_job import Psi4JobRequest
 from api.schemas.result import Artifact, ResultBundle
 from api.services.jobs_store import get_store
 from api.services.queue import submit_job
@@ -14,39 +15,58 @@ router = APIRouter()
 
 
 class SimpleJobRequest(BaseModel):
+    engine: str = "simple"
     kind: str = "echo"
     payload: Dict[str, Any] = {}
 
 
-@router.post("/jobs")
-async def create_job(request: Request):
-    """Create a job - supports both simple and XTB job formats"""
-    try:
-        # Try to parse as raw dict first
-        body = await request.json()
+# Use discriminated union to avoid misrouting
+JobRequestUnion = Annotated[
+    Union[Psi4JobRequest, JobRequest, SimpleJobRequest],
+    Field(discriminator="engine")
+]
 
-        # Check if it looks like a simple job request (has 'kind' field)
-        if "kind" in body and "payload" in body:
-            # Simple job request
-            simple_req = SimpleJobRequest(**body)
-            job_id = submit_job(simple_req.kind, simple_req.payload)
+
+@router.post("/jobs")
+async def create_job(body: JobRequestUnion):
+    """Create a job - supports simple, XTB, and Psi4 job formats.
+    
+    Provide one of:
+    - SimpleJobRequest: {kind: str, payload: dict}
+    - Psi4JobRequest: {engine: "psi4", ...psi4 fields}
+    - JobRequest: {engine: "xtb" or default, ...xtb fields}
+    """
+    try:
+        # SimpleJobRequest
+        if isinstance(body, SimpleJobRequest):
+            job_id = submit_job(body.kind, body.payload)
             j = get_store().get(job_id)
             if j is None:
                 raise HTTPException(500, "Failed to create job")
             return {"job_id": job_id, "state": j.state}
 
-        # Otherwise try to parse as XTB JobRequest
-        try:
-            xtb_req = JobRequest(**body)
-            payload = {"job_request": xtb_req.model_dump_json()}
-            job_id = submit_job("xtb", payload)
-
+        # Psi4JobRequest
+        if isinstance(body, Psi4JobRequest):
+            payload = {"job_request": body.model_dump_json()}
+            job_id = submit_job("psi4", payload)
             return JobStatus(
-                job_id=job_id, state="pending", message="Job queued for processing"
+                job_id=job_id,
+                state="pending",
+                message="Psi4 job queued for processing",
             )
-        except ValidationError:
-            raise HTTPException(422, "Invalid job request format")
 
+        # JobRequest (XTB or default)
+        if isinstance(body, JobRequest):
+            payload = {"job_request": body.model_dump_json()}
+            job_id = submit_job("xtb", payload)
+            return JobStatus(
+                job_id=job_id,
+                state="pending",
+                message="Job queued for processing",
+            )
+
+    except ValidationError as e:
+        raise HTTPException(422, f"Invalid job request format: {e}")
     except Exception as e:
         raise HTTPException(400, f"Invalid request: {str(e)}")
 
