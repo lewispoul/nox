@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Annotated, Any, Dict, Union
+from typing import Any, Dict
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ValidationError
 
 from api.schemas.job import JobRequest, JobStatus
 from api.schemas.psi4_job import Psi4JobRequest
@@ -25,7 +25,7 @@ class SimpleJobRequest(BaseModel):
 @router.post("/jobs")
 async def create_job(body: Dict[str, Any]):
     """Create a job - supports simple, XTB, and Psi4 job formats.
-    
+
     Provide one of:
     - SimpleJobRequest: {kind: str, payload: dict}
     - Psi4JobRequest: {engine: "psi4", ...psi4 fields}
@@ -41,7 +41,7 @@ async def create_job(body: Dict[str, Any]):
             if j is None:
                 raise HTTPException(500, "Failed to create job")
             return {"job_id": job_id, "state": j.state}
-        
+
         elif "engine" in body:
             engine = body.get("engine", "xtb")
             if engine == "psi4":

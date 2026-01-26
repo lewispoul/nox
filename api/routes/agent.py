@@ -25,15 +25,15 @@ def _get_conversation(session_id: str) -> Dict[str, Any]:
         # Move to end (most recently used)
         _conversations.move_to_end(session_id)
         return _conversations[session_id]
-    
+
     # Create new conversation
     convo = {"history": []}
     _conversations[session_id] = convo
-    
+
     # Evict oldest if at capacity
     if len(_conversations) > _MAX_CONVERSATIONS:
         _conversations.popitem(last=False)
-    
+
     return convo
 
 
