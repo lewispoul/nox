@@ -37,3 +37,6 @@ Thumbs.db
 .vscode/
 .vscode-remote-containers/
 artifacts/
+
+# Runtime
+.run/
