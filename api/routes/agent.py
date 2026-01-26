@@ -86,7 +86,10 @@ async def agent_ask(request: Request, body: AgentAskRequest) -> Dict[str, Any]:
     else:
         if re.search(r"\bxyz\b|\bsmiles\b", question):
             plan = "Default to XTB optimization"
-            jr = JobRequest(**params)
+            try:
+                jr = JobRequest(**params)
+            except Exception as e:
+                raise HTTPException(422, f"Invalid XTB params: {e}")
             job_id = submit_job("xtb", {"job_request": jr.model_dump_json()})
         else:
             raise HTTPException(400, "Could not determine intent; specify 'params'")
