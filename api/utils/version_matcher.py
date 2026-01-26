@@ -54,8 +54,6 @@ class VersionMatcher:
         """
         self.available_versions = available_versions
         self.arch = arch
-        # Parse and sort versions
-        self.parsed_versions = [self._parse_version(v) for v in available_versions]
     
     def _parse_version(self, version_str: str) -> Tuple[int, ...]:
         """
