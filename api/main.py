@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from api.routes import jobs  # sera présent après création de jobs.py
+from api.routes import jobs
 from api.routes import predict
 from api.routes import agent
 
