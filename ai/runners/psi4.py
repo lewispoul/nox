@@ -86,6 +86,7 @@ multiplicity {multiplicity}
     try:
         psi4.set_memory("1 GiB")
     except Exception:
+        # If setting memory fails, continue with Psi4's default memory settings.
         pass
 
     # Build method/basis label
