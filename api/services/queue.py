@@ -102,6 +102,8 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
     def _runner():
         try:
             store.set_state(job_id, "running")
+            # Small delay to ensure immediate follow-up reads see a non-final state
+            time.sleep(0.05)
             if kind == "echo":
                 result = echo_worker(payload)
             elif kind == "xtb":
