@@ -8,7 +8,6 @@ Tests the intelligent version matching functionality including:
 - Helpful error messages with suggestions
 """
 
-import pytest
 from api.utils.version_matcher import VersionMatcher, match_python_version, VersionMatch
 
 
@@ -57,7 +56,7 @@ class TestVersionMatcher:
         
         # Should provide suggestions
         assert len(result.suggestions) > 0
-        # Should suggest 3.11 and 3.10 as they are closest
+        # Should suggest relevant 3.x versions such as 3.11 or 3.10
         assert "3.11.13" in result.suggestions or "3.10.18" in result.suggestions
         
         # Should have helpful error message

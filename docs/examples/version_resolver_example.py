@@ -7,9 +7,18 @@ systems that need to resolve Python versions, such as:
 - CI/CD pipelines
 - Python version managers
 - Environment setup scripts
+
+Note: This is a demonstration/example file. For production use, adapt as needed.
 """
 
-from typing import Any, Dict, List, Optional, Union
+import sys
+from pathlib import Path
+
+# Add the project root to sys.path for imports
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from typing import Any, Dict, List, Optional
 from api.utils.version_matcher import VersionMatcher
 
 
@@ -136,7 +145,7 @@ def main():
         print(f"\n{'-' * 70}")
         print(f"Attempting to set up Python {version}")
         print(f"{'-' * 70}")
-        success = setup_python_environment(version)
+        setup_python_environment(version)
         print()
     
     print("=" * 70)

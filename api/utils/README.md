@@ -2,6 +2,16 @@
 
 A robust utility for matching and resolving Python versions with intelligent error handling and suggestions.
 
+## Purpose
+
+This utility is designed to provide better error messages and version suggestions for Python version resolution scenarios. It can be integrated into:
+- GitHub Actions workflows (e.g., `setup-python` version resolution)
+- CI/CD pipelines
+- Python version managers
+- Environment setup scripts
+
+**Note:** This is currently a standalone utility prepared for future integration. It provides reusable version matching logic that can be incorporated when needed.
+
 ## Problem Statement
 
 When users request a Python version like "3.1" (a common typo for "3.11"), traditional string matching can fail to provide helpful feedback. This utility solves the problem by:
@@ -136,21 +146,9 @@ Result dataclass containing:
 
 ## Examples
 
-### Example 1: GitHub Actions Setup
+### Example 1: Python Environment Setup
 
-```python
-from api.utils.version_resolver import PythonVersionResolver
-
-resolver = PythonVersionResolver()
-result = resolver.resolve_version("3.11")
-
-if result["success"]:
-    python_path = result["path"]
-    # Use python_path for execution
-else:
-    print(result["error"])
-    print(f"Try: {result['suggestions'][0]}")
-```
+See `docs/examples/version_resolver_example.py` for a complete integration example showing how to use the version matcher in a Python version resolution system.
 
 ### Example 2: CI/CD Pipeline
 
@@ -271,6 +269,7 @@ Part of the NOX API project.
 
 ## Related
 
-- `api/utils/version_resolver.py` - Integration example
+- `docs/examples/version_resolver_example.py` - Integration example
 - `tests/test_version_matcher.py` - Test suite
 - `scripts/demo_version_matcher.py` - Demonstration script
+- `docs/version-matcher-solution.md` - Implementation details
