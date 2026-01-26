@@ -106,7 +106,10 @@ def run_psi4_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
     )
 
     if result.get("returncode") != 0:
-        raise RuntimeError("Psi4 calculation failed")
+        error_msg = (
+            f"Psi4 calculation failed with return code {result.get('returncode')}"
+        )
+        raise RuntimeError(error_msg)
     return result
 
 
