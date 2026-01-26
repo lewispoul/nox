@@ -75,25 +75,23 @@ async def test_wait_already_completed():
     """Test /jobs/{id}/wait returns immediately for already-done jobs"""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        # Create and let job complete
-        job_request = {"kind": "echo", "payload": {"instant": True}}
+        # Create job
+        job_request = {"kind": "echo", "payload": {}}
         create_response = await ac.post("/jobs/simple", json=job_request)
+        assert create_response.status_code == status.HTTP_200_OK
         job_id = create_response.json()["job_id"]
         
-        # Wait for job to definitely complete (echo + delay buffer)
+        # Wait for job to complete (echo is fast, 0.2s + overhead is enough)
         import asyncio
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.6)
         
-        # Verify job is done before calling wait
-        status_response = await ac.get(f"/jobs/{job_id}/status")
-        status_data = status_response.json()
-        
-        # Now call wait - should return immediately since job is done
+        # Call wait - job should already be done, should return immediately
         wait_response = await ac.get(f"/jobs/{job_id}/wait?timeout=1")
-        assert wait_response.status_code == status.HTTP_200_OK
+        assert wait_response.status_code == status.HTTP_200_OK, f"Expected 200, got {wait_response.status_code}: {wait_response.text}"
         
         wait_data = wait_response.json()
-        assert wait_data["state"] in ("completed", "failed")
+        assert "job_id" in wait_data
+        assert wait_data["state"] in ("completed", "failed"), f"Unexpected state: {wait_data.get('state')}"
 
 
 @pytest.mark.asyncio
