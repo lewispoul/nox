@@ -139,7 +139,7 @@ class VersionMatcher:
         
         if matches:
             # Return the latest version among matches
-            latest = max(matches, key=lambda v: self._parse_version(v))
+            latest = max(matches, key=self._parse_version)
             return VersionMatch(
                 requested=requested_version,
                 exact_match=latest
