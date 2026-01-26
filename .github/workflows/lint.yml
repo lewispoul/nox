@@ -25,8 +25,7 @@ jobs:
       - name: Install Python dependencies
         run: pip install black flake8
 
-      - name: lint
-        uses: wearerequired/lint-action@v2
-        with:
-          black: true
-          flake8: true
+      - name: Run black and flake8
+        run: |
+          black .
+          flake8 .
