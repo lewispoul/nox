@@ -14,7 +14,7 @@ Example:
     ...     print(f"Suggestions: {result.suggestions}")
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 import re
 
@@ -25,12 +25,8 @@ class VersionMatch:
     
     requested: str
     exact_match: Optional[str] = None
-    suggestions: List[str] = None
+    suggestions: List[str] = field(default_factory=list)
     error_message: Optional[str] = None
-    
-    def __post_init__(self):
-        if self.suggestions is None:
-            self.suggestions = []
     
     @property
     def found(self) -> bool:
@@ -91,6 +87,12 @@ class VersionMatcher:
         Returns:
             Distance value (lower is closer)
         """
+        # Handle empty tuples
+        if not v1 and not v2:
+            return 0.0
+        if not v1 or not v2:
+            return float('inf')
+        
         # Pad versions to same length
         max_len = max(len(v1), len(v2))
         v1_padded = v1 + (0,) * (max_len - len(v1))

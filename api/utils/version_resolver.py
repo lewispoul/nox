@@ -9,8 +9,7 @@ systems that need to resolve Python versions, such as:
 - Environment setup scripts
 """
 
-import sys
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 from api.utils.version_matcher import VersionMatcher
 
 
@@ -51,7 +50,7 @@ class PythonVersionResolver:
             "3.13.7": "/usr/bin/python3.13",
         }
     
-    def resolve_version(self, requested_version: str, arch: str = "x64") -> Dict[str, any]:
+    def resolve_version(self, requested_version: str, arch: str = "x64") -> Dict[str, Any]:
         """
         Resolve a requested Python version to an available installation.
         
