@@ -16,14 +16,17 @@ def health():
 try:
     app.include_router(jobs.router)
 except Exception:
+    # Intentionally ignore failures when including optional 'jobs' routes.
     pass
 
 try:
     app.include_router(predict.router)
 except Exception:
+    # Intentionally ignore failures when including optional 'predict' routes.
     pass
 
 try:
     app.include_router(agent.router)
 except Exception:
+    # Intentionally ignore failures when including optional 'agent' routes.
     pass
