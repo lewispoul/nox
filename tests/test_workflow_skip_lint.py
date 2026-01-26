@@ -28,7 +28,9 @@ def test_workflow_syntax_valid(workflow):
 
 def test_workflow_dispatch_has_skip_lint_input(workflow):
     """Test that workflow_dispatch has skip_lint input"""
-    # Note: 'on' is parsed as True in YAML (boolean alias)
+    # Note: 'on' is a YAML boolean alias, so PyYAML parses it as True.
+    # This is the correct way to access the 'on' key in a parsed YAML workflow.
+    # See: https://yaml.org/type/bool.html
     triggers = workflow.get(True, {})
     assert "workflow_dispatch" in triggers, "workflow_dispatch trigger missing"
     

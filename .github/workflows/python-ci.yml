@@ -270,11 +270,11 @@ jobs:
         echo "  • SBOM: ${{ needs.sbom.result }}"
         echo ""
         # Success if tests pass (code-quality can be skipped)
-        if [[ ("${{ needs.code-quality.result }}" == "success" || "${{ needs.code-quality.result }}" == "skipped") && "${{ needs.test.result }}" == "success" ]]; then
+        if [[ "${{ needs.code-quality.result }}" == "success" || "${{ needs.code-quality.result }}" == "skipped" ]] && [[ "${{ needs.test.result }}" == "success" ]]; then
           echo "✅ CI Pipeline: SUCCESS"
           echo "🚀 Code is ready for deployment"
           if [[ "${{ needs.code-quality.result }}" == "skipped" ]]; then
-            echo "ℹ️  Note: Code quality checks were skipped"
+            echo "ℹ️ Note: Code quality checks were skipped"
           fi
         else
           echo "❌ CI Pipeline: FAILURE"
