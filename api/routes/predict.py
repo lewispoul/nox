@@ -58,14 +58,13 @@ async def predict_vod(body: VoDRequest) -> Dict[str, Any]:
         )
         out["models"]["keshavarz"] = {"VoD_km_s": d2}
 
-    # Simple ML
-    d3 = simple_ml_vod_kms({k: float(v) for k, v in body_dict.items() if isinstance(v, (int, float))})
-    out["models"]["ml_baseline"] = {"VoD_km_s": d3}
-
     if not out["models"]:
         raise HTTPException(
             422,
             "Provide inputs for KJ (rho_g_cc,N,M,Q_cal_g) and/or Keshavarz (rho_g_cc,OB).",
         )
 
+    # Simple ML
+    d3 = simple_ml_vod_kms({k: float(v) for k, v in body_dict.items() if isinstance(v, (int, float))})
+    out["models"]["ml_baseline"] = {"VoD_km_s": d3}
     return out
