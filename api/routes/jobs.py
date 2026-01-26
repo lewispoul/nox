@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Annotated, Any, Dict, Union
+from typing import Annotated, Any, Dict, Literal, Union
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, ValidationError
@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 class SimpleJobRequest(BaseModel):
-    engine: str = "simple"
+    engine: Literal["simple"] = "simple"
     kind: str = "echo"
     payload: Dict[str, Any] = {}
 

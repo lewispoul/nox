@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -20,6 +22,6 @@ class Psi4Inputs(BaseModel):
 
 
 class Psi4JobRequest(BaseModel):
-    engine: str = "psi4"
+    engine: Literal["psi4"] = "psi4"
     kind: str = "opt_scf_freq"
     inputs: Psi4Inputs
