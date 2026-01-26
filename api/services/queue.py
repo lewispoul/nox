@@ -30,6 +30,7 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
                     energy = float(result[k])
                     break
                 except Exception:
+                    # Ignore values that cannot be converted to float and try next key
                     pass
         if energy is not None:
             scalars = {"E_total_hartree": energy}
