@@ -166,8 +166,18 @@ def _default_xtb_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
     if settings.iam_use_remote and settings.iam_base_url:
         from ai.iam_client import IAMClient
 
-        client = IAMClient(base_url=settings.iam_base_url)
-        result = _normalize_remote_result(client.run_xtb(JR.model_dump()))
+        try:
+            client = IAMClient(base_url=settings.iam_base_url)
+            result = _normalize_remote_result(client.run_xtb(JR.model_dump()))
+        except Exception as e:
+            # Normalize IAM errors into a failure result so caller logic remains consistent
+            result = {
+                "scalars": {},
+                "series": {},
+                "artifacts": [],
+                "returncode": 1,
+                "error": f"IAM XTB invocation failed: {e}",
+            }
         # Assume IAM returns compatible structure; otherwise adapt here
     else:
         result = run_xtb_job(
