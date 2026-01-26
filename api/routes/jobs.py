@@ -128,7 +128,7 @@ def get_artifacts(job_id: str):
 
 
 @router.get("/jobs/{job_id}/wait")
-async def wait_for_job(job_id: str, timeout: int = 30):
+def wait_for_job(job_id: str, timeout: int = 30):
     """Poll job until completion or timeout.
     
     Args:
@@ -138,7 +138,7 @@ async def wait_for_job(job_id: str, timeout: int = 30):
     Returns:
         JobStatus with final state (completed/failed) or current state if timeout
     """
-    import asyncio
+    import time
     
     if timeout > 300:
         timeout = 300
@@ -146,7 +146,7 @@ async def wait_for_job(job_id: str, timeout: int = 30):
         timeout = 1
         
     elapsed = 0
-    poll_interval = 0.5  # 500ms between polls
+    poll_interval = 0.1  # 100ms between polls
     
     while elapsed < timeout:
         j = get_store().get(job_id)
@@ -171,7 +171,7 @@ async def wait_for_job(job_id: str, timeout: int = 30):
             )
             
         # Non-terminal state - wait and poll again
-        await asyncio.sleep(poll_interval)
+        time.sleep(poll_interval)
         elapsed += poll_interval
         
     # Timeout reached - return current state
