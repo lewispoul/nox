@@ -116,4 +116,8 @@ def run_cj_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     jd = job_dir(payload.get("job_id", "unknown"))
     req = payload.get("cj_request", {})
-    return run_cj(jd, req)
+    result = run_cj(jd, req)
+
+    if result.get("returncode") != 0:
+        raise RuntimeError("CJ calculation failed")
+    return result
