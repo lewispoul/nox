@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Union
+from typing import Annotated, Any, Dict, Union
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 from api.schemas.job import JobRequest, JobStatus
 from api.schemas.psi4_job import Psi4JobRequest
@@ -15,12 +15,20 @@ router = APIRouter()
 
 
 class SimpleJobRequest(BaseModel):
+    engine: str = "simple"
     kind: str = "echo"
     payload: Dict[str, Any] = {}
 
 
+# Use discriminated union to avoid misrouting
+JobRequestUnion = Annotated[
+    Union[Psi4JobRequest, JobRequest, SimpleJobRequest],
+    Field(discriminator="engine")
+]
+
+
 @router.post("/jobs")
-async def create_job(body: Union[SimpleJobRequest, Psi4JobRequest, JobRequest]):
+async def create_job(body: JobRequestUnion):
     """Create a job - supports simple, XTB, and Psi4 job formats.
     
     Provide one of:

@@ -52,6 +52,7 @@ def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
     from ai.runners.xtb import run_xtb_job
     from api.schemas.job import JobRequest
     from api.services.storage import job_dir
+    from api.services.settings import settings
 
     # Parse the job request
     job_request_json = payload.get("job_request", "{}")
@@ -63,13 +64,21 @@ def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
     job_id = payload.get("job_id", "unknown")
     jd = job_dir(job_id)
 
-    result = run_xtb_job(
-        jd,
-        JR.inputs.xyz,
-        JR.inputs.charge,
-        JR.inputs.multiplicity,
-        JR.inputs.params.model_dump(),
-    )
+    if settings.iam_use_remote and settings.iam_base_url:
+        from ai.iam_client import IAMClient
+
+        client = IAMClient(base_url=settings.iam_base_url)
+        # Normalize remote result to match local format
+        from api.services.queue import _normalize_remote_result
+        result = _normalize_remote_result(client.run_xtb(JR.model_dump()))
+    else:
+        result = run_xtb_job(
+            jd,
+            JR.inputs.xyz,
+            JR.inputs.charge,
+            JR.inputs.multiplicity,
+            JR.inputs.params.model_dump(),
+        )
 
     # XTB success: return code 0 OR (return code 2 with valid energy results)
     has_energy = result.get("scalars", {}).get("E_total_hartree") is not None
@@ -85,25 +94,36 @@ def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     return result
 
-
 def run_psi4_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
     from ai.runners.psi4 import run_psi4_job
     from api.schemas.psi4_job import Psi4JobRequest
     from api.services.storage import job_dir
+    from api.services.settings import settings
 
     job_request_json = payload.get("job_request", "{}")
-    JR = Psi4JobRequest.model_validate_json(job_request_json)
+    try:
+        JR = Psi4JobRequest.model_validate_json(job_request_json)
+    except Exception as e:
+        raise ValueError(f"Invalid Psi4 job request: {e}") from e
 
     job_id = payload.get("job_id", "unknown")
     jd = job_dir(job_id)
 
-    result = run_psi4_job(
-        jd,
-        JR.inputs.xyz,
-        JR.inputs.charge,
-        JR.inputs.multiplicity,
-        JR.inputs.params.model_dump(),
-    )
+    if settings.iam_use_remote and settings.iam_base_url:
+        from ai.iam_client import IAMClient
+
+        client = IAMClient(base_url=settings.iam_base_url)
+        # Normalize remote result to match local format
+        from api.services.queue import _normalize_remote_result
+        result = _normalize_remote_result(client.run_psi4(JR.model_dump()))
+    else:
+        result = run_psi4_job(
+            jd,
+            JR.inputs.xyz,
+            JR.inputs.charge,
+            JR.inputs.multiplicity,
+            JR.inputs.params.model_dump(),
+        )
 
     if result.get("returncode") != 0:
         raise RuntimeError("Psi4 calculation failed")

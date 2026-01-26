@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from api.routes import jobs  # sera présent après création de jobs.py
+from api.routes import jobs
 from api.routes import predict
 from api.routes import agent
 
@@ -16,14 +16,17 @@ def health():
 try:
     app.include_router(jobs.router)
 except Exception:
+    # Ignore if router is not available
     pass
 
 try:
     app.include_router(predict.router)
 except Exception:
+    # Ignore if router is not available
     pass
 
 try:
     app.include_router(agent.router)
 except Exception:
+    # Ignore if router is not available
     pass

@@ -17,7 +17,7 @@ def kamlet_jacobs_vod_kms(
     """
     from math import sqrt
 
-    return 1.01 * (N_mol_gas_per_g * M_g_mol * Q_cal_g) ** 0.5 * (1.0 + 1.30 * rho_g_cc)
+    return 1.01 * sqrt(N_mol_gas_per_g * M_g_mol * Q_cal_g) * (1.0 + 1.30 * rho_g_cc)
 
 
 def keshavarz_vod_kms(

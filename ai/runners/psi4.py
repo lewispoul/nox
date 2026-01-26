@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -86,6 +85,7 @@ multiplicity {multiplicity}
     try:
         psi4.set_memory("1 GiB")
     except Exception:
+        # Ignore if memory setting fails
         pass
 
     # Build method/basis label

@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-import json
-import shutil
 from pathlib import Path
 from typing import Any, Dict
 
 
 def _has_cantera() -> bool:
-    if shutil.which("python") is None:
-        return False
     try:
         import importlib
 
