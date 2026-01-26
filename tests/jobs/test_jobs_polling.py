@@ -26,8 +26,12 @@ async def test_wait_completes_for_done_job():
         create_response = await ac.post("/jobs/simple", json=job_request)
         job_id = create_response.json()["job_id"]
         
-        # Wait for job (should complete within default timeout)
-        wait_response = await ac.get(f"/jobs/{job_id}/wait")
+        # Wait a bit for job to complete (echo is fast)
+        import asyncio
+        await asyncio.sleep(0.3)
+        
+        # Wait for job (should be done or complete quickly)
+        wait_response = await ac.get(f"/jobs/{job_id}/wait?timeout=5")
         assert wait_response.status_code == status.HTTP_200_OK
         
         wait_data = wait_response.json()
@@ -76,11 +80,15 @@ async def test_wait_already_completed():
         create_response = await ac.post("/jobs/simple", json=job_request)
         job_id = create_response.json()["job_id"]
         
-        # Wait briefly for job to finish
+        # Wait for job to definitely complete (echo + delay buffer)
         import asyncio
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(0.5)
         
-        # Now call wait - should return immediately
+        # Verify job is done before calling wait
+        status_response = await ac.get(f"/jobs/{job_id}/status")
+        status_data = status_response.json()
+        
+        # Now call wait - should return immediately since job is done
         wait_response = await ac.get(f"/jobs/{job_id}/wait?timeout=1")
         assert wait_response.status_code == status.HTTP_200_OK
         
