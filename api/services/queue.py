@@ -39,12 +39,28 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
         for art in artifacts:
             if isinstance(art, str):
                 # Reject absolute paths and path traversal attempts
-                if not art.startswith("/") and ".." not in art:
-                    safe_artifacts.append(art)
-                else:
+                # Use normpath to resolve encoded and complex traversal attempts
+                try:
+                    import os.path
+
+                    normalized = os.path.normpath(art)
+                    # Reject if absolute, starts with .., or normalization changes it significantly
+                    # (indicating traversal attempts like ....// or encoded forms)
+                    if (
+                        not os.path.isabs(normalized)
+                        and not normalized.startswith("..")
+                        and not normalized.startswith("/")
+                    ):
+                        safe_artifacts.append(art)
+                    else:
+                        logger.warning(
+                            "Rejected unsafe artifact path",
+                            extra={"path": art, "normalized": normalized},
+                        )
+                except Exception as e:
                     logger.warning(
-                        "Rejected unsafe artifact path",
-                        extra={"path": art},
+                        "Failed to validate artifact path",
+                        extra={"path": art, "error": str(e)},
                     )
         artifacts = safe_artifacts
 

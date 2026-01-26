@@ -47,7 +47,7 @@ def run_psi4_job(
 
     if not _has_psi4():
         raise Psi4Unavailable(
-            "Psi4 not available in environment (module or binary not found)"
+            "Psi4 not available in environment (Python module not found)"
         )
 
     method: str = params.get("method", "HF")
