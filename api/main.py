@@ -13,17 +13,6 @@ def health():
 
 
 # branchement des routes
-try:
-    app.include_router(jobs.router)
-except Exception:
-    pass
-
-try:
-    app.include_router(predict.router)
-except Exception:
-    pass
-
-try:
-    app.include_router(agent.router)
-except Exception:
-    pass
+app.include_router(jobs.router)
+app.include_router(predict.router)
+app.include_router(agent.router)
