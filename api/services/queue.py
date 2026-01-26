@@ -45,19 +45,17 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
                     # Reject if:
                     # - Absolute path after normalization
                     # - Starts with .. (parent directory traversal)
-                    # - Normalization significantly changed the path (indicates obfuscation)
                     is_safe = (
                         not os.path.isabs(normalized)
                         and not normalized.startswith("..")
-                        and not normalized.startswith("/")
                     )
                     
-                    # Additional check: if normalization removed components, reject it
+                    # Additional check: if normalization changed the path, verify no
+                    # parent directory components were introduced by obfuscation
                     # (e.g., "foo/../../etc" -> "../etc" or "....//etc" -> "../etc")
                     if is_safe and normalized != art:
-                        # Allow simple normalization like "./foo" -> "foo"
-                        # but reject if parent directory components were resolved
-                        if normalized.startswith("..") or ".." in normalized.split(os.sep):
+                        # Reject if any path component is ".." after normalization
+                        if ".." in normalized.split(os.sep):
                             is_safe = False
                     
                     if is_safe:
