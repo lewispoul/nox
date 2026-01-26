@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
+from typing import Literal
+
+from pydantic import BaseModel, Field
 
 
 class Psi4Params(BaseModel):
@@ -20,6 +22,6 @@ class Psi4Inputs(BaseModel):
 
 
 class Psi4JobRequest(BaseModel):
-    engine: str = "psi4"
+    engine: Literal["psi4"] = Field(default="psi4")
     kind: str = "opt_scf_freq"
     inputs: Psi4Inputs

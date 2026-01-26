@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from typing import Literal
+
+from pydantic import BaseModel, Field
 
 
 class XTBParams(BaseModel):
@@ -19,7 +21,7 @@ class JobInputs(BaseModel):
 
 
 class JobRequest(BaseModel):
-    engine: str = "xtb"
+    engine: Literal["xtb"] = Field(default="xtb")
     kind: str = "opt_properties"
     inputs: JobInputs
 
