@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pydantic import field_validator
+from pydantic import ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     @field_validator("iam_base_url")
     @classmethod
-    def validate_iam_base_url(cls, v: str, info) -> str:
+    def validate_iam_base_url(cls, v: str, info: ValidationInfo) -> str:
         """Validate that iam_base_url is provided when iam_use_remote is enabled."""
         # Access iam_use_remote from the values being validated
         iam_use_remote = info.data.get("iam_use_remote", False)
