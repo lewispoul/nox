@@ -77,13 +77,11 @@ jobs:
         JWT_SECRET_KEY: test_secret_key_for_ci
         NOX_API_HOST: "0.0.0.0"
         NOX_API_PORT: "8000"
-        # Single-node database config for CI
         PG_PRIMARY_HOST: "localhost"
         PG_REPLICA1_HOST: "localhost" 
         PG_REPLICA2_HOST: "localhost"
-        # Single Redis instance for CI
         REDIS_URL: "redis://localhost:6379/0"
-        # Disable clustering in test environment
+        JOBS_FORCE_LOCAL: "true"
         DISABLE_MULTINODE: "true"
         CI_ENVIRONMENT: "true"
     
