@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import logging
 import os
 import threading
 import time
 from typing import Any, Dict
 
 from .jobs_store import get_store
+
+logger = logging.getLogger(__name__)
+
+
 def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
     """Normalize a remote IAM response into Nox result shape.
 
@@ -23,9 +28,7 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
 
     # Validate artifacts is a list and contains only safe paths
     if not isinstance(artifacts, list):
-        import logging
-
-        logging.getLogger(__name__).warning(
+        logger.warning(
             "Invalid artifacts type in remote result, expected list",
             extra={"type": type(artifacts).__name__},
         )
@@ -39,9 +42,7 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
                 if not art.startswith("/") and ".." not in art:
                     safe_artifacts.append(art)
                 else:
-                    import logging
-
-                    logging.getLogger(__name__).warning(
+                    logger.warning(
                         "Rejected unsafe artifact path",
                         extra={"path": art},
                     )
@@ -49,18 +50,14 @@ def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
 
     # Validate scalars and series are dicts
     if not isinstance(scalars, dict):
-        import logging
-
-        logging.getLogger(__name__).warning(
+        logger.warning(
             "Invalid scalars type in remote result, expected dict",
             extra={"type": type(scalars).__name__},
         )
         scalars = {}
 
     if not isinstance(series, dict):
-        import logging
-
-        logging.getLogger(__name__).warning(
+        logger.warning(
             "Invalid series type in remote result, expected dict",
             extra={"type": type(series).__name__},
         )
@@ -186,9 +183,7 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
             try:
                 enqueue_job.send(job_id, kind, payload)
             except Exception as exc:  # noqa: BLE001
-                import logging
-
-                logging.getLogger(__name__).exception(
+                logger.exception(
                     "enqueue_job.send failed; falling back to local execution",
                     extra={"job_id": job_id, "kind": kind},
                 )

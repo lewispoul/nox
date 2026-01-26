@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Annotated, Any, Dict, Union
+from typing import Any, Dict, Union
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ValidationError
 
 from api.schemas.job import JobRequest, JobStatus
 from api.schemas.psi4_job import Psi4JobRequest
@@ -17,31 +17,20 @@ router = APIRouter()
 class SimpleJobRequest(BaseModel):
     kind: str = "echo"
     payload: Dict[str, Any] = {}
-    # Add a discriminator field to distinguish from engine-based requests
-    request_type: str = Field(default="simple", const=True)
-
-
-# Use discriminated union for clearer API schema and validation
-JobRequestUnion = Annotated[
-    Union[Psi4JobRequest, JobRequest, SimpleJobRequest],
-    Field(discriminator="engine"),
-]
 
 
 @router.post("/jobs")
 async def create_job(body: Union[SimpleJobRequest, Psi4JobRequest, JobRequest]):
     """Create a job - supports simple, XTB, and Psi4 job formats.
     
-    The request type is automatically determined by the request body:
-    - SimpleJobRequest: {kind: str, payload: dict}
-    - Psi4JobRequest: {engine: "psi4", kind: str, inputs: {...}}
-    - JobRequest: {engine: "xtb", kind: str, inputs: {...}}
+    The request type is automatically determined by the request body structure:
+    - SimpleJobRequest: {kind: str, payload: dict} - for simple echo jobs
+    - Psi4JobRequest: {engine: "psi4", kind: str, inputs: {...}} - for Psi4 calculations
+    - JobRequest: {engine: "xtb", kind: str, inputs: {...}} - for XTB calculations
     
-    Note: FastAPI will attempt to validate against each type in order.
-    For clearer validation errors, consider using the specific endpoints:
-    - POST /jobs/simple for simple jobs
-    - POST /jobs with engine="psi4" for Psi4 jobs
-    - POST /jobs with engine="xtb" for XTB jobs
+    Note: FastAPI validates against each union member in order. If you receive
+    unexpected validation errors, ensure your request matches one of the schemas above.
+    Alternatively, use the dedicated /jobs/simple endpoint for simple jobs.
     """
     try:
         # SimpleJobRequest
