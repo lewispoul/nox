@@ -132,7 +132,13 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
         def _send_or_fallback():
             try:
                 enqueue_job.send(job_id, kind, payload)
-            except Exception:
+            except Exception as exc:  # noqa: BLE001
+                import logging
+
+                logging.getLogger(__name__).exception(
+                    "enqueue_job.send failed; falling back to local execution",
+                    extra={"job_id": job_id, "kind": kind},
+                )
                 _run_local()
 
         threading.Thread(target=_send_or_fallback, daemon=True).start()
