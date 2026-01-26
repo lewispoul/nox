@@ -257,6 +257,10 @@ def _default_cj_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
     req = payload.get("cj_request", {})
     res = run_cj(jd, req)
     res["payload"] = payload
+
+    rc = res.get("returncode")
+    if rc != 0:
+        raise RuntimeError(f"CJ calculation failed, returncode={rc}")
     return res
 
 
