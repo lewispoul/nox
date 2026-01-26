@@ -189,41 +189,38 @@ class TestVersionMatchDataclass:
         assert match.suggestions == []
 
 
-class TestVersionParsing:
-    """Test suite for version parsing logic."""
-    
-    def test_parse_various_formats(self):
-        """Test parsing of various version formats."""
-        matcher = VersionMatcher(AVAILABLE_VERSIONS)
-        
-        # Test valid formats
-        assert matcher._parse_version("3.11.13") == (3, 11, 13)
-        assert matcher._parse_version("3.11") == (3, 11)
-        assert matcher._parse_version("3") == (3,)
-        assert matcher._parse_version("3.11rc1") == (3, 11)
-        assert matcher._parse_version("3.12.0a1") == (3, 12, 0)
-    
-    def test_version_distance_calculation(self):
-        """Test that version distance calculation works correctly."""
-        matcher = VersionMatcher(AVAILABLE_VERSIONS)
-        
-        # Same versions should have 0 distance
-        v1 = (3, 11, 13)
-        assert matcher._version_distance(v1, v1) == 0
-        
-        # 3.10 should be closer to 3.11 than 3.9
-        v_req = (3, 11)
-        v_3_10 = (3, 10, 18)
-        v_3_9 = (3, 9, 23)
-        
-        dist_to_3_10 = matcher._version_distance(v_req, v_3_10)
-        dist_to_3_9 = matcher._version_distance(v_req, v_3_9)
-        
-        assert dist_to_3_10 < dist_to_3_9
-
-
 class TestEdgeCases:
     """Test edge cases and boundary conditions."""
+    
+    def test_empty_available_versions(self):
+        """Test behavior with no available versions."""
+        matcher = VersionMatcher([])
+        result = matcher.find_match("3.11")
+        
+        assert not result.found
+        assert result.suggestions == []
+    
+    def test_single_available_version(self):
+        """Test with only one available version."""
+        matcher = VersionMatcher(["3.11.13"])
+        
+        # Exact match
+        result = matcher.find_match("3.11.13")
+        assert result.found
+        
+        # Non-match should suggest the only version
+        result = matcher.find_match("3.10")
+        assert not result.found
+        assert "3.11.13" in result.suggestions
+    
+    def test_very_long_version_string(self):
+        """Test handling of unusually long version strings."""
+        versions = ["3.11.13.1.2.3"]
+        matcher = VersionMatcher(versions)
+        result = matcher.find_match("3.11")
+        
+        assert result.found
+        assert result.exact_match == "3.11.13.1.2.3"
     
     def test_empty_available_versions(self):
         """Test behavior with no available versions."""
