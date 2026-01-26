@@ -213,7 +213,10 @@ def _default_psi4_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
     from api.services.settings import settings
 
     job_request_json = payload.get("job_request", "{}")
-    JR = Psi4JobRequest.model_validate_json(job_request_json)
+    try:
+        JR = Psi4JobRequest.model_validate_json(job_request_json)
+    except Exception as exc:
+        raise ValueError(f"Invalid Psi4 job_request payload: {exc}") from exc
 
     job_id = payload.get("job_id", "unknown")
     jd = job_dir(job_id)
