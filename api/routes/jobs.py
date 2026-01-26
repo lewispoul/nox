@@ -128,66 +128,56 @@ def get_artifacts(job_id: str):
 
 
 @router.get("/jobs/{job_id}/wait")
-def wait_for_job(job_id: str, timeout: int = 30):
+async def wait_for_job(job_id: str, timeout: int = 30, poll_delay: float = 0.5):
     """Poll job until completion or timeout.
     
-    Args:
-        job_id: Job identifier
-        timeout: Maximum seconds to wait (default 30, max 300)
-        
-    Returns:
-        JobStatus with final state (completed/failed) or current state if timeout
+    - Fast-path returns immediately when job is already terminal (done/failed)
+    - Polls at `poll_delay` until `timeout` seconds
+    - Returns 202 when timing out with job still running/pending
     """
+    import asyncio
     import time
-    
-    if timeout > 300:
-        timeout = 300
-    if timeout < 1:
-        timeout = 1
-        
-    elapsed = 0
-    poll_interval = 0.1  # 100ms between polls
-    
-    while elapsed < timeout:
-        j = get_store().get(job_id)
-        if not j:
-            raise HTTPException(404, "Job not found")
-            
-        # Map internal states to API states
-        state_mapping = {
-            "queued": "pending",
-            "running": "running",
-            "done": "completed",
-            "failed": "failed",
-        }
-        api_state = state_mapping.get(j.state, j.state)
-        
-        # Terminal states - return immediately
-        if j.state in ("done", "failed"):
-            return JobStatus(
-                job_id=job_id,
-                state=api_state,
-                message=j.error or "Job completed",
-            )
-            
-        # Non-terminal state - wait and poll again
-        time.sleep(poll_interval)
-        elapsed += poll_interval
-        
-    # Timeout reached - return current state
-    j = get_store().get(job_id)
-    if not j:
-        raise HTTPException(404, "Job not found")
-        
+    from fastapi.responses import JSONResponse
+
+    # Clamp timeout and poll delay to sane bounds
+    timeout = max(1, min(timeout, 300))
+    poll_delay = max(0.05, min(poll_delay, 5.0))
+
     state_mapping = {
         "queued": "pending",
         "running": "running",
         "done": "completed",
         "failed": "failed",
     }
-    
-    return JobStatus(
-        job_id=job_id,
-        state=state_mapping.get(j.state, j.state),
-        message=f"Timeout after {timeout}s - job still {j.state}",
-    )
+
+    def _job_status(job):
+        api_state = state_mapping.get(job.state, job.state)
+        msg = job.error or ("Job completed" if job.state == "done" else "Job processing")
+        return JobStatus(job_id=job_id, state=api_state, message=msg)
+
+    job = get_store().get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Fast-path for terminal states
+    if job.state in ("done", "failed"):
+        return _job_status(job)
+
+    # Poll until timeout
+    start = time.monotonic()
+    while time.monotonic() - start < timeout:
+        await asyncio.sleep(poll_delay)
+        job = get_store().get(job_id)
+        if not job:
+            raise HTTPException(status_code=404, detail="Job not found")
+        if job.state in ("done", "failed"):
+            return _job_status(job)
+
+    # Timed out, job still not terminal
+    job = get_store().get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    status_body = _job_status(job)
+    status_body.message = f"Timeout after {timeout}s - job still {job.state}"
+    return JSONResponse(status_code=202, content=status_body.model_dump())

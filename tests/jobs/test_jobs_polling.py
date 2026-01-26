@@ -28,7 +28,7 @@ async def test_wait_endpoint_exists():
         
         # Call wait endpoint with short timeout
         wait_response = await ac.get(f"/jobs/{job_id}/wait?timeout=1")
-        assert wait_response.status_code == status.HTTP_200_OK
+        assert wait_response.status_code in (status.HTTP_200_OK, status.HTTP_202_ACCEPTED)
         
         wait_data = wait_response.json()
         assert "job_id" in wait_data
@@ -50,7 +50,7 @@ async def test_wait_with_custom_timeout():
         # Test with various timeout values
         for timeout in [1, 5, 10]:
             wait_response = await ac.get(f"/jobs/{job_id}/wait?timeout={timeout}")
-            assert wait_response.status_code == status.HTTP_200_OK
+            assert wait_response.status_code in (status.HTTP_200_OK, status.HTTP_202_ACCEPTED)
             wait_data = wait_response.json()
             assert wait_data["job_id"] == job_id
 
@@ -79,7 +79,7 @@ async def test_wait_enforces_max_timeout():
         
         # Request huge timeout - should be capped by endpoint
         wait_response = await ac.get(f"/jobs/{job_id}/wait?timeout=999999")
-        assert wait_response.status_code == status.HTTP_200_OK
+        assert wait_response.status_code in (status.HTTP_200_OK, status.HTTP_202_ACCEPTED)
         
         wait_data = wait_response.json()
         assert wait_data["job_id"] == job_id
