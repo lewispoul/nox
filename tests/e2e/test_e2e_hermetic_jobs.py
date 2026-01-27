@@ -10,6 +10,7 @@ from httpx import ASGITransport, AsyncClient
 from api.routes.jobs import router as jobs_router
 from api.routes.predict import router as predict_router
 from api.services import queue as q
+from tests.helpers import wait_for_job_done
 
 
 @pytest.mark.asyncio
@@ -74,12 +75,7 @@ async def test_e2e_cj_hermetic(monkeypatch):
         assert r.status_code == 200
         job_id = r.json()["job_id"]
 
-        deadline = time.time() + 5
-        state = r.json()["state"]
-        while state not in {"done", "failed"} and time.time() < deadline:
-            await asyncio.sleep(0.05)
-            r2 = await client.get(f"/jobs/{job_id}")
-            state = r2.json()["state"]
+        state = await wait_for_job_done(job_id, client=client)
         assert state == "done"
 
         r3 = await client.get(f"/jobs/{job_id}")
@@ -131,12 +127,7 @@ async def test_e2e_xtb_with_mock_runner(monkeypatch):
         assert r.status_code == 200
         job_id = r.json()["job_id"]
 
-        deadline = time.time() + 5
-        state = r.json()["state"]
-        while state not in {"done", "failed"} and time.time() < deadline:
-            await asyncio.sleep(0.05)
-            r2 = await client.get(f"/jobs/{job_id}")
-            state = r2.json()["state"]
+        state = await wait_for_job_done(job_id, client=client)
         assert state == "done"
 
         r3 = await client.get(f"/jobs/{job_id}")
@@ -187,12 +178,7 @@ async def test_e2e_cj_with_mock_runner(monkeypatch):
         assert r.status_code == 200
         job_id = r.json()["job_id"]
 
-        deadline = time.time() + 5
-        state = r.json()["state"]
-        while state not in {"done", "failed"} and time.time() < deadline:
-            await asyncio.sleep(0.05)
-            r2 = await client.get(f"/jobs/{job_id}")
-            state = r2.json()["state"]
+        state = await wait_for_job_done(job_id, client=client)
         assert state == "done"
 
         r3 = await client.get(f"/jobs/{job_id}")

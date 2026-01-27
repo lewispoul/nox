@@ -8,6 +8,7 @@ import pytest
 from api.services import queue
 from api.services.jobs_store import get_store
 from api.schemas.job import JobInputs, JobRequest, XTBParams
+from tests.helpers import wait_for_job_done
 
 
 @pytest.mark.asyncio
@@ -83,13 +84,9 @@ async def test_xtb_job_with_mock_runner(monkeypatch):
 
     job_id = queue.submit_job("xtb", {"job_request": jr.model_dump_json()})
 
-    store = get_store()
-    deadline = time.time() + 5
-    state = store.get(job_id).state
-    while state not in {"done", "failed"} and time.time() < deadline:
-        await asyncio.sleep(0.05)
-        state = store.get(job_id).state
+    state = await wait_for_job_done(job_id)
 
+    store = get_store()
     job = store.get(job_id)
     assert job.state == "done"
     result = job.result or {}
