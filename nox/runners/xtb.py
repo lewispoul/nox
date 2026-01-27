@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import pathlib
 import shutil
-from typing import Any, Dict, List
+from typing import Any, Dict
 
-from nox.artifacts.cubes import generate_cubes_from_molden, validate_cube_file
 from nox.parsers.xtb_json import parse_xtbout_text
 
 
@@ -48,17 +47,19 @@ def run_xtb_job(
 
         if params.get("cubes"):
             # Generate placeholder cube files directly for hermetic mode
-            from nox.artifacts.cubes import _create_placeholder_cubes
-            
+            from nox.artifacts.cubes import _create_placeholder_cubes, validate_cube_file
+
             try:
                 cube_files = _create_placeholder_cubes(job_dir, ["homo", "lumo"])
                 for cube_file in cube_files:
+                    metadata = validate_cube_file(cube_file)
                     result["artifacts"].append(
                         {
                             "name": cube_file.name,
                             "path": str(cube_file),
                             "mime": "application/x-cube",
                             "size": cube_file.stat().st_size,
+                            "metadata": metadata,
                         }
                     )
             except Exception:
