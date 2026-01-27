@@ -28,19 +28,19 @@ jobs:
           pip install black isort flake8 ruff
       
       - name: Run Black
-        run: black --check api/ tests/ || true
+        run: black --check api/ tests/
         continue-on-error: true
       
       - name: Run isort
-        run: isort --check-only api/ tests/ || true
+        run: isort --check-only api/ tests/
         continue-on-error: true
       
       - name: Run flake8
-        run: flake8 api/ tests/ || true
+        run: flake8 api/ tests/
         continue-on-error: true
       
       - name: Run Ruff
-        run: ruff check api/ tests/ || true
+        run: ruff check api/ tests/
         continue-on-error: true
 
   security:
@@ -60,20 +60,20 @@ jobs:
       
       - name: Run Bandit
         run: |
-          bandit -r api/ -f json -o bandit-report.json || true
-          bandit -r api/ || true
+          bandit -r api/ -f json -o bandit-report.json
+          bandit -r api/
         continue-on-error: true
       
       - name: Run Safety
         run: |
-          safety check --json --output safety-report.json || true
-          safety check || true
+          safety check --json --output safety-report.json
+          safety check
         continue-on-error: true
       
       - name: Run pip-audit
         run: |
-          pip-audit --format json --output pip-audit-report.json || true
-          pip-audit || true
+          pip-audit --format json --output pip-audit-report.json
+          pip-audit
         continue-on-error: true
       
       - name: Upload Security Reports
@@ -133,7 +133,7 @@ jobs:
       
       - name: Run tests
         run: |
-          python -m pytest tests/ -v --cov=. --cov-report=xml --cov-report=html || true
+          python -m pytest tests/ -v --cov=. --cov-report=xml --cov-report=html
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/nox_test
           JWT_SECRET_KEY: test_secret_key_for_ci
@@ -179,14 +179,16 @@ jobs:
           python -c "
           import json
           import sys
+          import uuid
+          from datetime import datetime
           
           sbom = {
             'bomFormat': 'CycloneDX',
             'specVersion': '1.4',
-            'serialNumber': 'urn:uuid:$(uuidgen)',
+            'serialNumber': 'urn:uuid:' + str(uuid.uuid4()),
             'version': 1,
             'metadata': {
-              'timestamp': '$(date -u +%Y-%m-%dT%H:%M:%SZ)',
+              'timestamp': datetime.utcnow().isoformat() + 'Z',
               'component': {
                 'type': 'application',
                 'name': 'nox-api',
@@ -212,8 +214,8 @@ jobs:
             json.dump(sbom, f, indent=2)
           
           print('SBOM generated successfully')
-          " || echo "SBOM generation completed with warnings"
-      
+          "
+        continue-on-error: true
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
         with:
