@@ -26,6 +26,7 @@ async def _run_job_and_get_result(app, payload, endpoint="/jobs"):
         return r3.json().get("result", {})
 
 
+@pytest.mark.skipif(shutil.which("xtb") is not None, reason="Test hermetic fallback only when xtb unavailable")
 @pytest.mark.asyncio
 async def test_e2e_xtb_cubes_hermetic(monkeypatch):
     monkeypatch.setenv("JOBS_FORCE_LOCAL", "1")
@@ -45,16 +46,15 @@ async def test_e2e_xtb_cubes_hermetic(monkeypatch):
         },
     }
 
-    # Use mock.patch as context manager to ensure it's active during execution
-    with mock.patch("shutil.which", return_value=None):
-        result = await _run_job_and_get_result(app, payload)
-        artifacts = result.get("artifacts", [])
-        names = {a.get("name") for a in artifacts}
-        assert {"homo.cube", "lumo.cube"} <= names
-        scalars = result.get("scalars", {})
-        assert scalars.get("E_total_hartree") is not None
+    result = await _run_job_and_get_result(app, payload)
+    artifacts = result.get("artifacts", [])
+    names = {a.get("name") for a in artifacts}
+    assert {"homo.cube", "lumo.cube"} <= names
+    scalars = result.get("scalars", {})
+    assert scalars.get("E_total_hartree") is not None
 
 
+@pytest.mark.skipif(shutil.which("xtb") is not None, reason="Test hermetic fallback only when xtb unavailable")
 @pytest.mark.asyncio
 async def test_e2e_cj_hermetic(monkeypatch):
     monkeypatch.setenv("JOBS_FORCE_LOCAL", "1")

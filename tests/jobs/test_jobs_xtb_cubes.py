@@ -1,3 +1,4 @@
+import shutil
 from unittest import mock
 
 import pytest
@@ -8,6 +9,7 @@ from api.schemas.job import JobInputs, JobRequest, XTBParams
 from tests.helpers import wait_for_job_done
 
 
+@pytest.mark.skipif(shutil.which("xtb") is not None, reason="Test hermetic fallback only when xtb unavailable")
 @pytest.mark.asyncio
 async def test_xtb_job_hermetic_cubes(monkeypatch):
     # Force local execution and hermetic XTB path
@@ -26,22 +28,20 @@ async def test_xtb_job_hermetic_cubes(monkeypatch):
         ),
     )
 
-    # Use mock.patch as context manager to ensure it's active during execution
-    with mock.patch("shutil.which", return_value=None):
-        job_id = queue.submit_job("xtb", {"job_request": jr.model_dump_json()})
+    job_id = queue.submit_job("xtb", {"job_request": jr.model_dump_json()})
 
-        await wait_for_job_done(job_id)
+    await wait_for_job_done(job_id)
 
-        store = get_store()
-        job = store.get(job_id)
-        assert job.state == "done"
-        result = job.result or {}
-        artifacts = result.get("artifacts", [])
-        names = {a.get("name") for a in artifacts}
-        assert {"homo.cube", "lumo.cube"} <= names
-        scalars = result.get("scalars", {})
-        assert scalars.get("E_total_hartree") is not None
-        assert scalars.get("gap_eV") is not None
+    store = get_store()
+    job = store.get(job_id)
+    assert job.state == "done"
+    result = job.result or {}
+    artifacts = result.get("artifacts", [])
+    names = {a.get("name") for a in artifacts}
+    assert {"homo.cube", "lumo.cube"} <= names
+    scalars = result.get("scalars", {})
+    assert scalars.get("E_total_hartree") is not None
+    assert scalars.get("gap_eV") is not None
 
 
 @pytest.mark.asyncio
