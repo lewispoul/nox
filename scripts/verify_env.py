@@ -51,9 +51,7 @@ class EnvironmentValidator:
             )
             return False
 
-    def validate_package_import(
-        self, package_name: str, import_name: Optional[str] = None
-    ) -> bool:
+    def validate_package_import(self, package_name: str, import_name: Optional[str] = None) -> bool:
         """Validate that a package can be imported successfully"""
         import_name = import_name or package_name
 
@@ -85,9 +83,7 @@ class EnvironmentValidator:
             if not isinstance(mw, float) or mw <= 0:
                 raise ValueError("Failed to calculate molecular weight")
 
-            self.log_result(
-                "RDKit", True, f"Functional test passed (MW calculation: {mw:.2f})"
-            )
+            self.log_result("RDKit", True, f"Functional test passed (MW calculation: {mw:.2f})")
             return True
 
         except ImportError as e:
@@ -133,9 +129,7 @@ class EnvironmentValidator:
             # Test setting state
             gas.TPX = 300, 101325, "CH4:1, O2:2, N2:7.52"
 
-            self.log_result(
-                "Cantera", True, f"version {ct.__version__} - GRI-Mech loaded OK"
-            )
+            self.log_result("Cantera", True, f"version {ct.__version__} - GRI-Mech loaded OK")
             return True
 
         except ImportError as e:
@@ -174,9 +168,7 @@ class EnvironmentValidator:
                     self.log_result("XTB", True, f"executable found at {xtb_path}")
                     return True
                 else:
-                    self.log_result(
-                        "XTB", False, "Executable found but version check failed"
-                    )
+                    self.log_result("XTB", False, "Executable found but version check failed")
                     return False
             else:
                 self.log_result("XTB", False, "Executable not found in PATH")
@@ -232,9 +224,7 @@ class EnvironmentValidator:
                 missing_vars.append(var)
 
         if missing_vars:
-            self.log_result(
-                "Environment Variables", False, f"Missing: {', '.join(missing_vars)}"
-            )
+            self.log_result("Environment Variables", False, f"Missing: {', '.join(missing_vars)}")
             return False
         else:
             self.log_result(
@@ -272,9 +262,7 @@ class EnvironmentValidator:
                 permission_issues.append(f"{path} (insufficient permissions)")
 
         if permission_issues:
-            self.log_result(
-                "File Permissions", False, f"Issues: {', '.join(permission_issues)}"
-            )
+            self.log_result("File Permissions", False, f"Issues: {', '.join(permission_issues)}")
             return False
         else:
             self.log_result("File Permissions", True, "All paths accessible")
@@ -327,22 +315,17 @@ class EnvironmentValidator:
             result
             for component, result in self.results.items()
             if not result["status"]
-            and component
-            in ["Python Version", "RDKit", "Psi4", "Environment Variables"]
+            and component in ["Python Version", "RDKit", "Psi4", "Environment Variables"]
         ]
 
         if critical_failures:
-            print(
-                "\n🚨 CRITICAL FAILURES DETECTED - Environment NOT ready for staging!"
-            )
+            print("\n🚨 CRITICAL FAILURES DETECTED - Environment NOT ready for staging!")
             return False
         elif passed >= total * 0.8:  # 80% success rate required
             print("\n✅ Environment validation PASSED - Ready for staging deployment!")
             return True
         else:
-            print(
-                "\n⚠️  Environment validation PARTIAL - Review failures before proceeding"
-            )
+            print("\n⚠️  Environment validation PARTIAL - Review failures before proceeding")
             return False
 
 

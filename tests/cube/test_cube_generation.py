@@ -39,9 +39,7 @@ class TestCubeGeneration:
             molden_file.write_text("# Minimal molden file for testing")
 
             # Generate cubes (should create placeholders when no tools available)
-            cube_files = generate_cubes_from_molden(
-                molden_file, work_dir, ["homo", "lumo"]
-            )
+            cube_files = generate_cubes_from_molden(molden_file, work_dir, ["homo", "lumo"])
 
             # Should have generated cube files
             assert len(cube_files) >= 0  # Might be 0 if real tools are available
@@ -138,9 +136,7 @@ H   2   1   1.100000   0.000000   0.000000
             molden_file.write_text(molden_content)
 
             # Generate cubes
-            cube_files = generate_cubes_from_molden(
-                molden_file, work_dir, ["homo", "lumo"]
-            )
+            cube_files = generate_cubes_from_molden(molden_file, work_dir, ["homo", "lumo"])
 
             # Verify results
             if cube_files:  # Only if cubes were generated

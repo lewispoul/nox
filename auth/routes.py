@@ -50,15 +50,11 @@ async def login(credentials: UserLogin):
     # Récupérer l'utilisateur
     user = await db.get_user_by_email(credentials.email)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     # Vérifier le mot de passe
     if not AuthUtils.verify_password(credentials.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     # Vérifier que l'utilisateur est actif
     if not user.is_active:
@@ -89,15 +85,11 @@ async def list_users(
 
 
 @router.get("/users/{user_id}", response_model=UserOut)
-async def get_user(
-    user_id: str, current_user: User = Depends(require_role(UserRole.ADMIN))
-):
+async def get_user(user_id: str, current_user: User = Depends(require_role(UserRole.ADMIN))):
     """Récupère un utilisateur par ID (admin uniquement)"""
     user = await db.get_user_by_id(user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return UserOut(**user.to_dict())
 
 
@@ -110,9 +102,7 @@ async def update_user(
     """Met à jour un utilisateur (admin uniquement)"""
     user = await db.get_user_by_id(user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     # Mettre à jour les champs fournis
     if user_data.email is not None:
@@ -145,9 +135,7 @@ async def update_user(
 
 
 @router.delete("/users/{user_id}")
-async def delete_user(
-    user_id: str, current_user: User = Depends(require_role(UserRole.ADMIN))
-):
+async def delete_user(user_id: str, current_user: User = Depends(require_role(UserRole.ADMIN))):
     """Supprime un utilisateur (admin uniquement)"""
     if user_id == current_user.id:
         raise HTTPException(
@@ -157,9 +145,7 @@ async def delete_user(
 
     success = await db.delete_user(user_id)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     return {"message": "User deleted successfully"}
 

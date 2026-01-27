@@ -138,9 +138,7 @@ class BiometricClient:
                 "metadata": metadata or {},
             }
 
-            response = await self.client.post(
-                "/api/ai/biometric/enroll", data=enrollment_data
-            )
+            response = await self.client.post("/api/ai/biometric/enroll", data=enrollment_data)
 
             if response.success and response.data:
                 template = BiometricTemplate(
@@ -149,9 +147,7 @@ class BiometricClient:
                     biometric_type=biometric_type,
                     template_data=response.data["template_data"],
                     quality_score=response.data.get("quality_score", 0.0),
-                    created_at=response.data.get(
-                        "created_at", datetime.utcnow().isoformat()
-                    ),
+                    created_at=response.data.get("created_at", datetime.utcnow().isoformat()),
                     expires_at=response.data.get("expires_at"),
                     metadata=response.data.get("metadata"),
                 )
@@ -199,9 +195,7 @@ class BiometricClient:
                 "challenge_id": challenge_id,
             }
 
-            response = await self.client.post(
-                "/api/ai/biometric/authenticate", data=auth_data
-            )
+            response = await self.client.post("/api/ai/biometric/authenticate", data=auth_data)
 
             if response.success and response.data:
                 auth_response = AuthenticationResponse(
@@ -210,9 +204,7 @@ class BiometricClient:
                     matched_templates=response.data.get("matched_templates", []),
                     processing_time_ms=response.response_time_ms or 0.0,
                     challenge_id=response.data.get("challenge_id"),
-                    additional_requirements=response.data.get(
-                        "additional_requirements"
-                    ),
+                    additional_requirements=response.data.get("additional_requirements"),
                     fraud_indicators=response.data.get("fraud_indicators"),
                 )
 
@@ -362,9 +354,7 @@ class BiometricClient:
         """
 
         try:
-            response = await self.client.delete(
-                f"/api/ai/biometric/templates/{template_id}"
-            )
+            response = await self.client.delete(f"/api/ai/biometric/templates/{template_id}")
 
             if response.success:
                 logger.info(f"Biometric template deleted: {template_id}")
@@ -437,9 +427,7 @@ class BiometricClient:
                 "biometric_data": encoded_data,
             }
 
-            response = await self.client.post(
-                "/api/ai/biometric/liveness", data=liveness_data
-            )
+            response = await self.client.post("/api/ai/biometric/liveness", data=liveness_data)
 
             if response.success:
                 return response.data
@@ -479,9 +467,7 @@ class BiometricClient:
             logger.error(f"Failed to get fraud analysis: {e}")
             return None
 
-    async def configure_biometric_settings(
-        self, user_id: str, settings: Dict[str, Any]
-    ) -> bool:
+    async def configure_biometric_settings(self, user_id: str, settings: Dict[str, Any]) -> bool:
         """
         Configure biometric settings for a user.
 
@@ -494,17 +480,13 @@ class BiometricClient:
         """
 
         try:
-            response = await self.client.put(
-                f"/api/ai/biometric/settings/{user_id}", data=settings
-            )
+            response = await self.client.put(f"/api/ai/biometric/settings/{user_id}", data=settings)
 
             if response.success:
                 logger.info(f"Biometric settings configured for user: {user_id}")
                 return True
 
-            logger.warning(
-                f"Failed to configure biometric settings for user: {user_id}"
-            )
+            logger.warning(f"Failed to configure biometric settings for user: {user_id}")
             return False
 
         except Exception as e:
@@ -598,9 +580,7 @@ class BiometricClient:
 
         # Maintain max history size
         if len(self.authentication_history) > self.max_history_size:
-            self.authentication_history = self.authentication_history[
-                -self.max_history_size :
-            ]
+            self.authentication_history = self.authentication_history[-self.max_history_size :]
 
     def get_authentication_history(self) -> List[AuthenticationResponse]:
         """Get authentication history."""

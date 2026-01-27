@@ -9,9 +9,7 @@ class AgentRunRequest(BaseModel):
     """Request body for agent run endpoint."""
 
     intent: str = Field(..., description="Intent keyword (xtb, psi4, cj, etc.)")
-    params: Dict[str, Any] = Field(
-        default_factory=dict, description="Parameters for the job"
-    )
+    params: Dict[str, Any] = Field(default_factory=dict, description="Parameters for the job")
 
 
 class AgentAskRequest(BaseModel):

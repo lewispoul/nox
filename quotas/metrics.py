@@ -104,9 +104,7 @@ class QuotaMetricsCollector:
     def __init__(self):
         self.enabled = os.getenv("NOX_QUOTAS_ENABLED", "0") == "1"
 
-    def record_request(
-        self, user_id: str, endpoint: str, status_code: int, duration: float
-    ):
+    def record_request(self, user_id: str, endpoint: str, status_code: int, duration: float):
         """Enregistre une requête HTTP"""
         if not self.enabled:
             return
@@ -115,9 +113,7 @@ class QuotaMetricsCollector:
             user_id=user_id, endpoint=endpoint, status_code=str(status_code)
         ).inc()
 
-        user_request_duration.labels(user_id=user_id, endpoint=endpoint).observe(
-            duration
-        )
+        user_request_duration.labels(user_id=user_id, endpoint=endpoint).observe(duration)
 
     def record_quota_violation(self, user_id: str, quota_type: str):
         """Enregistre une violation de quota"""
@@ -129,9 +125,7 @@ class QuotaMetricsCollector:
         # Marquer comme dépassé
         quota_exceeded.labels(user_id=user_id, quota_type=quota_type).set(1)
 
-    def update_quota_usage(
-        self, user_id: str, quota_type: str, current: int, limit: int
-    ):
+    def update_quota_usage(self, user_id: str, quota_type: str, current: int, limit: int):
         """Met à jour les métriques d'usage de quota"""
         if not self.enabled:
             return
@@ -149,9 +143,7 @@ class QuotaMetricsCollector:
             1 if ratio >= 0.8 else 0
         )
 
-        quota_exceeded.labels(user_id=user_id, quota_type=quota_type).set(
-            1 if ratio >= 1.0 else 0
-        )
+        quota_exceeded.labels(user_id=user_id, quota_type=quota_type).set(1 if ratio >= 1.0 else 0)
 
     def record_cpu_usage(self, user_id: str, cpu_seconds: float):
         """Enregistre l'usage CPU"""

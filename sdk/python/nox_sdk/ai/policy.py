@@ -103,9 +103,7 @@ class PolicyClient:
 
         logger.info("AI Policy client initialized")
 
-    async def evaluate_policy(
-        self, context: PolicyContext
-    ) -> Optional[PolicyEvaluation]:
+    async def evaluate_policy(self, context: PolicyContext) -> Optional[PolicyEvaluation]:
         """
         Evaluate policies for a given context.
 
@@ -123,9 +121,7 @@ class PolicyClient:
                 context_data["timestamp"] = datetime.utcnow().isoformat()
 
             # Send to AI policy engine
-            response = await self.client.post(
-                "/api/ai/policy/evaluate", data=context_data
-            )
+            response = await self.client.post("/api/ai/policy/evaluate", data=context_data)
 
             if response.success and response.data:
                 evaluation = PolicyEvaluation(
@@ -133,9 +129,7 @@ class PolicyClient:
                     matched_rules=response.data.get("matched_rules", []),
                     confidence_score=response.data.get("confidence_score", 0.0),
                     evaluation_time_ms=response.response_time_ms or 0.0,
-                    additional_requirements=response.data.get(
-                        "additional_requirements"
-                    ),
+                    additional_requirements=response.data.get("additional_requirements"),
                     context=response.data.get("context"),
                 )
 
@@ -193,9 +187,7 @@ class PolicyClient:
         """
 
         try:
-            response = await self.client.put(
-                f"/api/ai/policy/rules/{rule_id}", data=updates
-            )
+            response = await self.client.put(f"/api/ai/policy/rules/{rule_id}", data=updates)
 
             if response.success:
                 # Update cache if exists
@@ -378,9 +370,7 @@ class PolicyClient:
         try:
             params = {"user_id": user_id, "period": analysis_period}
 
-            response = await self.client.get(
-                "/api/ai/policy/recommendations", params=params
-            )
+            response = await self.client.get("/api/ai/policy/recommendations", params=params)
 
             if response.success and response.data:
                 return response.data.get("recommendations", [])
@@ -391,9 +381,7 @@ class PolicyClient:
             logger.error(f"Failed to get policy recommendations: {e}")
             return []
 
-    async def analyze_policy_violations(
-        self, time_range: str = "24h"
-    ) -> Optional[Dict[str, Any]]:
+    async def analyze_policy_violations(self, time_range: str = "24h") -> Optional[Dict[str, Any]]:
         """
         Analyze policy violations using AI.
 
@@ -439,9 +427,7 @@ class PolicyClient:
             }
             adaptive_data["base_rule"]["action"] = base_rule.action.value
 
-            response = await self.client.post(
-                "/api/ai/policy/adaptive", data=adaptive_data
-            )
+            response = await self.client.post("/api/ai/policy/adaptive", data=adaptive_data)
 
             if response.success and response.data:
                 policy_id = response.data.get("policy_id")
@@ -499,9 +485,7 @@ class PolicyClient:
             logger.error(f"Failed to export policies: {e}")
             return None
 
-    async def import_policies(
-        self, policy_data: str, format_type: str = "json"
-    ) -> bool:
+    async def import_policies(self, policy_data: str, format_type: str = "json") -> bool:
         """
         Import policies from data.
 

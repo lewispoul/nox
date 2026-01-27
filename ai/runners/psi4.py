@@ -46,9 +46,7 @@ def run_psi4_job(
     job_dir.mkdir(parents=True, exist_ok=True)
 
     if not _has_psi4():
-        raise Psi4Unavailable(
-            "Psi4 not available in environment (module or binary not found)"
-        )
+        raise Psi4Unavailable("Psi4 not available in environment (module or binary not found)")
 
     method: str = params.get("method", "HF")
     basis: str = params.get("basis", "6-31G*")

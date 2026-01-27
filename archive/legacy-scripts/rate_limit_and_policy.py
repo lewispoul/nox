@@ -113,9 +113,7 @@ class RateLimitAndPolicyMiddleware(BaseHTTPMiddleware):
             self.audit_logger = None
             return
 
-        log_file = audit_config.get(
-            "log_file", "/home/lppoulin/nox-api-src/logs/audit.jsonl"
-        )
+        log_file = audit_config.get("log_file", "/home/lppoulin/nox-api-src/logs/audit.jsonl")
         log_dir = Path(log_file).parent
         log_dir.mkdir(parents=True, exist_ok=True)
 
@@ -190,15 +188,11 @@ class RateLimitAndPolicyMiddleware(BaseHTTPMiddleware):
 
         # Reset quotas si nouveau jour
         if current_time - quota_data["last_reset"] > 86400:  # 24h
-            quota_data.update(
-                {"cpu_seconds": 0, "requests": 0, "last_reset": current_time}
-            )
+            quota_data.update({"cpu_seconds": 0, "requests": 0, "last_reset": current_time})
 
         # Vérification quota de requêtes (simple compteur)
         quota_config = self.policies["quotas"]["default"]
-        daily_request_limit = quota_config.get(
-            "daily_requests", 10000
-        )  # Limite par défaut
+        daily_request_limit = quota_config.get("daily_requests", 10000)  # Limite par défaut
 
         if quota_data["requests"] >= daily_request_limit:
             return False
@@ -248,9 +242,7 @@ class RateLimitAndPolicyMiddleware(BaseHTTPMiddleware):
             "timestamp_unix": int(time.time()),
             "client_ip": request.client.host if request.client else "unknown",
             "user_agent": request.headers.get("user-agent", "unknown"),
-            "token_id": hashlib.sha256(
-                token.encode() if token else b"anonymous"
-            ).hexdigest()[:16],
+            "token_id": hashlib.sha256(token.encode() if token else b"anonymous").hexdigest()[:16],
             "method": request.method,
             "endpoint": str(request.url.path),
             "query_params": str(request.url.query) if request.url.query else None,
@@ -261,9 +253,7 @@ class RateLimitAndPolicyMiddleware(BaseHTTPMiddleware):
 
         # Signature HMAC pour l'intégrité
         audit_json = json.dumps(audit_data, sort_keys=True)
-        signature = hmac.new(
-            AUDIT_KEY.encode(), audit_json.encode(), hashlib.sha256
-        ).hexdigest()
+        signature = hmac.new(AUDIT_KEY.encode(), audit_json.encode(), hashlib.sha256).hexdigest()
 
         audit_data["hmac_signature"] = signature
 
@@ -292,9 +282,7 @@ class RateLimitAndPolicyMiddleware(BaseHTTPMiddleware):
                     status_code=429,
                     headers={"Retry-After": "60", "Content-Type": "application/json"},
                 )
-                self.create_audit_log(
-                    request, response, token, start_time, "rate_limit_exceeded"
-                )
+                self.create_audit_log(request, response, token, start_time, "rate_limit_exceeded")
                 return response
 
             # 2. Vérification Quotas
@@ -304,9 +292,7 @@ class RateLimitAndPolicyMiddleware(BaseHTTPMiddleware):
                     status_code=429,
                     headers={"Content-Type": "application/json"},
                 )
-                self.create_audit_log(
-                    request, response, token, start_time, "quota_exceeded"
-                )
+                self.create_audit_log(request, response, token, start_time, "quota_exceeded")
                 return response
 
             # 3. Validation commandes shell (pour endpoint /run_sh)

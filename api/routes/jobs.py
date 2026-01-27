@@ -22,7 +22,7 @@ class SimpleJobRequest(BaseModel):
 @router.post("/jobs")
 async def create_job(body: Union[SimpleJobRequest, Psi4JobRequest, JobRequest]):
     """Create a job - supports simple, XTB, and Psi4 job formats.
-    
+
     Provide one of:
     - SimpleJobRequest: {kind: str, payload: dict}
     - Psi4JobRequest: {engine: "psi4", ...psi4 fields}
@@ -130,7 +130,7 @@ def get_artifacts(job_id: str):
 @router.get("/jobs/{job_id}/wait")
 async def wait_for_job(job_id: str, timeout: int = 30, poll_delay: float = 0.5):
     """Poll job until completion or timeout.
-    
+
     - Fast-path returns immediately when job is already terminal (done/failed)
     - Polls at `poll_delay` until `timeout` seconds
     - Returns 202 when timing out with job still running/pending

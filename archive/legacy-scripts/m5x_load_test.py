@@ -37,16 +37,12 @@ class QuotaLoadTester:
         self.token = token
         self.headers = {"Authorization": f"Bearer {token}"}
 
-    async def single_request(
-        self, session: aiohttp.ClientSession, endpoint: str
-    ) -> Dict[str, Any]:
+    async def single_request(self, session: aiohttp.ClientSession, endpoint: str) -> Dict[str, Any]:
         """Execute a single HTTP request and capture metrics"""
         start_time = time.time()
 
         try:
-            async with session.get(
-                f"{self.base_url}{endpoint}", headers=self.headers
-            ) as response:
+            async with session.get(f"{self.base_url}{endpoint}", headers=self.headers) as response:
                 end_time = time.time()
                 content = await response.text()
 
@@ -76,9 +72,7 @@ class QuotaLoadTester:
         self, endpoint: str, concurrent_requests: int, total_requests: int
     ) -> LoadTestResult:
         """Execute a burst of concurrent requests to test quota enforcement"""
-        print(
-            f"🚀 Burst Test: {concurrent_requests} concurrent requests, {total_requests} total"
-        )
+        print(f"🚀 Burst Test: {concurrent_requests} concurrent requests, {total_requests} total")
         print(f"   Endpoint: {endpoint}")
 
         start_time = time.time()
@@ -93,10 +87,7 @@ class QuotaLoadTester:
                 batch_requests = min(batch_size, total_requests - i)
 
                 # Execute batch concurrently
-                tasks = [
-                    self.single_request(session, endpoint)
-                    for _ in range(batch_requests)
-                ]
+                tasks = [self.single_request(session, endpoint) for _ in range(batch_requests)]
 
                 batch_results = await asyncio.gather(*tasks)
                 results.extend(batch_results)
@@ -130,9 +121,7 @@ class QuotaLoadTester:
         self, endpoint: str, duration_seconds: int, requests_per_second: int
     ) -> LoadTestResult:
         """Execute sustained load over time to test quota accumulation"""
-        print(
-            f"⏱️  Sustained Load Test: {requests_per_second} req/s for {duration_seconds}s"
-        )
+        print(f"⏱️  Sustained Load Test: {requests_per_second} req/s for {duration_seconds}s")
         print(f"   Endpoint: {endpoint}")
 
         start_time = time.time()
@@ -148,10 +137,7 @@ class QuotaLoadTester:
                 batch_start = time.time()
 
                 # Send requests for this second
-                tasks = [
-                    self.single_request(session, endpoint)
-                    for _ in range(requests_per_second)
-                ]
+                tasks = [self.single_request(session, endpoint) for _ in range(requests_per_second)]
 
                 batch_results = await asyncio.gather(*tasks)
                 results.extend(batch_results)
@@ -260,23 +246,17 @@ async def main():
 
     # 3. Burst Test - Low intensity to warm up
     print("\n3️⃣ Burst Test - Low Intensity")
-    result1 = await tester.burst_test(
-        "/health", concurrent_requests=5, total_requests=20
-    )
+    result1 = await tester.burst_test("/health", concurrent_requests=5, total_requests=20)
     tester.print_results("Low Intensity Burst", result1)
 
     # 4. Burst Test - High intensity to trigger quotas
     print("\n4️⃣ Burst Test - High Intensity")
-    result2 = await tester.burst_test(
-        "/health", concurrent_requests=20, total_requests=100
-    )
+    result2 = await tester.burst_test("/health", concurrent_requests=20, total_requests=100)
     tester.print_results("High Intensity Burst", result2)
 
     # 5. Test quota endpoint under load
     print("\n5️⃣ Quota Endpoint Load Test")
-    result3 = await tester.burst_test(
-        "/quotas/my/usage", concurrent_requests=10, total_requests=50
-    )
+    result3 = await tester.burst_test("/quotas/my/usage", concurrent_requests=10, total_requests=50)
     tester.print_results("Quota Endpoint Load", result3)
 
     # 6. Sustained load test

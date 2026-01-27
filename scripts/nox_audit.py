@@ -228,9 +228,7 @@ def build_tree(files: List[FileMeta]) -> Dict:
         parts = Path(fm.path).parts
         node = root
         for d in parts[:-1]:
-            node = node["children"].setdefault(
-                d, {"name": d, "children": {}, "_files": []}
-            )
+            node = node["children"].setdefault(d, {"name": d, "children": {}, "_files": []})
         node["_files"].append(fm)
     return root
 
@@ -346,9 +344,7 @@ def render_markdown(
         "duplicates_by_hash": [[asdict(x) for x in grp] for grp in dup_hash_groups],
     }
     json_block = (
-        "```json\n"
-        + json.dumps(json_payload, ensure_ascii=False, separators=(",", ":"))
-        + "\n```"
+        "```json\n" + json.dumps(json_payload, ensure_ascii=False, separators=(",", ":")) + "\n```"
     )
 
     md = []
@@ -393,9 +389,7 @@ def render_markdown(
         md.append("| Path | Size | Ext | MTime | SHA256 |")
         md.append("| --- | ---: | --- | --- | --- |")
         for f in sorted(lst, key=lambda x: x.path.lower()):
-            md.append(
-                f"| `{f.path}` | {f.size} | `{f.ext}` | {f.mtime} | `{f.sha256 or ''}` |"
-            )
+            md.append(f"| `{f.path}` | {f.size} | `{f.ext}` | {f.mtime} | `{f.sha256 or ''}` |")
         md.append("")
 
     md.append("## Doublons par nom")
@@ -431,9 +425,7 @@ def render_markdown(
     md.append(
         "- Vérifier la présence de dossiers proches comme `api`, `api-old`, `api_backup`, `archive`."
     )
-    md.append(
-        "- Vérifier la duplication potentielle de modules entre `ai/`, `api/`, `scripts/`."
-    )
+    md.append("- Vérifier la duplication potentielle de modules entre `ai/`, `api/`, `scripts/`.")
     md.append(
         "- Vérifier les configs multiples et chevauchantes: `pyproject.toml`, `setup.cfg`, `ruff.toml`, `.flake8`, `tsconfig.json`, `package.json`."
     )
@@ -442,15 +434,11 @@ def render_markdown(
     md.append("## Recommandations de nettoyage (non destructif)")
     md.append("")
     md.append("1. Geler l'état actuel dans une branche ou un tag.")
-    md.append(
-        "2. Écrire des tests rapides pour valider imports et endpoints critiques."
-    )
+    md.append("2. Écrire des tests rapides pour valider imports et endpoints critiques.")
     md.append(
         "3. Consolider les duplications par nom ou par hash en gardant la référence la plus récente située dans `api/` si pertinent."
     )
-    md.append(
-        "4. Déplacer artefacts, logs et caches vers `artifacts/` ou les ignorer via VCS."
-    )
+    md.append("4. Déplacer artefacts, logs et caches vers `artifacts/` ou les ignorer via VCS.")
     md.append(
         "5. Unifier les configurations redondantes et centraliser les scripts dans `scripts/`."
     )
@@ -473,9 +461,7 @@ def render_markdown(
     md.append("- Exclusions extensions: " + ", ".join(sorted(EXCLUDED_EXTS)))
     md.append("- Extensions hashées: " + ", ".join(sorted(HASHABLE_EXTS)))
     md.append("- Taille dossier = somme des tailles des fichiers du sous-arbre.")
-    md.append(
-        "- Doublons par nom: groupement insensible à la casse sur le nom de fichier."
-    )
+    md.append("- Doublons par nom: groupement insensible à la casse sur le nom de fichier.")
     md.append("- Doublons par hash: groupement sur SHA256 des fichiers texte/code.")
 
     md.append("")
@@ -488,37 +474,25 @@ def render_markdown(
     md.append("")
     md.append("- [ ] Tous les chemins listés existent dans `nox-api-src/`.")
     md.append("- [ ] Recalculer 3 SHA256 au hasard et comparer avec le tableau.")
-    md.append(
-        "- [ ] Les recommandations n'impliquent pas de suppression sans sauvegarde."
-    )
+    md.append("- [ ] Les recommandations n'impliquent pas de suppression sans sauvegarde.")
     md.append("- [ ] Les dossiers exclus n'apparaissent pas dans l'inventaire.")
-    md.append(
-        "- [ ] Les imports et endpoints critiques passent les tests après consolidation."
-    )
-    md.append(
-        "- [ ] Les chemins relatifs restent valides après tout mouvement suggéré."
-    )
+    md.append("- [ ] Les imports et endpoints critiques passent les tests après consolidation.")
+    md.append("- [ ] Les chemins relatifs restent valides après tout mouvement suggéré.")
 
     return "\n".join(md)
 
 
 # ---------- Main ----------
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Audit nox-api-src et écrire un rapport Markdown."
-    )
+    parser = argparse.ArgumentParser(description="Audit nox-api-src et écrire un rapport Markdown.")
     parser.add_argument(
         "--root",
         type=str,
         default=None,
         help="Chemin explicite vers nox-api-src (doit être le dossier lui-même).",
     )
-    parser.add_argument(
-        "--depth", type=int, default=6, help="Profondeur max de l'arbre."
-    )
-    parser.add_argument(
-        "--max-top", type=int, default=50, help="Top N plus gros fichiers."
-    )
+    parser.add_argument("--depth", type=int, default=6, help="Profondeur max de l'arbre.")
+    parser.add_argument("--max-top", type=int, default=50, help="Top N plus gros fichiers.")
     parser.add_argument(
         "--no-hash",
         action="store_true",
@@ -538,20 +512,14 @@ def main() -> None:
     if args.root:
         target = Path(args.root).resolve()
         if not target.is_dir() or target.name != TARGET_DIRNAME:
-            fail(
-                f"--root doit pointer vers le dossier '{TARGET_DIRNAME}' lui-même: {target}"
-            )
+            fail(f"--root doit pointer vers le dossier '{TARGET_DIRNAME}' lui-même: {target}")
     else:
         target = find_nox_api_src(repo_root)
 
     ok(f"Racine d'analyse: {target}")
 
     # Résoudre le dossier reports (ne jamais créer)
-    reports_dir = (
-        Path(args.reports_dir).resolve()
-        if args.reports_dir
-        else (repo_root / "reports")
-    )
+    reports_dir = Path(args.reports_dir).resolve() if args.reports_dir else (repo_root / "reports")
     if not reports_dir.is_dir():
         fail(
             f"Le dossier reports n'existe pas: {reports_dir}. Crée-le manuellement pour éviter les doublons."

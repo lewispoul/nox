@@ -47,14 +47,19 @@ async def predict_vod(body: VoDRequest) -> Dict[str, Any]:
     # Kamlet–Jacobs
     if all(k in body_dict for k in ("rho_g_cc", "N", "M", "Q_cal_g")):
         d = kamlet_jacobs_vod_kms(
-            float(body_dict["rho_g_cc"]), float(body_dict["N"]), float(body_dict["M"]), float(body_dict["Q_cal_g"])
+            float(body_dict["rho_g_cc"]),
+            float(body_dict["N"]),
+            float(body_dict["M"]),
+            float(body_dict["Q_cal_g"]),
         )
         out["models"]["kamlet_jacobs"] = {"VoD_km_s": d}
 
     # Keshavarz
     if all(k in body_dict for k in ("rho_g_cc", "OB")):
         d2 = keshavarz_vod_kms(
-            float(body_dict["rho_g_cc"]), float(body_dict["OB"]), float(body_dict.get("Q_MJ_kg", 0.0))
+            float(body_dict["rho_g_cc"]),
+            float(body_dict["OB"]),
+            float(body_dict.get("Q_MJ_kg", 0.0)),
         )
         out["models"]["keshavarz"] = {"VoD_km_s": d2}
 
@@ -65,6 +70,8 @@ async def predict_vod(body: VoDRequest) -> Dict[str, Any]:
         )
 
     # Simple ML
-    d3 = simple_ml_vod_kms({k: float(v) for k, v in body_dict.items() if isinstance(v, (int, float))})
+    d3 = simple_ml_vod_kms(
+        {k: float(v) for k, v in body_dict.items() if isinstance(v, (int, float))}
+    )
     out["models"]["ml_baseline"] = {"VoD_km_s": d3}
     return out

@@ -20,9 +20,7 @@ class RedisJobStorage:
 
     def __init__(self, redis_url: str = None):
         """Initialize Redis connection"""
-        self.redis_url = redis_url or getattr(
-            settings, "redis_url", "redis://localhost:6379/0"
-        )
+        self.redis_url = redis_url or getattr(settings, "redis_url", "redis://localhost:6379/0")
         self.redis_client = redis.from_url(self.redis_url, decode_responses=True)
 
     def _job_key(self, job_id: str) -> str:
@@ -82,9 +80,7 @@ class RedisJobStorage:
         self, job_id: str, state: str, message: str = "", progress: float = 0.0
     ) -> bool:
         """Update job state"""
-        return self.update_job(
-            job_id, {"state": state, "message": message, "progress": progress}
-        )
+        return self.update_job(job_id, {"state": state, "message": message, "progress": progress})
 
     def set_job_result(self, job_id: str, result: Dict[str, Any]) -> bool:
         """Set job result and mark as completed"""

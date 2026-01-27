@@ -20,9 +20,7 @@ warnings.filterwarnings(
 )
 
 pytestmark = [
-    pytest.mark.filterwarnings(
-        "ignore:The verify_requirements argument is now a no-op.*"
-    ),
+    pytest.mark.filterwarnings("ignore:The verify_requirements argument is now a no-op.*"),
     pytest.mark.filterwarnings("ignore:ast.Str is deprecated.*"),
 ]
 

@@ -11,9 +11,7 @@ def health():
 
 def put(local, remote):
     with open(local, "rb") as f:
-        r = requests.post(
-            f"{BASE}/put", headers=H, files={"f": f}, params={"path": remote}
-        )
+        r = requests.post(f"{BASE}/put", headers=H, files={"f": f}, params={"path": remote})
     print(r.json())
 
 

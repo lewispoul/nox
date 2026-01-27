@@ -223,9 +223,7 @@ def run_xtb_job(
 
             # Generate HOMO/LUMO cube files using our cube module
             try:
-                cube_files = generate_cubes_from_molden(
-                    molden_path, job_dir, ["homo", "lumo"]
-                )
+                cube_files = generate_cubes_from_molden(molden_path, job_dir, ["homo", "lumo"])
 
                 for cube_file in cube_files:
                     if cube_file.exists():

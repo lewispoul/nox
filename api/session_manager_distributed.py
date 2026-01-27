@@ -72,16 +72,13 @@ class DistributedSessionManager:
         self.USER_SESSION_PREFIX = "nox:user_sessions:"
         self.OAUTH_PREFIX = "nox:oauth:"
 
-        logger.info(
-            f"Distributed Session Manager initialized with {len(redis_nodes)} nodes"
-        )
+        logger.info(f"Distributed Session Manager initialized with {len(redis_nodes)} nodes")
 
     def _initialize_cluster(self) -> RedisCluster:
         """Initialize Redis Cluster connection with retry logic."""
 
         startup_nodes = [
-            redis.cluster.ClusterNode(node["host"], node["port"])
-            for node in self.redis_nodes
+            redis.cluster.ClusterNode(node["host"], node["port"]) for node in self.redis_nodes
         ]
 
         try:
@@ -99,9 +96,7 @@ class DistributedSessionManager:
             # Test cluster connectivity
             cluster.ping()
             cluster_info = cluster.cluster_info()
-            logger.info(
-                f"Redis Cluster connected: {cluster_info.get('cluster_state', 'unknown')}"
-            )
+            logger.info(f"Redis Cluster connected: {cluster_info.get('cluster_state', 'unknown')}")
 
             return cluster
 
@@ -144,9 +139,7 @@ class DistributedSessionManager:
             "last_accessed": datetime.utcnow().isoformat(),
             "oauth_provider": oauth_provider,
             "node_id": self._get_node_id(),
-            "expires_at": (
-                datetime.utcnow() + timedelta(seconds=self.session_ttl)
-            ).isoformat(),
+            "expires_at": (datetime.utcnow() + timedelta(seconds=self.session_ttl)).isoformat(),
         }
 
         try:
@@ -267,9 +260,7 @@ class DistributedSessionManager:
             logger.error(f"Failed to delete session {session_id}: {e}")
             return False
 
-    def _store_oauth_tokens(
-        self, session_id: str, oauth_tokens: Dict[str, Any]
-    ) -> bool:
+    def _store_oauth_tokens(self, session_id: str, oauth_tokens: Dict[str, Any]) -> bool:
         """Store OAuth2 tokens in the distributed store."""
 
         oauth_key = f"{self.OAUTH_PREFIX}{session_id}"
@@ -277,9 +268,7 @@ class DistributedSessionManager:
             "session_id": session_id,
             "tokens": oauth_tokens,
             "stored_at": datetime.utcnow().isoformat(),
-            "expires_at": (
-                datetime.utcnow() + timedelta(seconds=self.token_ttl)
-            ).isoformat(),
+            "expires_at": (datetime.utcnow() + timedelta(seconds=self.token_ttl)).isoformat(),
         }
 
         try:
@@ -304,9 +293,7 @@ class DistributedSessionManager:
             return oauth_data.get("tokens")
 
         except (RedisError, json.JSONDecodeError) as e:
-            logger.error(
-                f"Failed to retrieve OAuth tokens for session {session_id}: {e}"
-            )
+            logger.error(f"Failed to retrieve OAuth tokens for session {session_id}: {e}")
             return None
 
     def refresh_oauth_tokens(self, session_id: str, new_tokens: Dict[str, Any]) -> bool:
@@ -328,9 +315,7 @@ class DistributedSessionManager:
             return True
 
         except (RedisError, json.JSONDecodeError) as e:
-            logger.error(
-                f"Failed to refresh OAuth tokens for session {session_id}: {e}"
-            )
+            logger.error(f"Failed to refresh OAuth tokens for session {session_id}: {e}")
             return False
 
     def _add_user_session(self, user_id: str, session_id: str) -> None:
@@ -339,9 +324,7 @@ class DistributedSessionManager:
         user_sessions_key = f"{self.USER_SESSION_PREFIX}{user_id}"
         try:
             self.cluster.sadd(user_sessions_key, session_id)
-            self.cluster.expire(
-                user_sessions_key, self.session_ttl * 2
-            )  # Longer TTL for tracking
+            self.cluster.expire(user_sessions_key, self.session_ttl * 2)  # Longer TTL for tracking
         except RedisError as e:
             logger.warning(f"Failed to track user session {user_id}: {e}")
 
@@ -438,9 +421,7 @@ class DistributedSessionManager:
                 "cluster_known_nodes": cluster_info.get("cluster_known_nodes"),
                 "cluster_size": cluster_info.get("cluster_size"),
                 "nodes": cluster_nodes,
-                "session_count": len(
-                    list(self.cluster.scan_iter(match=f"{self.SESSION_PREFIX}*"))
-                ),
+                "session_count": len(list(self.cluster.scan_iter(match=f"{self.SESSION_PREFIX}*"))),
                 "oauth_token_count": len(
                     list(self.cluster.scan_iter(match=f"{self.OAUTH_PREFIX}*"))
                 ),

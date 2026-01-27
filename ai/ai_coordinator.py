@@ -24,8 +24,8 @@ from psycopg2.extras import RealDictCursor
 from redis.cluster import RedisCluster
 
 from .biometric_auth import BiometricAuthenticationSystem, BiometricChallenge
-from .policy_engine import (AccessRequest, BiometricType,
-                            IntelligentPolicyEngine)
+from .policy_engine import AccessRequest, BiometricType, IntelligentPolicyEngine
+
 # Import AI components
 from .security_monitor import AISecurityMonitor, SecurityEvent
 
@@ -411,9 +411,7 @@ class AISystemCoordinator:
 
         # Calculate overall confidence score
         overall_confidence = (
-            sum(confidence_scores) / len(confidence_scores)
-            if confidence_scores
-            else 0.0
+            sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0.0
         )
 
         # Apply confidence-based decision logic
@@ -433,9 +431,7 @@ class AISystemCoordinator:
             requires_human_review = True
 
         # Add unique actions from individual components
-        final_actions.extend(
-            [action for action in actions_taken if action not in final_actions]
-        )
+        final_actions.extend([action for action in actions_taken if action not in final_actions])
 
         # Generate comprehensive reasoning
         reasoning = f"AI decision (confidence: {overall_confidence:.2f}): " + "; ".join(
@@ -485,10 +481,7 @@ class AISystemCoordinator:
             required_types.append(BiometricType.VOICE_RECOGNITION)
 
         # Add behavioral biometrics for additional security
-        if (
-            risk_level in ["high", "critical"]
-            or "unusual_access_pattern" in threat_indicators
-        ):
+        if risk_level in ["high", "critical"] or "unusual_access_pattern" in threat_indicators:
             required_types.append(BiometricType.BEHAVIORAL_PATTERN)
 
         # Create the challenge
@@ -514,9 +507,7 @@ class AISystemCoordinator:
             cached_metrics = self.redis_cluster.get(cache_key)
             if cached_metrics:
                 metrics_data = json.loads(cached_metrics)
-                metrics_data["last_updated"] = datetime.fromisoformat(
-                    metrics_data["last_updated"]
-                )
+                metrics_data["last_updated"] = datetime.fromisoformat(metrics_data["last_updated"])
                 return AISystemMetrics(**metrics_data)
         except Exception as e:
             logger.warning(f"Cache access failed: {e}")
@@ -680,9 +671,7 @@ class AISystemCoordinator:
         except Exception as e:
             logger.error(f"Error storing AI decision: {e}")
 
-    async def _update_system_metrics(
-        self, decision: AIDecision, ai_components: List[str]
-    ):
+    async def _update_system_metrics(self, decision: AIDecision, ai_components: List[str]):
         """Update system metrics based on latest decision."""
 
         try:
@@ -776,9 +765,7 @@ if __name__ == "__main__":
                 "challenge_id": "test_challenge_123",
                 "face_data": b"mock_face_image_data",
                 "behavioral_data": {
-                    "keystroke_dynamics": [
-                        {"key": "h", "key_down_time": 1000, "key_up_time": 1050}
-                    ]
+                    "keystroke_dynamics": [{"key": "h", "key_down_time": 1000, "key_up_time": 1050}]
                 },
             },
         }

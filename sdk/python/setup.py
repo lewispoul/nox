@@ -22,9 +22,7 @@ def read_readme():
 def read_requirements():
     try:
         with open("requirements.txt", "r", encoding="utf-8") as fh:
-            return [
-                line.strip() for line in fh if line.strip() and not line.startswith("#")
-            ]
+            return [line.strip() for line in fh if line.strip() and not line.startswith("#")]
     except FileNotFoundError:
         return [
             "aiohttp>=3.8.0",

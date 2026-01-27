@@ -6,6 +6,8 @@ import time
 from typing import Any, Dict
 
 from .jobs_store import get_store
+
+
 def _normalize_remote_result(resp: Dict[str, Any]) -> Dict[str, Any]:
     """Normalize a remote IAM response into Nox result shape.
 
@@ -84,9 +86,7 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
             # If runner returned a returncode, treat non-success as failure
             if isinstance(result, dict) and "returncode" in result:
                 rc = result.get("returncode")
-                has_energy = (
-                    result.get("scalars", {}).get("E_total_hartree") is not None
-                )
+                has_energy = result.get("scalars", {}).get("E_total_hartree") is not None
                 success = (rc == 0) or (rc == 2 and has_energy)
                 if not success:
                     store.set_state(
@@ -199,14 +199,10 @@ def _default_xtb_runner(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     # XTB success: return code 0 OR (return code 2 with valid energy results)
     has_energy = result.get("scalars", {}).get("E_total_hartree") is not None
-    success = (result.get("returncode") == 0) or (
-        result.get("returncode") == 2 and has_energy
-    )
+    success = (result.get("returncode") == 0) or (result.get("returncode") == 2 and has_energy)
 
     if not success:
-        error_msg = (
-            "XTB calculation failed with return code " f"{result.get('returncode')}"
-        )
+        error_msg = "XTB calculation failed with return code " f"{result.get('returncode')}"
         raise RuntimeError(error_msg)
 
     return result

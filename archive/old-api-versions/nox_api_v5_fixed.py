@@ -99,9 +99,7 @@ async def health(request: Request):
 
 
 @app.get("/ls")
-async def list_files(
-    request: Request, path: str = "", authorization: str | None = Header(None)
-):
+async def list_files(request: Request, path: str = "", authorization: str | None = Header(None)):
     """Liste les fichiers dans le sandbox"""
     check_auth(authorization)
 
@@ -129,9 +127,7 @@ async def list_files(
         # Calcul des statistiques pour les quotas
         if NOX_QUOTAS_ENABLED and quota_db and hasattr(request.state, "user_id"):
             total_files = len([f for f in files if f["type"] == "file"])
-            total_size = sum(
-                f["size"] for f in files if f["type"] == "file" and f["size"]
-            )
+            total_size = sum(f["size"] for f in files if f["type"] == "file" and f["size"])
 
             # Mise à jour usage storage et files
             try:
@@ -195,9 +191,7 @@ async def upload_file(
 
 
 @app.post("/run_py")
-async def run_python(
-    request: Request, code: dict, authorization: str | None = Header(None)
-):
+async def run_python(request: Request, code: dict, authorization: str | None = Header(None)):
     """Exécute du code Python dans le sandbox"""
     check_auth(authorization)
 
@@ -206,9 +200,7 @@ async def run_python(
 
     try:
         # Créer fichier temporaire
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".py", delete=False, dir=SANDBOX
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False, dir=SANDBOX) as f:
             f.write(code["code"])
             temp_file = pathlib.Path(f.name)
 
@@ -253,9 +245,7 @@ async def run_python(
 
 
 @app.post("/run_sh")
-async def run_shell(
-    request: Request, cmd: dict, authorization: str | None = Header(None)
-):
+async def run_shell(request: Request, cmd: dict, authorization: str | None = Header(None)):
     """Exécute une commande shell dans le sandbox"""
     check_auth(authorization)
 
@@ -311,9 +301,7 @@ def metrics():
         ct, payload = metrics_response()
 
         # Convertir les bytes en string pour la concaténation
-        payload_str = (
-            payload.decode("utf-8") if isinstance(payload, bytes) else str(payload)
-        )
+        payload_str = payload.decode("utf-8") if isinstance(payload, bytes) else str(payload)
 
         # Ajouter les métriques de quotas si activées
         if NOX_QUOTAS_ENABLED:
@@ -345,9 +333,7 @@ async def startup_event():
 
             # Statistiques initiales
             stats = await quota_db.get_usage_statistics()
-            print(
-                f"✅ Quota system initialized - tracking {stats.get('total_users', 0)} users"
-            )
+            print(f"✅ Quota system initialized - tracking {stats.get('total_users', 0)} users")
         except Exception as e:
             print(f"⚠️ Warning: Quota system startup error: {e}")
 

@@ -123,9 +123,7 @@ class AuthManager:
                         return False
 
                     else:
-                        logger.error(
-                            f"API token validation failed - status: {response.status}"
-                        )
+                        logger.error(f"API token validation failed - status: {response.status}")
                         return False
 
         except Exception as e:
@@ -150,9 +148,7 @@ class AuthManager:
 
         if authorization_code:
             # Exchange authorization code for tokens
-            return await self._exchange_authorization_code(
-                authorization_code, redirect_uri
-            )
+            return await self._exchange_authorization_code(authorization_code, redirect_uri)
 
         # Generate authorization URL for user
         auth_url = self.get_oauth2_authorization_url(redirect_uri)
@@ -218,9 +214,7 @@ class AuthManager:
             True if token exchange successful
         """
 
-        if not self.oauth_config.get("client_id") or not self.oauth_config.get(
-            "client_secret"
-        ):
+        if not self.oauth_config.get("client_id") or not self.oauth_config.get("client_secret"):
             raise AuthenticationError("OAuth2 credentials not configured")
 
         token_data = {
@@ -247,9 +241,7 @@ class AuthManager:
 
                         # Calculate token expiration
                         expires_in = token_response.get("expires_in", 3600)
-                        self.token_expires_at = datetime.utcnow() + timedelta(
-                            seconds=expires_in
-                        )
+                        self.token_expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
 
                         # Get user information
                         await self._fetch_user_info()
@@ -305,9 +297,7 @@ class AuthManager:
             logger.warning("No refresh token available")
             return False
 
-        if not self.oauth_config.get("client_id") or not self.oauth_config.get(
-            "client_secret"
-        ):
+        if not self.oauth_config.get("client_id") or not self.oauth_config.get("client_secret"):
             logger.error("OAuth2 credentials not configured for token refresh")
             return False
 
@@ -336,9 +326,7 @@ class AuthManager:
 
                         # Update expiration
                         expires_in = token_response.get("expires_in", 3600)
-                        self.token_expires_at = datetime.utcnow() + timedelta(
-                            seconds=expires_in
-                        )
+                        self.token_expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
 
                         logger.info("Token refresh successful")
                         return True
@@ -413,9 +401,7 @@ class AuthManager:
                     ) as response:
 
                         if response.status not in [200, 204]:
-                            logger.warning(
-                                f"Token revocation failed: {response.status}"
-                            )
+                            logger.warning(f"Token revocation failed: {response.status}")
 
         except Exception as e:
             logger.warning(f"Token revocation error: {e}")
@@ -496,9 +482,7 @@ class AuthManager:
         """
 
         if not await self.is_authenticated():
-            raise AuthenticationError(
-                "Must be authenticated to initiate biometric challenge"
-            )
+            raise AuthenticationError("Must be authenticated to initiate biometric challenge")
 
         challenge_data = {
             "challenge_types": challenge_types,
@@ -545,9 +529,7 @@ class AuthManager:
         """
 
         if not await self.is_authenticated():
-            raise AuthenticationError(
-                "Must be authenticated to complete biometric challenge"
-            )
+            raise AuthenticationError("Must be authenticated to complete biometric challenge")
 
         try:
             headers = await self.get_auth_headers()
@@ -571,9 +553,7 @@ class AuthManager:
                         return success
 
                     else:
-                        logger.error(
-                            f"Biometric verification failed: {response.status}"
-                        )
+                        logger.error(f"Biometric verification failed: {response.status}")
                         return False
 
         except Exception as e:
