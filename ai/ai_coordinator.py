@@ -24,8 +24,8 @@ from psycopg2.extras import RealDictCursor
 from redis.cluster import RedisCluster
 
 from .biometric_auth import BiometricAuthenticationSystem, BiometricChallenge
-from .policy_engine import (AccessRequest, BiometricType,
-                            IntelligentPolicyEngine)
+from .policy_engine import AccessRequest, BiometricType, IntelligentPolicyEngine
+
 # Import AI components
 from .security_monitor import AISecurityMonitor, SecurityEvent
 
