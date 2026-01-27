@@ -9,7 +9,7 @@
 **Framework:** FastAPI 0.116.1 + Uvicorn 0.35.0  
 **Key Dependencies:** Dramatiq (task queue), Redis (job storage), pytest (testing)  
 **Repository Size:** Extensive Python codebase with comprehensive documentation  
-**Test Suite:** Fast test suite (60+ tests, runs in ~2 seconds)
+**Test Suite:** Fast comprehensive test suite (runs in ~2 seconds)
 
 ### Key Features
 - 🤖 **NOX Agent**: Autonomous coding system with file operations and LLM integration
@@ -55,8 +55,8 @@ PROJECT_ROOT/                       # Repository root (typically /home/runner/wo
 ├── tests/                          # Comprehensive test suite
 │   ├── test_api_minimal.py         # Basic API tests
 │   ├── test_ci_validation.py       # CI smoke tests
-│   ├── jobs/                       # Job system tests (27 tests)
-│   ├── unit/                       # Unit tests (7 tests)
+│   ├── jobs/                       # Job system tests
+│   ├── unit/                       # Unit tests
 │   ├── e2e/                        # End-to-end tests
 │   ├── agent/                      # Agent tests
 │   ├── cube/                       # Cube generation tests
@@ -99,7 +99,7 @@ pip install -r dev-requirements.txt
 
 **Run all tests (PRIMARY command for validation):**
 ```bash
-# Full test suite - 60 tests pass in ~2 seconds
+# Full test suite - runs in ~2 seconds
 PYTHONPATH=. JOBS_FORCE_LOCAL=1 pytest -q
 
 # Verbose output
@@ -108,10 +108,10 @@ PYTHONPATH=. JOBS_FORCE_LOCAL=1 pytest -v
 
 **Run specific test suites:**
 ```bash
-# Job system tests (27 tests, ~1s)
+# Job system tests (~1s)
 PYTHONPATH=. pytest tests/jobs -v
 
-# Unit tests (7 tests, <1s)
+# Unit tests (<1s)
 PYTHONPATH=. pytest tests/unit -v
 
 # CI validation tests (3 tests, <1s)
@@ -410,7 +410,7 @@ flake8 .
 
 These instructions have been validated by:
 - Running complete dependency installation
-- Executing full test suite (60 tests pass)
+- Executing full test suite (all tests pass)
 - Testing linting tools (black, flake8, isort)
 - Verifying CI workflow configuration
 - Testing common development commands
