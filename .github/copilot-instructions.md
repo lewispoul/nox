@@ -63,7 +63,7 @@ PROJECT_ROOT/                       # Repository root (typically /home/runner/wo
 │   └── xtb/                        # XTB integration tests
 │
 ├── scripts/                        # Operational scripts
-├── docs/                           # Comprehensive documentation (162+ files)
+├── docs/                           # Comprehensive documentation
 ├── k8s/                           # Kubernetes deployment configs
 └── docker-compose.yml             # Docker development setup
 ```
@@ -281,7 +281,7 @@ PYTHONPATH=. python -m uvicorn api.main:app
 
 **Symptom:** Black reports files would be reformatted
 
-**Expected:** Baseline has ~7 files that need formatting. Only reformat files you modify.
+**Expected:** Baseline has some formatting issues. Only reformat files you modify.
 
 **Fix specific files:**
 ```bash
@@ -404,7 +404,8 @@ flake8 .
 - **README:** `README.md` for quick overview
 - **Project structure:** `PROJECT_STRUCTURE.md` for detailed architecture
 - **Development workflow:** `docs/dev/DEV-WORKFLOW.md`
-- **Session protocols:** `.copilot-instructions.md` in repository root contains additional session protocols and documentation standards
+
+**Note:** This repository also has a `.copilot-instructions.md` file in the root directory that contains session-specific protocols and documentation standards for development sessions. This `.github/copilot-instructions.md` file focuses on onboarding and general repository information.
 
 ## ✅ Trust These Instructions
 
