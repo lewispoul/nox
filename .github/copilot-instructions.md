@@ -8,8 +8,8 @@
 **Primary Language:** Python 3.11+ (tested with Python 3.12.3)  
 **Framework:** FastAPI 0.116.1 + Uvicorn 0.35.0  
 **Key Dependencies:** Dramatiq (task queue), Redis (job storage), pytest (testing)  
-**Repository Size:** ~160+ Python files, 162+ markdown documentation files  
-**Test Suite:** 60 passing tests, runs in ~2 seconds
+**Repository Size:** Extensive Python codebase with comprehensive documentation  
+**Test Suite:** Fast test suite (60+ tests, runs in ~2 seconds)
 
 ### Key Features
 - 🤖 **NOX Agent**: Autonomous coding system with file operations and LLM integration
@@ -23,7 +23,7 @@
 ### Directory Structure
 
 ```
-/home/runner/work/nox/nox/          # Repository root
+PROJECT_ROOT/                       # Repository root (typically /home/runner/work/nox/nox in CI)
 ├── api/                            # FastAPI application (PRIMARY - use this)
 │   ├── main.py                     # Application entry point
 │   ├── routes/                     # API endpoint routers
@@ -130,7 +130,7 @@ PYTHONPATH=. JOBS_FORCE_LOCAL=1 pytest tests/e2e -v
 
 **Check code formatting (does not modify files):**
 ```bash
-# Check black formatting (7 files need reformatting as of baseline)
+# Check black formatting (some files may need reformatting in baseline)
 black --check .
 
 # Run flake8 linting (multiple whitespace/unused var issues in baseline)
@@ -399,7 +399,7 @@ flake8 .
 
 ## 📚 Additional Resources
 
-- **Comprehensive docs:** `docs/` directory has 162+ documentation files
+- **Comprehensive docs:** `docs/` directory has extensive documentation
 - **Project status:** `docs/PROJECT_STATUS_2025-08-19.md`
 - **README:** `README.md` for quick overview
 - **Project structure:** `PROJECT_STRUCTURE.md` for detailed architecture
@@ -420,6 +420,6 @@ If something doesn't work as documented, first verify:
 1. Dependencies are installed (`pip list | grep -E "pytest|fastapi"`)
 2. You're using `PYTHONPATH=.` for Python commands
 3. You're using `JOBS_FORCE_LOCAL=1` for tests
-4. You're in the repository root directory (`/home/runner/work/nox/nox`)
+4. You're in the repository root directory (check with `pwd`)
 
 If issues persist, you may need to search/explore further, but these instructions cover 95% of common development tasks.
