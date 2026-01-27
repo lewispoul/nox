@@ -5,8 +5,8 @@
 **NOX API** is a secure, sandboxed execution platform built on FastAPI for autonomous computational chemistry workflows. It combines secure Python/shell execution with advanced AI agent capabilities, designed for computational chemistry research and automation.
 
 **Project Type:** Python FastAPI web service with async task processing  
-**Primary Language:** Python 3.11+ (tested with Python 3.12.3)  
-**Framework:** FastAPI 0.116.1 + Uvicorn 0.35.0  
+**Primary Language:** Python 3.11+ (repository tested with Python 3.12)  
+**Framework:** FastAPI 0.116+ with Uvicorn 0.35+  
 **Key Dependencies:** Dramatiq (task queue), Redis (job storage), pytest (testing)  
 **Repository Size:** Extensive Python codebase with comprehensive documentation  
 **Test Suite:** Fast comprehensive test suite (runs in ~2 seconds)
@@ -133,7 +133,7 @@ PYTHONPATH=. JOBS_FORCE_LOCAL=1 pytest tests/e2e -v
 # Check black formatting (some files may need reformatting in baseline)
 black --check .
 
-# Run flake8 linting (multiple whitespace/unused var issues in baseline)
+# Run flake8 linting (baseline has some whitespace/unused var issues)
 flake8 .
 
 # Check import sorting
