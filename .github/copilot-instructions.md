@@ -400,11 +400,11 @@ flake8 .
 ## 📚 Additional Resources
 
 - **Comprehensive docs:** `docs/` directory has extensive documentation
-- **Project status:** `docs/PROJECT_STATUS_2025-08-19.md`
+- **Project status:** Latest status documents in `docs/` directory
 - **README:** `README.md` for quick overview
 - **Project structure:** `PROJECT_STRUCTURE.md` for detailed architecture
 - **Development workflow:** `docs/dev/DEV-WORKFLOW.md`
-- **Root .copilot-instructions.md:** Contains session protocols and documentation standards
+- **Session protocols:** `.copilot-instructions.md` in repository root contains additional session protocols and documentation standards
 
 ## ✅ Trust These Instructions
 
