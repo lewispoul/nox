@@ -1,8 +1,3 @@
-import asyncio
-import json
-import shutil
-import time
-
 import pytest
 
 from api.services import queue
@@ -32,13 +27,9 @@ async def test_xtb_job_hermetic_cubes(monkeypatch):
 
     job_id = queue.submit_job("xtb", {"job_request": jr.model_dump_json()})
 
-    store = get_store()
-    deadline = time.time() + 5
-    state = store.get(job_id).state
-    while state not in {"done", "failed"} and time.time() < deadline:
-        await asyncio.sleep(0.05)
-        state = store.get(job_id).state
+    await wait_for_job_done(job_id)
 
+    store = get_store()
     job = store.get(job_id)
     assert job.state == "done"
     result = job.result or {}
@@ -84,7 +75,7 @@ async def test_xtb_job_with_mock_runner(monkeypatch):
 
     job_id = queue.submit_job("xtb", {"job_request": jr.model_dump_json()})
 
-    state = await wait_for_job_done(job_id)
+    await wait_for_job_done(job_id)
 
     store = get_store()
     job = store.get(job_id)
