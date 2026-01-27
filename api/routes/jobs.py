@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, ValidationError
 
 from api.schemas.job import JobRequest, JobStatus
+from api.schemas.psi4_job import Psi4JobRequest
 from api.schemas.result import Artifact, ResultBundle
 from api.services.jobs_store import get_store
 from api.services.queue import submit_job
@@ -19,34 +20,45 @@ class SimpleJobRequest(BaseModel):
 
 
 @router.post("/jobs")
-async def create_job(request: Request):
-    """Create a job - supports both simple and XTB job formats"""
+async def create_job(body: Union[SimpleJobRequest, Psi4JobRequest, JobRequest]):
+    """Create a job - supports simple, XTB, and Psi4 job formats.
+    
+    Provide one of:
+    - SimpleJobRequest: {kind: str, payload: dict}
+    - Psi4JobRequest: {engine: "psi4", ...psi4 fields}
+    - JobRequest: {engine: "xtb" or default, ...xtb fields}
+    """
     try:
-        # Try to parse as raw dict first
-        body = await request.json()
-
-        # Check if it looks like a simple job request (has 'kind' field)
-        if "kind" in body and "payload" in body:
-            # Simple job request
-            simple_req = SimpleJobRequest(**body)
-            job_id = submit_job(simple_req.kind, simple_req.payload)
+        # SimpleJobRequest
+        if isinstance(body, SimpleJobRequest):
+            job_id = submit_job(body.kind, body.payload)
             j = get_store().get(job_id)
             if j is None:
                 raise HTTPException(500, "Failed to create job")
             return {"job_id": job_id, "state": j.state}
 
-        # Otherwise try to parse as XTB JobRequest
-        try:
-            xtb_req = JobRequest(**body)
-            payload = {"job_request": xtb_req.model_dump_json()}
-            job_id = submit_job("xtb", payload)
-
+        # Psi4JobRequest
+        if isinstance(body, Psi4JobRequest):
+            payload = {"job_request": body.model_dump_json()}
+            job_id = submit_job("psi4", payload)
             return JobStatus(
-                job_id=job_id, state="pending", message="Job queued for processing"
+                job_id=job_id,
+                state="pending",
+                message="Psi4 job queued for processing",
             )
-        except ValidationError:
-            raise HTTPException(422, "Invalid job request format")
 
+        # JobRequest (XTB or default)
+        if isinstance(body, JobRequest):
+            payload = {"job_request": body.model_dump_json()}
+            job_id = submit_job("xtb", payload)
+            return JobStatus(
+                job_id=job_id,
+                state="pending",
+                message="Job queued for processing",
+            )
+
+    except ValidationError as e:
+        raise HTTPException(422, f"Invalid job request format: {e}")
     except Exception as e:
         raise HTTPException(400, f"Invalid request: {str(e)}")
 
@@ -113,3 +125,59 @@ def get_artifacts(job_id: str):
     return ResultBundle(
         scalars=rb.get("scalars", {}), series=rb.get("series", {}), artifacts=artifacts
     )
+
+
+@router.get("/jobs/{job_id}/wait")
+async def wait_for_job(job_id: str, timeout: int = 30, poll_delay: float = 0.5):
+    """Poll job until completion or timeout.
+    
+    - Fast-path returns immediately when job is already terminal (done/failed)
+    - Polls at `poll_delay` until `timeout` seconds
+    - Returns 202 when timing out with job still running/pending
+    """
+    import asyncio
+    import time
+    from fastapi.responses import JSONResponse
+
+    # Clamp timeout and poll delay to sane bounds
+    timeout = max(1, min(timeout, 300))
+    poll_delay = max(0.05, min(poll_delay, 5.0))
+
+    state_mapping = {
+        "queued": "pending",
+        "running": "running",
+        "done": "completed",
+        "failed": "failed",
+    }
+
+    def _job_status(job):
+        api_state = state_mapping.get(job.state, job.state)
+        msg = job.error or ("Job completed" if job.state == "done" else "Job processing")
+        return JobStatus(job_id=job_id, state=api_state, message=msg)
+
+    job = get_store().get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Fast-path for terminal states
+    if job.state in ("done", "failed"):
+        return _job_status(job)
+
+    # Poll until timeout
+    start = time.monotonic()
+    while time.monotonic() - start < timeout:
+        await asyncio.sleep(poll_delay)
+        job = get_store().get(job_id)
+        if not job:
+            raise HTTPException(status_code=404, detail="Job not found")
+        if job.state in ("done", "failed"):
+            return _job_status(job)
+
+    # Timed out, job still not terminal
+    job = get_store().get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    status_body = _job_status(job)
+    status_body.message = f"Timeout after {timeout}s - job still {job.state}"
+    return JSONResponse(status_code=202, content=status_body.model_dump())

@@ -35,6 +35,10 @@ def enqueue_job(job_id: str, kind: str, payload: Dict[str, Any]):
         elif kind == "xtb":
             # Handle XTB calculation
             result = run_xtb_calculation(payload)
+        elif kind == "psi4":
+            result = run_psi4_calculation(payload)
+        elif kind == "cj":
+            result = run_cj_calculation(payload)
         else:
             result = {"echo": payload}
 
@@ -79,4 +83,41 @@ def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
         )
         raise RuntimeError(error_msg)
 
+    return result
+
+
+def run_psi4_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
+    from ai.runners.psi4 import run_psi4_job
+    from api.schemas.psi4_job import Psi4JobRequest
+    from api.services.storage import job_dir
+
+    job_request_json = payload.get("job_request", "{}")
+    JR = Psi4JobRequest.model_validate_json(job_request_json)
+
+    job_id = payload.get("job_id", "unknown")
+    jd = job_dir(job_id)
+
+    result = run_psi4_job(
+        jd,
+        JR.inputs.xyz,
+        JR.inputs.charge,
+        JR.inputs.multiplicity,
+        JR.inputs.params.model_dump(),
+    )
+
+    if result.get("returncode") != 0:
+        raise RuntimeError("Psi4 calculation failed")
+    return result
+
+
+def run_cj_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
+    from api.services.storage import job_dir
+    from nox.chemistry.cj import run_cj
+
+    jd = job_dir(payload.get("job_id", "unknown"))
+    req = payload.get("cj_request", {})
+    result = run_cj(jd, req)
+
+    if result.get("returncode") != 0:
+        raise RuntimeError("CJ calculation failed")
     return result
