@@ -84,9 +84,9 @@ jobs:
     - name: Run Safety vulnerability check
       run: |
         echo "Running Safety vulnerability check..."
-        safety check --json --output reports/safety-report.json || {
+        safety scan --save-as json reports/safety-report.json || {
           echo "⚠️  Safety found vulnerabilities"
-          safety check
+          safety scan
           exit 0
         }
       continue-on-error: true
@@ -94,7 +94,7 @@ jobs:
     - name: Run pip-audit supply chain security
       run: |
         echo "Running pip-audit for supply chain security..."
-        pip-audit --format json --output reports/pip-audit-report.json || {
+        pip-audit --format json -o reports/pip-audit-report.json || {
           echo "⚠️  pip-audit found vulnerabilities"
           pip-audit
           exit 0
