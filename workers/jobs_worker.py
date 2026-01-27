@@ -50,7 +50,7 @@ def enqueue_job(job_id: str, kind: str, payload: Dict[str, Any]):
 
 def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Execute XTB calculation with given parameters
-    
+
     In hermetic/local mode, if xtb binary is not available,
     returns a fake result to avoid hanging tests.
     """
@@ -63,7 +63,7 @@ def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
             "artifacts": [],
             "returncode": 0,
         }
-    
+
     from ai.runners.xtb import run_xtb_job
     from api.schemas.job import JobRequest
     from api.services.storage import job_dir

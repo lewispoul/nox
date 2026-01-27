@@ -133,7 +133,7 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
         def _send_or_fallback():
             try:
                 enqueue_job.send(job_id, kind, payload)
-            except Exception as exc:  # noqa: BLE001
+            except Exception:  # noqa: BLE001
                 import logging
 
                 logging.getLogger(__name__).exception(
