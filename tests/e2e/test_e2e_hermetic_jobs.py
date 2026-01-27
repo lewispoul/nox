@@ -10,6 +10,21 @@ from api.services import queue as q
 from tests.helpers import wait_for_job_done
 
 
+async def _run_job_and_get_result(app, payload, endpoint="/jobs"):
+    """Helper to run a job and retrieve its result."""
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        r = await client.post(endpoint, json=payload)
+        assert r.status_code == 200
+        job_id = r.json()["job_id"]
+
+        state = await wait_for_job_done(job_id, client=client)
+        assert state == "done"
+
+        r3 = await client.get(f"/jobs/{job_id}")
+        return r3.json().get("result", {})
+
+
 @pytest.mark.asyncio
 async def test_e2e_xtb_cubes_hermetic(monkeypatch):
     monkeypatch.setenv("JOBS_FORCE_LOCAL", "1")
@@ -30,22 +45,12 @@ async def test_e2e_xtb_cubes_hermetic(monkeypatch):
         },
     }
 
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        r = await client.post("/jobs", json=payload)
-        assert r.status_code == 200
-        job_id = r.json()["job_id"]
-
-        state = await wait_for_job_done(job_id, client=client)
-        assert state == "done"
-
-        r3 = await client.get(f"/jobs/{job_id}")
-        result = r3.json().get("result", {})
-        artifacts = result.get("artifacts", [])
-        names = {a.get("name") for a in artifacts}
-        assert {"homo.cube", "lumo.cube"} <= names
-        scalars = result.get("scalars", {})
-        assert scalars.get("E_total_hartree") is not None
+    result = await _run_job_and_get_result(app, payload)
+    artifacts = result.get("artifacts", [])
+    names = {a.get("name") for a in artifacts}
+    assert {"homo.cube", "lumo.cube"} <= names
+    scalars = result.get("scalars", {})
+    assert scalars.get("E_total_hartree") is not None
 
 
 @pytest.mark.asyncio
@@ -58,25 +63,14 @@ async def test_e2e_cj_hermetic(monkeypatch):
     app.include_router(predict_router)
     app.include_router(jobs_router)
 
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        r = await client.post(
-            "/predict/cj",
-            json={"reactants": {"H2": 2, "O2": 1}, "T0": 300.0, "P0": 101325.0},
-        )
-        assert r.status_code == 200
-        job_id = r.json()["job_id"]
+    payload = {"reactants": {"H2": 2, "O2": 1}, "T0": 300.0, "P0": 101325.0}
 
-        state = await wait_for_job_done(job_id, client=client)
-        assert state == "done"
-
-        r3 = await client.get(f"/jobs/{job_id}")
-        result = r3.json().get("result", {})
-        artifacts = result.get("artifacts", [])
-        assert any(a.get("name") == "cj_results.csv" for a in artifacts)
-        scalars = result.get("scalars", {})
-        assert scalars.get("Pcj_Pa") is not None
-        assert scalars.get("Tcj_K") is not None
+    result = await _run_job_and_get_result(app, payload, endpoint="/predict/cj")
+    artifacts = result.get("artifacts", [])
+    assert any(a.get("name") == "cj_results.csv" for a in artifacts)
+    scalars = result.get("scalars", {})
+    assert scalars.get("Pcj_Pa") is not None
+    assert scalars.get("Tcj_K") is not None
 
 
 @pytest.mark.asyncio
@@ -113,22 +107,12 @@ async def test_e2e_xtb_with_mock_runner(monkeypatch):
         },
     }
 
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        r = await client.post("/jobs", json=payload)
-        assert r.status_code == 200
-        job_id = r.json()["job_id"]
-
-        state = await wait_for_job_done(job_id, client=client)
-        assert state == "done"
-
-        r3 = await client.get(f"/jobs/{job_id}")
-        result = r3.json().get("result", {})
-        artifacts = result.get("artifacts", [])
-        names = {a.get("name") for a in artifacts}
-        assert {"homo.cube", "lumo.cube"} <= names
-        scalars = result.get("scalars", {})
-        assert scalars.get("E_total_hartree") == -12.34
+    result = await _run_job_and_get_result(app, payload)
+    artifacts = result.get("artifacts", [])
+    names = {a.get("name") for a in artifacts}
+    assert {"homo.cube", "lumo.cube"} <= names
+    scalars = result.get("scalars", {})
+    assert scalars.get("E_total_hartree") == -12.34
 
     q.set_xtb_runner(orig)
 
@@ -161,24 +145,14 @@ async def test_e2e_cj_with_mock_runner(monkeypatch):
     app.include_router(predict_router)
     app.include_router(jobs_router)
 
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        r = await client.post(
-            "/predict/cj",
-            json={"reactants": {"H2": 2, "O2": 1}, "T0": 300.0, "P0": 101325.0},
-        )
-        assert r.status_code == 200
-        job_id = r.json()["job_id"]
+    payload = {"reactants": {"H2": 2, "O2": 1}, "T0": 300.0, "P0": 101325.0}
 
-        state = await wait_for_job_done(job_id, client=client)
-        assert state == "done"
-
-        r3 = await client.get(f"/jobs/{job_id}")
-        result = r3.json().get("result", {})
-        artifacts = result.get("artifacts", [])
-        assert any(a.get("name") == "cj_results.csv" for a in artifacts)
-        scalars = result.get("scalars", {})
-        assert scalars.get("Pcj_Pa") == 1.23e9
-        assert scalars.get("Tcj_K") == 2500.0
+    result = await _run_job_and_get_result(app, payload, endpoint="/predict/cj")
+    artifacts = result.get("artifacts", [])
+    assert any(a.get("name") == "cj_results.csv" for a in artifacts)
+    scalars = result.get("scalars", {})
+    assert scalars.get("Pcj_Pa") == 1.23e9
+    assert scalars.get("Tcj_K") == 2500.0
 
     q.set_cj_runner(orig)
+
