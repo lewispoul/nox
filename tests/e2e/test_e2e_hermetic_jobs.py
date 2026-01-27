@@ -14,7 +14,7 @@ from tests.helpers import wait_for_job_done
 async def test_e2e_xtb_cubes_hermetic(monkeypatch):
     monkeypatch.setenv("JOBS_FORCE_LOCAL", "1")
     monkeypatch.delenv("REDIS_URL", raising=False)
-    monkeypatch.setattr(shutil, "which", lambda _: None)
+    monkeypatch.setattr("nox.runners.xtb.shutil.which", lambda _: None)
 
     app = FastAPI()
     app.include_router(jobs_router)

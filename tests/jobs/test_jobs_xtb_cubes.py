@@ -11,7 +11,7 @@ async def test_xtb_job_hermetic_cubes(monkeypatch):
     # Force local execution and hermetic XTB path
     monkeypatch.setenv("JOBS_FORCE_LOCAL", "1")
     monkeypatch.delenv("REDIS_URL", raising=False)
-    monkeypatch.setattr("shutil.which", lambda _: None, raising=False)
+    monkeypatch.setattr("nox.runners.xtb.shutil.which", lambda _: None)
 
     params = XTBParams(gfn=2, opt=True, cubes=True)
     jr = JobRequest(
