@@ -105,4 +105,3 @@ async def test_e2e_cj_with_mock_runner(monkeypatch):
     assert scalars.get("Tcj_K") == 2500.0
 
     q.set_cj_runner(orig)
-
