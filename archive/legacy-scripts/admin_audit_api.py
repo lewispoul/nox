@@ -135,15 +135,11 @@ async def get_audit_logs(
     action_category: Optional[str] = Query(None, description="Filter by category"),
     endpoint: Optional[str] = Query(None, description="Filter by endpoint"),
     success: Optional[bool] = Query(None, description="Filter by success status"),
-    quota_violation: Optional[bool] = Query(
-        None, description="Filter quota violations"
-    ),
+    quota_violation: Optional[bool] = Query(None, description="Filter quota violations"),
     client_ip: Optional[str] = Query(None, description="Filter by client IP"),
     start_date: Optional[datetime] = Query(None, description="Start date filter"),
     end_date: Optional[datetime] = Query(None, description="End date filter"),
-    search: Optional[str] = Query(
-        None, description="Search in error details or metadata"
-    ),
+    search: Optional[str] = Query(None, description="Search in error details or metadata"),
     admin_auth=Depends(verify_admin_token),
 ):
     """Get paginated audit logs with filtering"""
@@ -256,9 +252,7 @@ async def get_audit_logs(
 
 @admin_router.get("/export")
 async def export_audit_logs(
-    format: str = Query(
-        "csv", regex="^(csv|json)$", description="Export format: csv or json"
-    ),
+    format: str = Query("csv", regex="^(csv|json)$", description="Export format: csv or json"),
     user_id: Optional[str] = Query(None, description="Filter by user ID"),
     start_date: Optional[datetime] = Query(None, description="Start date filter"),
     end_date: Optional[datetime] = Query(None, description="End date filter"),
@@ -442,12 +436,9 @@ async def get_user_activity_summary(
                     ORDER BY count DESC
                     LIMIT 5
                 """
-                endpoint_rows = await conn.fetch(
-                    endpoints_query, row["user_id"], start_date
-                )
+                endpoint_rows = await conn.fetch(endpoints_query, row["user_id"], start_date)
                 top_endpoints = [
-                    {"endpoint": ep["endpoint"], "count": ep["count"]}
-                    for ep in endpoint_rows
+                    {"endpoint": ep["endpoint"], "count": ep["count"]} for ep in endpoint_rows
                 ]
 
                 summary = UserActivitySummary(
@@ -489,9 +480,7 @@ async def get_daily_summaries(
             raise HTTPException(status_code=500, detail="Database not available")
 
         async with db_connection.pool.acquire() as conn:
-            where_clause = (
-                "WHERE summary_date >= CURRENT_DATE - INTERVAL '%s days'" % days
-            )
+            where_clause = "WHERE summary_date >= CURRENT_DATE - INTERVAL '%s days'" % days
             params = []
 
             if user_id:

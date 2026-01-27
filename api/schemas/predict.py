@@ -15,19 +15,15 @@ class CJRequest(BaseModel):
 
 class VoDRequest(BaseModel):
     """Request body for Velocity of Detonation (VoD) prediction.
-    
+
     Supports multiple model inputs:
     - Kamlet-Jacobs: rho_g_cc, N, M, Q_cal_g
     - Keshavarz: rho_g_cc, OB (oxygen balance)
     - ML baseline: arbitrary_features
     """
 
-    rho_g_cc: float | None = Field(
-        default=None, description="Density in g/cm³"
-    )
-    N: float | None = Field(
-        default=None, description="Number of moles of gas products (KJ model)"
-    )
+    rho_g_cc: float | None = Field(default=None, description="Density in g/cm³")
+    N: float | None = Field(default=None, description="Number of moles of gas products (KJ model)")
     M: float | None = Field(
         default=None, description="Average molecular weight of products (KJ model)"
     )

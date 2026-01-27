@@ -247,9 +247,7 @@ class EnhancedOAuth2Service:
 
         return token_id
 
-    async def get_valid_oauth2_token(
-        self, user_id: str, provider: str
-    ) -> Optional[Dict]:
+    async def get_valid_oauth2_token(self, user_id: str, provider: str) -> Optional[Dict]:
         """Get valid OAuth2 token for user and provider"""
         async with self.pool.acquire() as conn:
             token_record = await conn.fetchrow(
@@ -286,9 +284,7 @@ class EnhancedOAuth2Service:
             # Generate new tokens
             new_access_token = secrets.token_urlsafe(32)
             new_refresh_token = secrets.token_urlsafe(32)
-            new_expires_at = datetime.utcnow() + timedelta(
-                minutes=self.access_token_expire_minutes
-            )
+            new_expires_at = datetime.utcnow() + timedelta(minutes=self.access_token_expire_minutes)
 
             # Update token record
             await conn.execute(
@@ -466,14 +462,10 @@ class EnhancedOAuth2Service:
 
             return total_stats
 
-    async def revoke_user_oauth2_tokens(
-        self, user_id: str, provider: str = None
-    ) -> int:
+    async def revoke_user_oauth2_tokens(self, user_id: str, provider: str = None) -> int:
         """Revoke OAuth2 tokens for user"""
         async with self.pool.acquire() as conn:
-            result = await conn.fetchval(
-                "SELECT revoke_oauth2_tokens($1, $2)", user_id, provider
-            )
+            result = await conn.fetchval("SELECT revoke_oauth2_tokens($1, $2)", user_id, provider)
             return result
 
     async def cleanup_expired_sessions(self) -> int:

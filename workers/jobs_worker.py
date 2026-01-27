@@ -73,14 +73,10 @@ def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     # XTB success: return code 0 OR (return code 2 with valid energy results)
     has_energy = result.get("scalars", {}).get("E_total_hartree") is not None
-    success = (result.get("returncode") == 0) or (
-        result.get("returncode") == 2 and has_energy
-    )
+    success = (result.get("returncode") == 0) or (result.get("returncode") == 2 and has_energy)
 
     if not success:
-        error_msg = (
-            f"XTB calculation failed with return code {result.get('returncode')}"
-        )
+        error_msg = f"XTB calculation failed with return code {result.get('returncode')}"
         raise RuntimeError(error_msg)
 
     return result

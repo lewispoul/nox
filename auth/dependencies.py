@@ -27,9 +27,7 @@ async def get_current_user(
     # Récupérer l'utilisateur depuis la base de données
     user = await db.get_user_by_id(token_data.user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
 
     # Vérifier que l'utilisateur est actif
     if not user.is_active:
@@ -69,9 +67,7 @@ def require_any_role(required_roles: List[str]) -> Callable:
 
 
 async def get_current_user_optional(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(
-        HTTPBearer(auto_error=False)
-    ),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False)),
 ) -> Optional[User]:
     """Dépendance pour récupérer l'utilisateur actuel de manière optionnelle"""
 

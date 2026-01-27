@@ -218,9 +218,7 @@ class AISecurityMonitor:
 
         logger.info(f"Initialized {len(self.models)} ML models for security monitoring")
 
-    async def process_security_event(
-        self, event: SecurityEvent
-    ) -> List[ThreatDetection]:
+    async def process_security_event(self, event: SecurityEvent) -> List[ThreatDetection]:
         """
         Process a security event and detect potential threats.
 
@@ -253,9 +251,7 @@ class AISecurityMonitor:
             if geo_threat:
                 threats.append(geo_threat)
 
-            temporal_threat = await self._analyze_temporal_patterns(
-                event, behavior_profile
-            )
+            temporal_threat = await self._analyze_temporal_patterns(event, behavior_profile)
             if temporal_threat:
                 threats.append(temporal_threat)
 
@@ -308,9 +304,7 @@ class AISecurityMonitor:
                     confidence_score=confidence,
                     detection_details={
                         "anomaly_score": anomaly_score,
-                        "features": dict(
-                            zip(self._get_login_feature_names(), features)
-                        ),
+                        "features": dict(zip(self._get_login_feature_names(), features)),
                         "event_timestamp": event.timestamp.isoformat(),
                         "ip_address": event.ip_address,
                     },
@@ -339,9 +333,7 @@ class AISecurityMonitor:
 
             # IP address features (simplified)
             ip_parts = event.ip_address.split(".")
-            ip_numeric = sum(
-                int(part) * (256 ** (3 - i)) for i, part in enumerate(ip_parts)
-            )
+            ip_numeric = sum(int(part) * (256 ** (3 - i)) for i, part in enumerate(ip_parts))
             ip_class = int(ip_parts[0]) // 64  # Rough IP class categorization
 
             # User agent features (simplified)
@@ -480,9 +472,7 @@ class AISecurityMonitor:
             "last_updated": datetime.utcnow().isoformat(),
         }
 
-    async def _update_behavior_profile(
-        self, event: SecurityEvent, current_profile: Dict[str, Any]
-    ):
+    async def _update_behavior_profile(self, event: SecurityEvent, current_profile: Dict[str, Any]):
         """Update user behavior profile based on new event."""
 
         # Update profile with new event data
@@ -520,11 +510,7 @@ class AISecurityMonitor:
                             json.dumps(event.location) if event.location else None,
                             event.device_fingerprint,
                             event.session_id,
-                            (
-                                json.dumps(event.additional_data)
-                                if event.additional_data
-                                else None
-                            ),
+                            (json.dumps(event.additional_data) if event.additional_data else None),
                         ),
                     )
                     conn.commit()
@@ -657,9 +643,7 @@ class AISecurityMonitor:
 
         total_score = 0.0
         for threat in recent_threats:
-            severity_weight = severity_weights.get(
-                threat.get("severity_level", "low"), 0.1
-            )
+            severity_weight = severity_weights.get(threat.get("severity_level", "low"), 0.1)
             confidence = threat.get("confidence_score", 0.5)
 
             # Apply time decay (newer threats have more weight)
@@ -680,9 +664,7 @@ class AISecurityMonitor:
         recommendations = []
 
         if risk_score > 0.8:
-            recommendations.append(
-                "Consider requiring additional authentication factors"
-            )
+            recommendations.append("Consider requiring additional authentication factors")
             recommendations.append("Review recent login locations and devices")
             recommendations.append("Enable real-time security alerts")
 

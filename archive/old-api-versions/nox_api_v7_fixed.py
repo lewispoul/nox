@@ -180,9 +180,7 @@ async def api_status():
                     db_test = await conn.fetchval("SELECT 1")
                     status_info["database"]["connected"] = db_test == 1
                     status_info["database"]["pool_size"] = (
-                        len(database_pool._queue._queue)
-                        if hasattr(database_pool, "_queue")
-                        else 0
+                        len(database_pool._queue._queue) if hasattr(database_pool, "_queue") else 0
                     )
             except Exception as e:
                 status_info["database"]["error"] = str(e)
@@ -230,9 +228,7 @@ async def get_prometheus_metrics():
 
         # Database metrics
         if database_pool:
-            metrics.append(
-                "# HELP nox_database_connections Current database connections"
-            )
+            metrics.append("# HELP nox_database_connections Current database connections")
             metrics.append(
                 f"nox_database_connections {len(database_pool._queue._queue) if hasattr(database_pool, '_queue') else 0}"
             )
@@ -241,9 +237,7 @@ async def get_prometheus_metrics():
         if oauth2_service and database_pool:
             try:
                 oauth2_stats = await oauth2_service.get_oauth2_statistics()
-                metrics.append(
-                    "# HELP nox_oauth2_users_total Total OAuth2 users by provider"
-                )
+                metrics.append("# HELP nox_oauth2_users_total Total OAuth2 users by provider")
                 for provider, stats in oauth2_stats.get("providers", {}).items():
                     metrics.append(
                         f'nox_oauth2_users_total{{provider="{provider}"}} {stats["total_users"]}'
@@ -257,9 +251,7 @@ async def get_prometheus_metrics():
         return Response(content="\n".join(metrics) + "\n", media_type="text/plain")
 
     except Exception as e:
-        return Response(
-            content=f"# Error generating metrics: {e}\n", media_type="text/plain"
-        )
+        return Response(content=f"# Error generating metrics: {e}\n", media_type="text/plain")
 
 
 # ===== ERROR HANDLERS =====

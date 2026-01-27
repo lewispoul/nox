@@ -20,9 +20,7 @@ def generate_quick_report():
     for root, dirs, files in os.walk(ROOT_DIR):
         # Exclure les dossiers cachés et temporaires
         dirs[:] = [
-            d
-            for d in dirs
-            if not d.startswith(".") and d not in ["__pycache__", "node_modules"]
+            d for d in dirs if not d.startswith(".") and d not in ["__pycache__", "node_modules"]
         ]
 
         for file in files:
@@ -35,9 +33,7 @@ def generate_quick_report():
 
             try:
                 size = file_path.stat().st_size
-                files_data.append(
-                    {"path": str(rel_path), "size": size, "ext": file_path.suffix}
-                )
+                files_data.append({"path": str(rel_path), "size": size, "ext": file_path.suffix})
                 total_size += size
             except:
                 continue

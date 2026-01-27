@@ -24,9 +24,7 @@ def make_request(endpoint, method="GET", data=None, headers=None):
         if method == "GET":
             response = requests.get(url, headers=default_headers, timeout=10)
         elif method == "POST":
-            response = requests.post(
-                url, json=data, headers=default_headers, timeout=10
-            )
+            response = requests.post(url, json=data, headers=default_headers, timeout=10)
         else:
             print(f"❌ Méthode {method} non supportée")
             return None

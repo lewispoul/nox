@@ -117,9 +117,7 @@ class SecurityClient:
             logger.error(f"Security event analysis failed: {e}")
             return None
 
-    async def analyze_api_call(
-        self, call_data: Dict[str, Any]
-    ) -> Optional[ThreatAssessment]:
+    async def analyze_api_call(self, call_data: Dict[str, Any]) -> Optional[ThreatAssessment]:
         """
         Analyze an API call for security threats.
 
@@ -184,9 +182,7 @@ class SecurityClient:
                 "reporter": "sdk_client",
             }
 
-            response = await self.client.post(
-                "/api/ai/security/report", data=report_data
-            )
+            response = await self.client.post("/api/ai/security/report", data=report_data)
 
             if response.success:
                 logger.info("Suspicious activity reported successfully")
@@ -280,9 +276,7 @@ class SecurityClient:
             logger.error(f"Failed to start behavioral monitoring: {e}")
             return None
 
-    async def stop_behavioral_monitoring(
-        self, session_id: str
-    ) -> Optional[Dict[str, Any]]:
+    async def stop_behavioral_monitoring(self, session_id: str) -> Optional[Dict[str, Any]]:
         """
         Stop behavioral monitoring session and get results.
 
@@ -294,9 +288,7 @@ class SecurityClient:
         """
 
         try:
-            response = await self.client.post(
-                f"/api/ai/security/monitor/stop/{session_id}"
-            )
+            response = await self.client.post(f"/api/ai/security/monitor/stop/{session_id}")
 
             if response.success:
                 logger.info(f"Behavioral monitoring stopped: {session_id}")
@@ -325,9 +317,7 @@ class SecurityClient:
         try:
             request_data = {"user_id": user_id, "context": context or {}}
 
-            response = await self.client.post(
-                "/api/ai/security/recommendations", data=request_data
-            )
+            response = await self.client.post("/api/ai/security/recommendations", data=request_data)
 
             if response.success and response.data:
                 return response.data.get("recommendations", [])
@@ -387,9 +377,7 @@ class SecurityClient:
             "threat_levels": threat_levels,
             "average_confidence": total_confidence / len(self.threat_history),
             "common_indicators": common_indicators,
-            "average_analysis_time": sum(
-                a.analysis_time_ms for a in self.threat_history
-            )
+            "average_analysis_time": sum(a.analysis_time_ms for a in self.threat_history)
             / len(self.threat_history),
         }
 

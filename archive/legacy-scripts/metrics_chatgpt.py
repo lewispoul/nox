@@ -26,12 +26,8 @@ LAT = Histogram(
     buckets=(0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10),
     registry=registry,
 )
-SANDBOX_FILES = Gauge(
-    "nox_sandbox_files", "Nombre de fichiers dans le sandbox", registry=registry
-)
-SANDBOX_BYTES = Gauge(
-    "nox_sandbox_bytes", "Taille totale sandbox en octets", registry=registry
-)
+SANDBOX_FILES = Gauge("nox_sandbox_files", "Nombre de fichiers dans le sandbox", registry=registry)
+SANDBOX_BYTES = Gauge("nox_sandbox_bytes", "Taille totale sandbox en octets", registry=registry)
 
 
 def update_sandbox_metrics(root: str) -> None:

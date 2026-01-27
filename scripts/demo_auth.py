@@ -142,9 +142,7 @@ print(f"🧮 Calcul: somme 1-10 = {result}")
         if "sandbox" in metrics:
             metrics_types.append("Métriques sandbox")
 
-        print(
-            f"   🏷️  Types détectés: {', '.join(metrics_types) if metrics_types else 'Standard'}"
-        )
+        print(f"   🏷️  Types détectés: {', '.join(metrics_types) if metrics_types else 'Standard'}")
         print(f"   🆔 Request-ID: {headers.get('x-request-id', 'N/A')[:8]}...")
 
     except Exception as e:

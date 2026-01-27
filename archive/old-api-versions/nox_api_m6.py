@@ -39,9 +39,7 @@ from rate_limit_and_policy import RateLimitAndPolicyMiddleware
 
 # Import existing metrics
 sys.path.append(
-    os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "observability"
-    )
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "observability")
 )
 from metrics_chatgpt import metrics_response, update_sandbox_metrics
 from middleware import MetricsMiddleware
@@ -181,9 +179,7 @@ def ls(
 
 
 @app.get("/cat")
-def cat(
-    path: str, authorization: str | None = Header(default=None, alias="Authorization")
-):
+def cat(path: str, authorization: str | None = Header(default=None, alias="Authorization")):
     """Lecture de fichiers avec audit de contenu"""
     check_auth(authorization)
 
@@ -228,9 +224,7 @@ async def write_file(
 
 
 @app.delete("/delete")
-def delete(
-    path: str, authorization: str | None = Header(default=None, alias="Authorization")
-):
+def delete(path: str, authorization: str | None = Header(default=None, alias="Authorization")):
     """Suppression de fichiers avec audit de sécurité"""
     check_auth(authorization)
 
@@ -272,9 +266,7 @@ def delete(
 
 class ExecuteRequest(BaseModel):
     command: str = Field(..., max_length=10000, description="Command to execute")
-    timeout: Optional[int] = Field(
-        default=None, ge=1, le=300, description="Timeout in seconds"
-    )
+    timeout: Optional[int] = Field(default=None, ge=1, le=300, description="Timeout in seconds")
 
 
 @app.post("/run")
@@ -294,9 +286,7 @@ def run_command(
         command_type = "python"
     elif request.command.strip().startswith("node"):
         command_type = "nodejs"
-    elif request.command.strip().startswith(
-        "npm"
-    ) or request.command.strip().startswith("npx"):
+    elif request.command.strip().startswith("npm") or request.command.strip().startswith("npx"):
         command_type = "nodejs"
 
     try:
@@ -354,9 +344,7 @@ def run_command(
 
 
 @app.get("/admin/audit/status")
-async def audit_status(
-    authorization: str | None = Header(default=None, alias="Authorization")
-):
+async def audit_status(authorization: str | None = Header(default=None, alias="Authorization")):
     """Statut du système d'audit - endpoint admin"""
     # Simple admin check - you should implement proper admin auth
     if not authorization or "admin" not in authorization.lower():
@@ -381,9 +369,7 @@ async def audit_status(
 
 
 @app.get("/admin/stats")
-async def admin_stats(
-    authorization: str | None = Header(default=None, alias="Authorization")
-):
+async def admin_stats(authorization: str | None = Header(default=None, alias="Authorization")):
     """Statistiques administratives rapides"""
     if not authorization or "admin" not in authorization.lower():
         raise HTTPException(status_code=403, detail="Admin access required")

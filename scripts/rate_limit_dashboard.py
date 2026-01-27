@@ -16,9 +16,7 @@ RATE_LIMIT_KEY_PATTERN = "rate_limit:*"
 
 
 def get_redis_connection():
-    return redis.Redis(
-        host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASS, decode_responses=True
-    )
+    return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASS, decode_responses=True)
 
 
 def fetch_rate_limits(r):

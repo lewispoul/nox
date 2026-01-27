@@ -87,9 +87,7 @@ class TestJobStorage:
         temp_storage.save_job(job_id, initial_data)
 
         # Update state
-        success = temp_storage.update_job_state(
-            job_id, JobState.RUNNING, "Processing", 0.5
-        )
+        success = temp_storage.update_job_state(job_id, JobState.RUNNING, "Processing", 0.5)
         assert success
 
         # Verify update
@@ -187,9 +185,7 @@ class TestJobManager:
         assert job_data["state"] == "running"
 
         # Invalid transition: running -> pending (should fail)
-        success = temp_manager.update_job_state(
-            job_id, JobState.PENDING, "Back to pending"
-        )
+        success = temp_manager.update_job_state(job_id, JobState.PENDING, "Back to pending")
         assert not success
 
         # State should remain unchanged

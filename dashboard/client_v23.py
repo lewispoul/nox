@@ -35,18 +35,14 @@ class NoxAuthClient:
     ) -> Tuple[Dict[str, Any], Dict]:
         """Inscription d'un nouvel utilisateur"""
         data = {"email": email, "password": password, "role": role}
-        r = self.session.post(
-            f"{self.base_url}/auth/register", json=data, timeout=self.timeout
-        )
+        r = self.session.post(f"{self.base_url}/auth/register", json=data, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 
     def login(self, email: str, password: str) -> Tuple[Dict[str, Any], Dict]:
         """Connexion utilisateur"""
         data = {"email": email, "password": password}
-        r = self.session.post(
-            f"{self.base_url}/auth/login", json=data, timeout=self.timeout
-        )
+        r = self.session.post(f"{self.base_url}/auth/login", json=data, timeout=self.timeout)
         r.raise_for_status()
 
         response_data = r.json()
@@ -70,14 +66,10 @@ class NoxAuthClient:
 
     # === ENDPOINTS UTILISATEUR ===
 
-    def list_users(
-        self, limit: int = 50, offset: int = 0
-    ) -> Tuple[Dict[str, Any], Dict]:
+    def list_users(self, limit: int = 50, offset: int = 0) -> Tuple[Dict[str, Any], Dict]:
         """Liste tous les utilisateurs (admin uniquement)"""
         params = {"limit": limit, "offset": offset}
-        r = self.session.get(
-            f"{self.base_url}/auth/users", params=params, timeout=self.timeout
-        )
+        r = self.session.get(f"{self.base_url}/auth/users", params=params, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 
@@ -108,52 +100,38 @@ class NoxAuthClient:
         r.raise_for_status()
         return r.json(), r.headers
 
-    def run_py(
-        self, code: str, filename: str = "run.py"
-    ) -> Tuple[Dict[str, Any], Dict]:
+    def run_py(self, code: str, filename: str = "run.py") -> Tuple[Dict[str, Any], Dict]:
         """Exécution de code Python"""
         data = {"code": code, "filename": filename}
-        r = self.session.post(
-            f"{self.base_url}/run_py", json=data, timeout=self.timeout
-        )
+        r = self.session.post(f"{self.base_url}/run_py", json=data, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 
     def run_sh(self, cmd: str) -> Tuple[Dict[str, Any], Dict]:
         """Exécution de commandes shell"""
         data = {"cmd": cmd}
-        r = self.session.post(
-            f"{self.base_url}/run_sh", json=data, timeout=self.timeout
-        )
+        r = self.session.post(f"{self.base_url}/run_sh", json=data, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 
-    def list_files(
-        self, path: str = "", recursive: bool = False
-    ) -> Tuple[Dict[str, Any], Dict]:
+    def list_files(self, path: str = "", recursive: bool = False) -> Tuple[Dict[str, Any], Dict]:
         """Listing des fichiers"""
         params = {"path": path, "recursive": recursive}
-        r = self.session.get(
-            f"{self.base_url}/list", params=params, timeout=self.timeout
-        )
+        r = self.session.get(f"{self.base_url}/list", params=params, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 
     def cat_file(self, path: str) -> Tuple[Dict[str, Any], Dict]:
         """Lecture d'un fichier"""
         params = {"path": path}
-        r = self.session.get(
-            f"{self.base_url}/cat", params=params, timeout=self.timeout
-        )
+        r = self.session.get(f"{self.base_url}/cat", params=params, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 
     def delete_file(self, path: str) -> Tuple[Dict[str, Any], Dict]:
         """Suppression de fichier (admin uniquement)"""
         params = {"path": path}
-        r = self.session.delete(
-            f"{self.base_url}/delete", params=params, timeout=self.timeout
-        )
+        r = self.session.delete(f"{self.base_url}/delete", params=params, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 

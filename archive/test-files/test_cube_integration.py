@@ -33,9 +33,7 @@ async def test_cube_generation_integration():
         },
     }
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # 1. Submit job with cube generation
         print("📤 Submitting XTB job with cube generation...")
         response = await client.post("/jobs", json=job_data)
@@ -90,9 +88,7 @@ async def test_cube_generation_integration():
                                 print(f"   Grid: {meta.get('grid_points', 'unknown')}")
                                 print(f"   Atoms: {meta.get('natoms', 'unknown')}")
                             else:
-                                print(
-                                    f"   ⚠️  Validation issue: {meta.get('error', 'unknown')}"
-                                )
+                                print(f"   ⚠️  Validation issue: {meta.get('error', 'unknown')}")
 
             elif molden_files:
                 print(f"🔶 Molden files found: {molden_files}")

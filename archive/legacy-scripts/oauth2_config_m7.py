@@ -67,9 +67,7 @@ class OAuth2Settings(BaseModel):
 
 # Load OAuth2 settings from environment
 oauth2_settings = OAuth2Settings(
-    google_client_id=os.getenv(
-        "GOOGLE_CLIENT_ID"
-    ),  # Updated env var names for consistency
+    google_client_id=os.getenv("GOOGLE_CLIENT_ID"),  # Updated env var names for consistency
     google_client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
     github_client_id=os.getenv("GITHUB_CLIENT_ID"),
     github_client_secret=os.getenv("GITHUB_CLIENT_SECRET"),
@@ -80,9 +78,7 @@ oauth2_settings = OAuth2Settings(
     frontend_success_url=os.getenv(
         "OAUTH_FRONTEND_SUCCESS_URL", "http://localhost:8501?auth=success"
     ),
-    frontend_error_url=os.getenv(
-        "OAUTH_FRONTEND_ERROR_URL", "http://localhost:8501?auth=error"
-    ),
+    frontend_error_url=os.getenv("OAUTH_FRONTEND_ERROR_URL", "http://localhost:8501?auth=error"),
 )
 
 # Configure OAuth2 client

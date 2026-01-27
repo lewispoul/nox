@@ -174,9 +174,7 @@ def create_client(
     oauth_client_secret = oauth_client_secret or os.getenv("NOX_OAUTH_CLIENT_SECRET")
 
     if not base_url:
-        raise ValueError(
-            "base_url must be provided or set NOX_BASE_URL environment variable"
-        )
+        raise ValueError("base_url must be provided or set NOX_BASE_URL environment variable")
 
     # Create client with provided configuration
     client_config = {"base_url": base_url, **kwargs}

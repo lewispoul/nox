@@ -21,9 +21,7 @@ import pytest
 
 API = "http://127.0.0.1:8081"
 
-pytestmark = pytest.mark.skipif(
-    shutil.which("xtb") is None, reason="xtb not available in PATH"
-)
+pytestmark = pytest.mark.skipif(shutil.which("xtb") is None, reason="xtb not available in PATH")
 
 XYZ_NM = """12
 nitromethane
@@ -93,9 +91,7 @@ async def test_xtb_job_e2e():
         # Check artifacts
         artifact_names = [a["name"] for a in data["artifacts"]]
         assert "xtb.log" in artifact_names, f"Missing xtb.log in {artifact_names}"
-        assert (
-            "xtbout.json" in artifact_names
-        ), f"Missing xtbout.json in {artifact_names}"
+        assert "xtbout.json" in artifact_names, f"Missing xtbout.json in {artifact_names}"
 
 
 @pytest.mark.anyio

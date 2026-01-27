@@ -133,9 +133,7 @@ class Database:
     async def get_user_by_email(self, email: str) -> Optional[User]:
         """Récupère un utilisateur par email"""
         async with aiosqlite.connect(self.db_path) as db:
-            async with db.execute(
-                "SELECT * FROM users WHERE email = ?", (email,)
-            ) as cursor:
+            async with db.execute("SELECT * FROM users WHERE email = ?", (email,)) as cursor:
                 row = await cursor.fetchone()
                 if row:
                     return self._row_to_user(row)
@@ -144,9 +142,7 @@ class Database:
     async def get_user_by_id(self, user_id: str) -> Optional[User]:
         """Récupère un utilisateur par ID"""
         async with aiosqlite.connect(self.db_path) as db:
-            async with db.execute(
-                "SELECT * FROM users WHERE id = ?", (user_id,)
-            ) as cursor:
+            async with db.execute("SELECT * FROM users WHERE id = ?", (user_id,)) as cursor:
                 row = await cursor.fetchone()
                 if row:
                     return self._row_to_user(row)

@@ -37,9 +37,7 @@ def test_cube_functionality():
             molden_file = work_dir / "test.molden"
             molden_file.write_text("# Test molden file\n[Molden Format]\n")
 
-            cube_files = generate_cubes_from_molden(
-                molden_file, work_dir, ["homo", "lumo"]
-            )
+            cube_files = generate_cubes_from_molden(molden_file, work_dir, ["homo", "lumo"])
 
             if cube_files:
                 print(f"✅ Generated {len(cube_files)} cube files")

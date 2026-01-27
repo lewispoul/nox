@@ -156,13 +156,9 @@ class QuotaAnalyzer:
 
         # Load test summary
         print("\n🔥 Load Test Results Summary:")
-        print(
-            f"   Total requests tested: {self.load_test_results['total_requests_tested']}"
-        )
+        print(f"   Total requests tested: {self.load_test_results['total_requests_tested']}")
         print(f"   Test duration: {self.load_test_results['test_duration_seconds']}s")
-        print(
-            f"   Blocking effectiveness: {self.load_test_results['blocking_effectiveness']}%"
-        )
+        print(f"   Blocking effectiveness: {self.load_test_results['blocking_effectiveness']}%")
         print("   ✅ System performed excellently under load")
 
         # Current vs recommended quotas

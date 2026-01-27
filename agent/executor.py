@@ -22,9 +22,7 @@ def apply_changes_via_files(changes, allowlist) -> str:
     # allowlist check
     for ch in changes:
         p = ch.get("path", "")
-        if not any(
-            p.startswith(prefix.rstrip("*").rstrip("/")) for prefix in allowlist
-        ):
+        if not any(p.startswith(prefix.rstrip("*").rstrip("/")) for prefix in allowlist):
             raise RuntimeError(f"Change touches disallowed path: {p}")
 
     # write/delete files
@@ -41,9 +39,7 @@ def apply_changes_via_files(changes, allowlist) -> str:
 
     # stage and generate diff from index
     subprocess.check_call("git add -A", shell=True)
-    diff = subprocess.check_output(
-        "git diff --cached --unified=3", shell=True, text=True
-    )
+    diff = subprocess.check_output("git diff --cached --unified=3", shell=True, text=True)
     return diff
 
 
@@ -88,9 +84,7 @@ def preflight_checks() -> None:
 
     # Check if working tree is dirty
     try:
-        status = subprocess.check_output(
-            "git status --porcelain", shell=True, text=True
-        ).strip()
+        status = subprocess.check_output("git status --porcelain", shell=True, text=True).strip()
         allow_dirty = os.getenv("NOX_AGENT_ALLOW_DIRTY", "0")
         if status and allow_dirty != "1":
             print(
@@ -173,9 +167,7 @@ def run_once(dry_run: bool = False, no_pr: bool = False) -> bool:
     cfg = load_config()
     task = fs.pick_task("agent/tasks/backlog.yaml")
     ctx = fs.read_context(task)
-    prompt = build_planner_prompt(
-        ctx["task_yaml"], ctx["repo_tree"], ctx["file_snippets"]
-    )
+    prompt = build_planner_prompt(ctx["task_yaml"], ctx["repo_tree"], ctx["file_snippets"])
 
     plan_text = call_llm(prompt)
     plan = plan_text
@@ -204,9 +196,7 @@ def run_once(dry_run: bool = False, no_pr: bool = False) -> bool:
     max_added = int(cfg.get("policies", {}).get("max_patch_size_lines", 1200))
     if isinstance(patch_text, str):
         added_lines = sum(
-            1
-            for ln in patch_text.splitlines()
-            if ln.startswith("+") and not ln.startswith("+++")
+            1 for ln in patch_text.splitlines() if ln.startswith("+") and not ln.startswith("+++")
         )
         if added_lines > max_added:
             raise RuntimeError(f"Patch exceeds size cap ({added_lines} > {max_added}).")
@@ -240,12 +230,8 @@ def run_once(dry_run: bool = False, no_pr: bool = False) -> bool:
 def main():
     ap = argparse.ArgumentParser(description="Nox Agent - Safe AI-powered code changes")
     ap.add_argument("--once", action="store_true", help="Run a single cycle")
-    ap.add_argument(
-        "--dry-run", action="store_true", help="Plan and show diff without applying"
-    )
-    ap.add_argument(
-        "--no-pr", action="store_true", help="Apply patch but skip PR creation"
-    )
+    ap.add_argument("--dry-run", action="store_true", help="Plan and show diff without applying")
+    ap.add_argument("--no-pr", action="store_true", help="Apply patch but skip PR creation")
     args = ap.parse_args()
 
     try:

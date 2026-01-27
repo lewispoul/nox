@@ -110,9 +110,7 @@ def test_authentication():
         admin_info, _ = client.admin_info()
         print("✅ Accès admin confirmé")
         print(f"   Admin: {admin_info.get('admin_user')}")
-        print(
-            f"   Métriques: {'activées' if admin_info.get('metrics_enabled') else 'désactivées'}"
-        )
+        print(f"   Métriques: {'activées' if admin_info.get('metrics_enabled') else 'désactivées'}")
     except Exception as e:
         print(f"❌ Erreur info admin: {e}")
 
@@ -124,9 +122,7 @@ def test_authentication():
 
     try:
         # Inscription
-        user_token, _ = user_client.register(
-            "testuser@example.com", "password123", "user"
-        )
+        user_token, _ = user_client.register("testuser@example.com", "password123", "user")
         print("✅ Utilisateur test créé et connecté")
 
         # Test des permissions

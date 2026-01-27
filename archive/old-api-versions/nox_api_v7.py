@@ -193,9 +193,7 @@ async def api_status():
                 "total_sessions": audit_stats["total_sessions"] if audit_stats else 0,
                 "sessions_24h": audit_stats["sessions_24h"] if audit_stats else 0,
             },
-            "session_manager": {
-                "active_sessions": session_manager.get_active_session_count()
-            },
+            "session_manager": {"active_sessions": session_manager.get_active_session_count()},
             "timestamp": datetime.utcnow().isoformat(),
         }
 
@@ -376,9 +374,7 @@ async def get_prometheus_metrics():
 
     except Exception as e:
         logger.error(f"Error generating metrics: {e}")
-        return Response(
-            content=f"# Error generating metrics: {e}", media_type="text/plain"
-        )
+        return Response(content=f"# Error generating metrics: {e}", media_type="text/plain")
 
 
 # ===== ERROR HANDLERS =====

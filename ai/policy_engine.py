@@ -238,9 +238,7 @@ class IntelligentPolicyEngine:
             if models_loaded == 0:
                 await self._initialize_with_dummy_data()
 
-            logger.info(
-                f"Policy engine initialized with {models_loaded} pre-trained models"
-            )
+            logger.info(f"Policy engine initialized with {models_loaded} pre-trained models")
 
         except Exception as e:
             logger.error(f"Error initializing models: {e}")
@@ -394,9 +392,7 @@ class IntelligentPolicyEngine:
                 1.0 if request.resource in user_profile.typical_resources else 0.0
             )
             access_frequency = user_profile.access_frequency.get(request.resource, 0)
-            hour_familiarity = (
-                1.0 if hour_of_day in user_profile.preferred_hours else 0.0
-            )
+            hour_familiarity = 1.0 if hour_of_day in user_profile.preferred_hours else 0.0
 
             # Context features
             is_weekend = 1.0 if day_of_week >= 5 else 0.0
@@ -464,9 +460,7 @@ class IntelligentPolicyEngine:
                 final_decision = AccessDecision.CHALLENGE
 
         # Medium risk with low confidence requires challenge
-        elif (
-            risk_level == 1 and decision_confidence < 0.6
-        ):  # Medium risk, low confidence
+        elif risk_level == 1 and decision_confidence < 0.6:  # Medium risk, low confidence
             risk_factors.append("medium_risk_low_confidence")
             if final_decision == AccessDecision.ALLOW:
                 final_decision = AccessDecision.CHALLENGE
@@ -509,9 +503,7 @@ class IntelligentPolicyEngine:
 
                     # Evaluate rule conditions (simplified)
                     for rule in rules:
-                        if self._evaluate_rule_condition(
-                            rule["condition"], request, user_profile
-                        ):
+                        if self._evaluate_rule_condition(rule["condition"], request, user_profile):
                             applicable_rules.append(rule["rule_id"])
 
         except Exception as e:
@@ -567,9 +559,7 @@ class IntelligentPolicyEngine:
         ]
 
         if decision == AccessDecision.CHALLENGE:
-            reasoning_parts.append(
-                "Additional authentication required due to risk factors"
-            )
+            reasoning_parts.append("Additional authentication required due to risk factors")
         elif decision == AccessDecision.DENY:
             reasoning_parts.append("Access denied due to policy violation or high risk")
 
@@ -632,9 +622,7 @@ class IntelligentPolicyEngine:
                     access_data = cursor.fetchall()
 
                     # Process access patterns
-                    typical_resources = list(
-                        set([row["resource"] for row in access_data[:10]])
-                    )
+                    typical_resources = list(set([row["resource"] for row in access_data[:10]]))
                     access_frequency = {}
                     preferred_hours = []
 
@@ -693,9 +681,7 @@ class IntelligentPolicyEngine:
             last_updated=datetime.utcnow(),
         )
 
-    async def _log_policy_decision(
-        self, request: AccessRequest, decision: PolicyDecision
-    ):
+    async def _log_policy_decision(self, request: AccessRequest, decision: PolicyDecision):
         """Log policy decision for learning and auditing."""
 
         try:
@@ -785,9 +771,7 @@ class IntelligentPolicyEngine:
             logger.error(f"Error generating role recommendations: {e}")
             return []
 
-    def _extract_role_features(
-        self, user_profile: UserAccessProfile
-    ) -> Optional[List[float]]:
+    def _extract_role_features(self, user_profile: UserAccessProfile) -> Optional[List[float]]:
         """Extract features for role recommendation."""
 
         try:
@@ -799,9 +783,7 @@ class IntelligentPolicyEngine:
             avg_access_freq = total_access / max(resource_count, 1)
 
             # Time patterns
-            work_hour_count = sum(
-                1 for hour in user_profile.preferred_hours if 9 <= hour <= 17
-            )
+            work_hour_count = sum(1 for hour in user_profile.preferred_hours if 9 <= hour <= 17)
 
             # Activity level indicators
             admin_resource_count = sum(
@@ -825,9 +807,7 @@ class IntelligentPolicyEngine:
             logger.error(f"Error extracting role features: {e}")
             return None
 
-    def _generate_role_reasoning(
-        self, role: str, user_profile: UserAccessProfile
-    ) -> str:
+    def _generate_role_reasoning(self, role: str, user_profile: UserAccessProfile) -> str:
         """Generate reasoning for role recommendation."""
 
         reasoning_map = {

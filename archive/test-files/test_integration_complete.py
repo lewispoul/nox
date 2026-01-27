@@ -64,9 +64,7 @@ async def test_complete_xtb_integration():
             if resp3.status_code == 200:
                 status = resp3.json()
                 final_state = status["state"]
-                print(
-                    f"   État après {waited}s: {final_state} - {status.get('message', '')}"
-                )
+                print(f"   État après {waited}s: {final_state} - {status.get('message', '')}")
 
                 if final_state in ["completed", "failed"]:
                     break
@@ -107,9 +105,7 @@ async def test_complete_xtb_integration():
             resp4 = await ac.get(f"/jobs/{job_id}")
             if resp4.status_code == 200:
                 error_info = resp4.json()
-                print(
-                    f"   Message d'erreur: {error_info.get('message', 'Unknown error')}"
-                )
+                print(f"   Message d'erreur: {error_info.get('message', 'Unknown error')}")
         else:
             print(f"⚠️  Job encore en cours après {max_wait}s - état: {final_state}")
 

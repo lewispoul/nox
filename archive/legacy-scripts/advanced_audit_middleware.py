@@ -40,17 +40,13 @@ class AuditMetrics:
         self.session_counter = 0
 
     def increment_action(self, user_id: str, action_type: str, success: bool):
-        self.action_counter[
-            f"{user_id}_{action_type}_{'success' if success else 'error'}"
-        ] += 1
+        self.action_counter[f"{user_id}_{action_type}_{'success' if success else 'error'}"] += 1
 
     def record_response_time(self, endpoint: str, response_time_ms: int):
         self.response_time_histogram[endpoint].append(response_time_ms)
         # Keep only last 1000 measurements for memory efficiency
         if len(self.response_time_histogram[endpoint]) > 1000:
-            self.response_time_histogram[endpoint] = self.response_time_histogram[
-                endpoint
-            ][-1000:]
+            self.response_time_histogram[endpoint] = self.response_time_histogram[endpoint][-1000:]
 
     def increment_error(self, endpoint: str, status_code: int):
         self.error_counter[f"{endpoint}_{status_code}"] += 1
@@ -233,8 +229,7 @@ class AdvancedAuditMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, database_url: str = None):
         super().__init__(app)
         self.database_url = (
-            database_url
-            or "postgresql://noxuser:test_password_123@localhost:5432/noxdb"
+            database_url or "postgresql://noxuser:test_password_123@localhost:5432/noxdb"
         )
 
     async def dispatch(self, request: Request, call_next):
