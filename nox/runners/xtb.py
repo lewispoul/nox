@@ -47,19 +47,18 @@ def run_xtb_job(
         result = _hermetic_result()
 
         if params.get("cubes"):
-            molden_path = job_dir / "molden.input"
-            molden_path.write_text("$molden placeholder", encoding="utf-8")
+            # Generate placeholder cube files directly for hermetic mode
+            from nox.artifacts.cubes import _create_placeholder_cubes
+            
             try:
-                cube_files = generate_cubes_from_molden(molden_path, job_dir, ["homo", "lumo"])
+                cube_files = _create_placeholder_cubes(job_dir, ["homo", "lumo"])
                 for cube_file in cube_files:
-                    info = validate_cube_file(cube_file)
                     result["artifacts"].append(
                         {
                             "name": cube_file.name,
                             "path": str(cube_file),
                             "mime": "application/x-cube",
                             "size": cube_file.stat().st_size,
-                            "metadata": info,
                         }
                     )
             except Exception:
