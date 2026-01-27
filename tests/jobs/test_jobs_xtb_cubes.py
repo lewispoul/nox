@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 
 from api.services import queue
@@ -11,7 +13,6 @@ async def test_xtb_job_hermetic_cubes(monkeypatch):
     # Force local execution and hermetic XTB path
     monkeypatch.setenv("JOBS_FORCE_LOCAL", "1")
     monkeypatch.delenv("REDIS_URL", raising=False)
-    monkeypatch.setattr("nox.runners.xtb.shutil.which", lambda _: None)
 
     params = XTBParams(gfn=2, opt=True, cubes=True)
     jr = JobRequest(
@@ -25,20 +26,22 @@ async def test_xtb_job_hermetic_cubes(monkeypatch):
         ),
     )
 
-    job_id = queue.submit_job("xtb", {"job_request": jr.model_dump_json()})
+    # Use mock.patch as context manager to ensure it's active during execution
+    with mock.patch("shutil.which", return_value=None):
+        job_id = queue.submit_job("xtb", {"job_request": jr.model_dump_json()})
 
-    await wait_for_job_done(job_id)
+        await wait_for_job_done(job_id)
 
-    store = get_store()
-    job = store.get(job_id)
-    assert job.state == "done"
-    result = job.result or {}
-    artifacts = result.get("artifacts", [])
-    names = {a.get("name") for a in artifacts}
-    assert {"homo.cube", "lumo.cube"} <= names
-    scalars = result.get("scalars", {})
-    assert scalars.get("E_total_hartree") is not None
-    assert scalars.get("gap_eV") is not None
+        store = get_store()
+        job = store.get(job_id)
+        assert job.state == "done"
+        result = job.result or {}
+        artifacts = result.get("artifacts", [])
+        names = {a.get("name") for a in artifacts}
+        assert {"homo.cube", "lumo.cube"} <= names
+        scalars = result.get("scalars", {})
+        assert scalars.get("E_total_hartree") is not None
+        assert scalars.get("gap_eV") is not None
 
 
 @pytest.mark.asyncio
