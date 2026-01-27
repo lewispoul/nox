@@ -23,7 +23,7 @@
 ### Directory Structure
 
 ```
-PROJECT_ROOT/                       # Repository root (typically /home/runner/work/nox/nox in CI)
+PROJECT_ROOT/                       # Repository root (environment-specific path)
 ├── api/                            # FastAPI application (PRIMARY - use this)
 │   ├── main.py                     # Application entry point
 │   ├── routes/                     # API endpoint routers
@@ -93,13 +93,13 @@ pip install -r requirements.txt
 pip install -r dev-requirements.txt
 ```
 
-**Time:** pip install takes 30-60 seconds for requirements.txt, 45-90 seconds for dev-requirements.txt
+**Time:** Installation typically takes 1-2 minutes depending on system configuration and network speed
 
 ### Testing Commands
 
 **Run all tests (PRIMARY command for validation):**
 ```bash
-# Full test suite - runs in ~2 seconds
+# Full test suite - fast execution
 PYTHONPATH=. JOBS_FORCE_LOCAL=1 pytest -q
 
 # Verbose output
@@ -108,13 +108,13 @@ PYTHONPATH=. JOBS_FORCE_LOCAL=1 pytest -v
 
 **Run specific test suites:**
 ```bash
-# Job system tests (~1s)
+# Job system tests
 PYTHONPATH=. pytest tests/jobs -v
 
-# Unit tests (<1s)
+# Unit tests
 PYTHONPATH=. pytest tests/unit -v
 
-# CI validation tests (3 tests, <1s)
+# CI validation tests
 PYTHONPATH=. pytest tests/test_ci_validation.py -v
 
 # End-to-end tests
@@ -158,16 +158,24 @@ ruff check --fix .
 
 **Development mode (recommended):**
 ```bash
-# Using Makefile (starts in background, port 8080)
+# New workflow - using Makefile (starts in background, port 8000)
+make api-start
+
+# Legacy workflow - using Makefile (foreground, port 8080)
 make run
 
-# Or manually with reload (foreground, port 8080)
+# Or manually with reload (foreground, custom port)
 PYTHONPATH=. python -m uvicorn api.main:app --reload --port 8080
 ```
 
 **Check API health:**
 ```bash
+# If using make api-start (port 8000)
+curl http://localhost:8000/health
+
+# If using make run (port 8080)
 curl http://localhost:8080/health
+
 # Expected: {"status":"ok"}
 ```
 
@@ -300,8 +308,8 @@ black path/to/modified/file.py
 
 **Solution:**
 ```bash
-# Check what's using port 8080
-lsof -i :8080
+# Check what's using the port (8000 or 8080 depending on command)
+lsof -i :8080  # or :8000
 
 # Kill the process (use specific PID, not pkill)
 kill <PID>
@@ -353,7 +361,7 @@ uvicorn api.main:app --port 8081
 
 ### Testing Philosophy
 
-- **Tests are fast:** Full suite runs in ~2 seconds
+- **Tests are fast:** Full suite typically runs in under 5 seconds
 - **Run tests early and often:** After each significant change
 - **Use targeted tests:** Run specific test files while developing
 - **Full suite before commit:** Always run full suite to catch regressions
