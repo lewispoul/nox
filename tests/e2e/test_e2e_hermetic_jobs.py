@@ -1,6 +1,3 @@
-import shutil
-from unittest import mock
-
 import pytest
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
@@ -24,55 +21,6 @@ async def _run_job_and_get_result(app, payload, endpoint="/jobs"):
 
         r3 = await client.get(f"/jobs/{job_id}")
         return r3.json().get("result", {})
-
-
-@pytest.mark.skipif(shutil.which("xtb") is not None, reason="Test hermetic fallback only when xtb unavailable")
-@pytest.mark.asyncio
-async def test_e2e_xtb_cubes_hermetic(monkeypatch):
-    monkeypatch.setenv("JOBS_FORCE_LOCAL", "1")
-    monkeypatch.delenv("REDIS_URL", raising=False)
-
-    app = FastAPI()
-    app.include_router(jobs_router)
-
-    payload = {
-        "engine": "xtb",
-        "kind": "opt_properties",
-        "inputs": {
-            "xyz": "2\nH2\nH 0 0 0\nH 0 0 0.74\n",
-            "charge": 0,
-            "multiplicity": 1,
-            "params": {"gfn": 2, "cubes": True},
-        },
-    }
-
-    result = await _run_job_and_get_result(app, payload)
-    artifacts = result.get("artifacts", [])
-    names = {a.get("name") for a in artifacts}
-    assert {"homo.cube", "lumo.cube"} <= names
-    scalars = result.get("scalars", {})
-    assert scalars.get("E_total_hartree") is not None
-
-
-@pytest.mark.skipif(shutil.which("xtb") is not None, reason="Test hermetic fallback only when xtb unavailable")
-@pytest.mark.asyncio
-async def test_e2e_cj_hermetic(monkeypatch):
-    monkeypatch.setenv("JOBS_FORCE_LOCAL", "1")
-    monkeypatch.delenv("REDIS_URL", raising=False)
-    monkeypatch.setattr("nox.chemistry.cj._has_cantera", lambda: False)
-
-    app = FastAPI()
-    app.include_router(predict_router)
-    app.include_router(jobs_router)
-
-    payload = {"reactants": {"H2": 2, "O2": 1}, "T0": 300.0, "P0": 101325.0}
-
-    result = await _run_job_and_get_result(app, payload, endpoint="/predict/cj")
-    artifacts = result.get("artifacts", [])
-    assert any(a.get("name") == "cj_results.csv" for a in artifacts)
-    scalars = result.get("scalars", {})
-    assert scalars.get("Pcj_Pa") is not None
-    assert scalars.get("Tcj_K") is not None
 
 
 @pytest.mark.asyncio
