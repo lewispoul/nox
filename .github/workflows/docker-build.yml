@@ -16,6 +16,8 @@ jobs:
   # This workflow focuses on Docker build and deployment
   ci:
     uses: ./.github/workflows/python-ci.yml
+    permissions:
+      contents: read
     
   build:
     needs: ci
