@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import time
 from typing import Any, Dict
 
@@ -49,24 +48,10 @@ def enqueue_job(job_id: str, kind: str, payload: Dict[str, Any]):
 
 
 def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
-    """Execute XTB calculation with given parameters
-
-    In hermetic/local mode, if xtb binary is not available,
-    returns a fake result to avoid hanging tests.
-    """
-    # Hermetic mode: if xtb binary is not present, return fake result
-    if shutil.which("xtb") is None:
-        return {
-            "payload": payload,
-            "scalars": {"E_total_hartree": -40.12},
-            "series": {},
-            "artifacts": [],
-            "returncode": 0,
-        }
-
-    from ai.runners.xtb import run_xtb_job
+    """Execute XTB calculation with given parameters"""
     from api.schemas.job import JobRequest
     from api.services.storage import job_dir
+    from nox.runners.xtb import run_xtb_job
 
     # Parse the job request
     job_request_json = payload.get("job_request", "{}")
