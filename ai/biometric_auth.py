@@ -23,7 +23,7 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from redis.cluster import RedisCluster
+from redis.cluster import ClusterNode, RedisCluster
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -90,7 +90,7 @@ class BiometricChallenge:
     expires_at: datetime
     attempts: int = 0
     max_attempts: int = 3
-    completed_types: List[BiometricType] = None
+    completed_types: Optional[List[BiometricType]] = None
 
 
 @dataclass
@@ -148,10 +148,10 @@ class BiometricAuthenticationSystem:
 
     def __init__(
         self,
-        redis_cluster: RedisCluster = None,
-        db_connection_params: Dict[str, Any] = None,
-        azure_face_key: str = None,
-        azure_speech_key: str = None,
+        redis_cluster: Optional[RedisCluster] = None,
+        db_connection_params: Optional[Dict[str, Any]] = None,
+        azure_face_key: Optional[str] = None,
+        azure_speech_key: Optional[str] = None,
     ):
         """
         Initialize Biometric Authentication System.
@@ -183,8 +183,8 @@ class BiometricAuthenticationSystem:
 
         # Security configuration
         self.encryption_key = self._load_encryption_key()
-        self.template_cache = {}
-        self.challenge_cache = {}
+        self.template_cache: Dict[str, BiometricTemplate] = {}
+        self.challenge_cache: Dict[str, BiometricChallenge] = {}
 
         # Behavioral analysis configuration
         self.keystroke_window_size = 50
@@ -195,9 +195,9 @@ class BiometricAuthenticationSystem:
     def _init_redis_cluster(self) -> RedisCluster:
         """Initialize Redis Cluster connection."""
         startup_nodes = [
-            {"host": "localhost", "port": 7001},
-            {"host": "localhost", "port": 7002},
-            {"host": "localhost", "port": 7003},
+            ClusterNode("localhost", 7001),
+            ClusterNode("localhost", 7002),
+            ClusterNode("localhost", 7003),
         ]
 
         return RedisCluster(
