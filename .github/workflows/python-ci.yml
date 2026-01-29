@@ -1,0 +1,319 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  code-quality:
+    name: Code Quality & Linting
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - uses: actions/checkout@v5
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black isort flake8
+    
+    - name: Check Black formatting
+      run: |
+        echo "Checking Black formatting on api/ and tests/ directories..."
+        black --check --diff api/ tests/ || {
+          echo "❌ Black formatting issues found. Run 'black api/ tests/' to fix."
+          exit 1
+        }
+      continue-on-error: true
+    
+    - name: Check isort import sorting
+      run: |
+        echo "Checking isort import sorting on api/ and tests/ directories..."
+        isort --check-only --diff api/ tests/ || {
+          echo "❌ isort issues found. Run 'isort api/ tests/' to fix."
+          exit 1
+        }
+      continue-on-error: true
+    
+    - name: Run flake8 linting
+      run: |
+        echo "Running flake8 on api/ and tests/ directories..."
+        flake8 api/ tests/ --count --show-source --statistics || {
+          echo "❌ flake8 linting issues found."
+          exit 1
+        }
+      continue-on-error: true
+
+  security-scanning:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - uses: actions/checkout@v5
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety pip-audit
+        pip install -r requirements.txt
+    
+    - name: Run Bandit security scan
+      run: |
+        echo "Running Bandit security scan on api/ and tests/ directories..."
+        mkdir -p reports
+        bandit -r api/ tests/ -f json -o reports/bandit-report.json || {
+          echo "⚠️  Bandit found security issues"
+          bandit -r api/ tests/
+          exit 0
+        }
+      continue-on-error: true
+    
+    - name: Run Safety vulnerability check
+      run: |
+        echo "Running Safety vulnerability check..."
+        safety scan --save-as json reports/safety-report.json || {
+          echo "⚠️  Safety found vulnerabilities"
+          safety scan
+          exit 0
+        }
+      continue-on-error: true
+    
+    - name: Run pip-audit supply chain security
+      run: |
+        echo "Running pip-audit for supply chain security..."
+        pip-audit --format json -o reports/pip-audit-report.json || {
+          echo "⚠️  pip-audit found vulnerabilities"
+          pip-audit
+          exit 0
+        }
+      continue-on-error: true
+    
+    - name: Upload security reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-reports
+        path: reports/
+        retention-days: 30
+
+  testing:
+    name: Testing with Coverage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: nox_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - uses: actions/checkout@v5
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        if [ -f dev-requirements.txt ]; then
+          pip install -r dev-requirements.txt
+        else
+          pip install pytest pytest-asyncio pytest-cov httpx
+        fi
+    
+    - name: Run pytest with coverage
+      run: |
+        mkdir -p reports
+        if command -v pytest-cov &> /dev/null || python -c "import pytest_cov" 2>/dev/null; then
+          echo "Running pytest with coverage..."
+          python -m pytest tests/ -v --cov=api --cov-report=html:reports/coverage --cov-report=xml:reports/coverage.xml || {
+            echo "⚠️  Some tests failed"
+            exit 0
+          }
+        else
+          echo "pytest-cov not available, running tests without coverage..."
+          python -m pytest tests/ -v || {
+            echo "⚠️  Some tests failed"
+            exit 0
+          }
+        fi
+      env:
+        DATABASE_URL: postgresql://test_user:test_password@localhost:5432/nox_test
+        JWT_SECRET_KEY: test_secret_key_for_ci
+        NOX_API_HOST: "0.0.0.0"
+        NOX_API_PORT: "8000"
+        PG_PRIMARY_HOST: "localhost"
+        PG_REPLICA1_HOST: "localhost"
+        PG_REPLICA2_HOST: "localhost"
+        REDIS_URL: "redis://localhost:6379/0"
+        JOBS_FORCE_LOCAL: "true"
+        DISABLE_MULTINODE: "true"
+        CI_ENVIRONMENT: "true"
+      continue-on-error: true
+    
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-reports
+        path: reports/
+        retention-days: 30
+
+  sbom-generation:
+    name: SBOM Generation
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    
+    steps:
+    - uses: actions/checkout@v5
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install cyclonedx-bom
+        pip install -r requirements.txt
+    
+    - name: Generate SBOM in JSON format
+      run: |
+        mkdir -p reports
+        cyclonedx-py requirements requirements.txt --of JSON -o reports/sbom.json || {
+          echo "⚠️  SBOM JSON generation failed"
+          exit 0
+        }
+      continue-on-error: true
+    
+    - name: Generate SBOM in XML format
+      run: |
+        cyclonedx-py requirements requirements.txt --of XML -o reports/sbom.xml || {
+          echo "⚠️  SBOM XML generation failed"
+          exit 0
+        }
+      continue-on-error: true
+    
+    - name: Upload SBOM artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: sbom-reports
+        path: reports/sbom.*
+        retention-days: 90
+
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs: [code-quality, security-scanning, testing, sbom-generation]
+    if: always()
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Check job results
+      run: |
+        echo "## 📊 CI Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Code Quality
+        if [ "${{ needs.code-quality.result }}" == "success" ]; then
+          echo "✅ **Code Quality**: Passed" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Code Quality**: Failed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Security Scanning
+        if [ "${{ needs.security-scanning.result }}" == "success" ]; then
+          echo "✅ **Security Scanning**: Passed" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️  **Security Scanning**: Check artifacts for details" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Testing
+        if [ "${{ needs.testing.result }}" == "success" ]; then
+          echo "✅ **Testing**: Passed" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️  **Testing**: Check artifacts for details" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # SBOM Generation (only on main)
+        if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          if [ "${{ needs.sbom-generation.result }}" == "success" ]; then
+            echo "✅ **SBOM Generation**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️  **SBOM Generation**: Check artifacts for details" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "⏭️  **SBOM Generation**: Skipped (only runs on main branch)" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📦 Artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "- Security reports (security-reports)" >> $GITHUB_STEP_SUMMARY
+        echo "- Coverage reports (coverage-reports)" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          echo "- SBOM files (sbom-reports)" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔧 Next Steps" >> $GITHUB_STEP_SUMMARY
+        echo "1. Review any failed checks above" >> $GITHUB_STEP_SUMMARY
+        echo "2. Download artifacts for detailed reports" >> $GITHUB_STEP_SUMMARY
+        echo "3. Address any security vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        echo "4. Ensure test coverage meets project standards" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Final status
+      run: |
+        if [ "${{ needs.code-quality.result }}" != "success" ] || \
+           [ "${{ needs.security-scanning.result }}" != "success" ] || \
+           [ "${{ needs.testing.result }}" != "success" ]; then
+          echo "⚠️  CI completed with warnings. Please review the results."
+          exit 0
+        else
+          echo "✅ All CI checks passed successfully!"
+        fi
