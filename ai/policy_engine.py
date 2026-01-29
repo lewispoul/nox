@@ -24,7 +24,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # Redis and database imports
-from redis.cluster import RedisCluster
+from redis.cluster import ClusterNode, RedisCluster
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
@@ -124,8 +124,8 @@ class IntelligentPolicyEngine:
 
     def __init__(
         self,
-        redis_cluster: RedisCluster = None,
-        db_connection_params: Dict[str, Any] = None,
+        redis_cluster: Optional[RedisCluster] = None,
+        db_connection_params: Optional[Dict[str, Any]] = None,
     ):
         """
         Initialize Intelligent Policy Engine.
@@ -139,14 +139,14 @@ class IntelligentPolicyEngine:
         self.db_params = db_connection_params or self._load_db_params()
 
         # ML Models for policy decisions
-        self.decision_model = None
-        self.role_recommender = None
-        self.risk_classifier = None
-        self.access_clusterer = None
+        self.decision_model: Optional[DecisionTreeClassifier] = None
+        self.role_recommender: Optional[RandomForestClassifier] = None
+        self.risk_classifier: Optional[DecisionTreeClassifier] = None
+        self.access_clusterer: Optional[KMeans] = None
 
         # Feature encoders and scalers
-        self.label_encoders = {}
-        self.feature_scaler = StandardScaler()
+        self.label_encoders: Dict[str, Any] = {}
+        self.feature_scaler: StandardScaler = StandardScaler()
 
         # Policy configuration
         self.default_policy_ttl = 86400  # 24 hours
@@ -157,8 +157,8 @@ class IntelligentPolicyEngine:
         self._initialize_models()
 
         # Cache for policies and user profiles
-        self.policy_cache = {}
-        self.user_profile_cache = {}
+        self.policy_cache: Dict[str, PolicyDecision] = {}
+        self.user_profile_cache: Dict[str, UserAccessProfile] = {}
         self.cache_ttl = 300  # 5 minutes
 
         logger.info("Intelligent Policy Engine initialized successfully")
@@ -166,9 +166,9 @@ class IntelligentPolicyEngine:
     def _init_redis_cluster(self) -> RedisCluster:
         """Initialize Redis Cluster connection."""
         startup_nodes = [
-            {"host": "localhost", "port": 7001},
-            {"host": "localhost", "port": 7002},
-            {"host": "localhost", "port": 7003},
+            ClusterNode("localhost", 7001),
+            ClusterNode("localhost", 7002),
+            ClusterNode("localhost", 7003),
         ]
 
         return RedisCluster(
@@ -236,15 +236,15 @@ class IntelligentPolicyEngine:
 
             # Initialize with dummy data if no models loaded
             if models_loaded == 0:
-                await self._initialize_with_dummy_data()
+                self._initialize_with_dummy_data()
 
             logger.info(f"Policy engine initialized with {models_loaded} pre-trained models")
 
         except Exception as e:
             logger.error(f"Error initializing models: {e}")
-            await self._initialize_with_dummy_data()
+            self._initialize_with_dummy_data()
 
-    async def _initialize_with_dummy_data(self):
+    def _initialize_with_dummy_data(self):
         """Initialize models with dummy data for cold start."""
 
         try:
