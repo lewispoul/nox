@@ -19,6 +19,7 @@ All documentation has been comprehensively organized in the [`docs/`](./docs/) d
 
 **Quick Start:**
 - 📖 **[Documentation Index](./docs/README.md)** - Complete documentation overview
+- ⭐ **[NEXT STEPS GUIDE](./NEXT_STEPS_GUIDE.md)** - **NEW!** Prioritized roadmap and action items
 - 🎯 **[Current Project Status](./docs/PROJECT_STATUS_2025-08-19.md)** - Latest development status
 - 📋 **[Latest Session Summary](./docs/SESSION_SUMMARY_2025-08-19.md)** - Recent achievements
 - 🚀 **[Deployment Guides](./docs/deployment-guides/)** - Production setup instructions
