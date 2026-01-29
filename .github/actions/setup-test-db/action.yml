@@ -1,0 +1,23 @@
+name: 'Setup Test Database'
+description: 'Initializes test database if init script exists'
+inputs:
+  database-url:
+    description: 'Database connection URL'
+    required: true
+  pg-password:
+    description: 'PostgreSQL password'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Initialize test database
+      shell: bash
+      run: |
+        if [ -f scripts/init-db.sql ]; then
+          psql ${{ inputs.database-url }} -f scripts/init-db.sql
+        else
+          echo "No init-db.sql found, skipping database initialization"
+        fi
+      env:
+        PGPASSWORD: ${{ inputs.pg-password }}

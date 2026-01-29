@@ -12,81 +12,15 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: test_password
-          POSTGRES_USER: test_user
-          POSTGRES_DB: nox_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-      
-      redis:
-        image: redis:7
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-    
-    steps:
-    - uses: actions/checkout@v5
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        if [ -f dev-requirements.txt ]; then
-          pip install -r dev-requirements.txt
-        else
-          pip install pytest pytest-asyncio pytest-cov httpx
-        fi
-    
-    - name: Initialize test database
-      run: |
-        export DATABASE_URL="postgresql://test_user:test_password@localhost:5432/nox_test"
-        if [ -f scripts/init-db.sql ]; then
-          psql $DATABASE_URL -f scripts/init-db.sql
-        else
-          echo "No init-db.sql found, skipping database initialization"
-        fi
-      env:
-        PGPASSWORD: test_password
-    
-    - name: Run tests
-      run: |
-        python -m pytest tests/ -v
-      env:
-        DATABASE_URL: postgresql://test_user:test_password@localhost:5432/nox_test
-        JWT_SECRET_KEY: test_secret_key_for_ci
-        NOX_API_HOST: "0.0.0.0"
-        NOX_API_PORT: "8000"
-        PG_PRIMARY_HOST: "localhost"
-        PG_REPLICA1_HOST: "localhost" 
-        PG_REPLICA2_HOST: "localhost"
-        REDIS_URL: "redis://localhost:6379/0"
-        JOBS_FORCE_LOCAL: "true"
-        DISABLE_MULTINODE: "true"
-        CI_ENVIRONMENT: "true"
+  # CI workflow is now handled by python-ci.yml
+  # This workflow focuses on Docker build and deployment
+  ci:
+    uses: ./.github/workflows/python-ci.yml
+    permissions:
+      contents: read
     
   build:
-    needs: test
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
       contents: read
