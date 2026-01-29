@@ -256,13 +256,9 @@ class MultiNodeDatabaseManager:
             # Try to find any healthy node as fallback
             fallback_node = self._get_healthy_node()
             if not fallback_node:
-                raise Exception(
-                    "No healthy database nodes available for write operations"
-                )
+                raise Exception("No healthy database nodes available for write operations")
 
-            logger.warning(
-                f"Using fallback node {fallback_node.host} for write operations"
-            )
+            logger.warning(f"Using fallback node {fallback_node.host} for write operations")
             primary_node = fallback_node
 
         with self._get_connection(primary_node.host) as conn:
@@ -409,8 +405,7 @@ class MultiNodeDatabaseManager:
                 node_status["pool_stats"] = {
                     "total_connections": pool_instance.maxconn,
                     "available_connections": len(pool_instance._pool),
-                    "used_connections": pool_instance.maxconn
-                    - len(pool_instance._pool),
+                    "used_connections": pool_instance.maxconn - len(pool_instance._pool),
                 }
 
             cluster_status["nodes"].append(node_status)
@@ -449,9 +444,7 @@ if __name__ == "__main__":
 
     # Test read query
     try:
-        users = db_manager.execute_read_query(
-            "SELECT id, email, created_at FROM users LIMIT 5;"
-        )
+        users = db_manager.execute_read_query("SELECT id, email, created_at FROM users LIMIT 5;")
         print(f"Sample users: {users}")
     except Exception as e:
         print(f"Read query failed: {e}")

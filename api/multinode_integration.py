@@ -102,9 +102,7 @@ class MultiNodeNoxAPI:
             logger.error(f"Authentication failed: {e}")
             # Log failed authentication
             if user_data.get("email"):
-                await self._log_auth_event(
-                    user_data["email"], oauth_provider, "failure", str(e)
-                )
+                await self._log_auth_event(user_data["email"], oauth_provider, "failure", str(e))
             raise
 
     async def _create_or_update_user(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -195,9 +193,7 @@ class MultiNodeNoxAPI:
             logger.error(f"Failed to retrieve session {session_id}: {e}")
             return None
 
-    async def update_user_session(
-        self, session_id: str, updates: Dict[str, Any]
-    ) -> bool:
+    async def update_user_session(self, session_id: str, updates: Dict[str, Any]) -> bool:
         """Update session data in distributed store."""
 
         return self.session_manager.update_session(session_id, updates)
@@ -223,20 +219,14 @@ class MultiNodeNoxAPI:
             logger.error(f"Failed to revoke session {session_id}: {e}")
             return False
 
-    async def revoke_all_user_sessions(
-        self, user_id: str, exclude_session: str = None
-    ) -> int:
+    async def revoke_all_user_sessions(self, user_id: str, exclude_session: str = None) -> int:
         """Revoke all sessions for a user except optionally one."""
 
         try:
-            revoked_count = self.session_manager.revoke_user_sessions(
-                user_id, exclude_session
-            )
+            revoked_count = self.session_manager.revoke_user_sessions(user_id, exclude_session)
 
             # Log bulk session revocation
-            await self._log_session_event(
-                user_id, f"{revoked_count} sessions", "bulk_revoked"
-            )
+            await self._log_session_event(user_id, f"{revoked_count} sessions", "bulk_revoked")
 
             return revoked_count
 
@@ -244,9 +234,7 @@ class MultiNodeNoxAPI:
             logger.error(f"Failed to revoke user sessions for {user_id}: {e}")
             return 0
 
-    async def _log_session_event(
-        self, user_id: str, session_info: str, event_type: str
-    ):
+    async def _log_session_event(self, user_id: str, session_info: str, event_type: str):
         """Log session events to database cluster."""
 
         try:
@@ -272,9 +260,7 @@ class MultiNodeNoxAPI:
             logger.error(f"Failed to get user profile {user_id}: {e}")
             return None
 
-    async def update_user_profile(
-        self, user_id: str, profile_data: Dict[str, Any]
-    ) -> bool:
+    async def update_user_profile(self, user_id: str, profile_data: Dict[str, Any]) -> bool:
         """Update user profile in database cluster."""
 
         try:

@@ -9,9 +9,7 @@ from client_v23 import NoxAuthClient
 from oauth2_client import oauth2_client
 
 # Configuration de la page
-st.set_page_config(
-    page_title="Nox API v2.4 - Dashboard with OAuth2", page_icon="🚀", layout="wide"
-)
+st.set_page_config(page_title="Nox API v2.4 - Dashboard with OAuth2", page_icon="🚀", layout="wide")
 
 # Configuration de base
 API_BASE_URL = os.getenv("NOX_API_URL", "http://127.0.0.1:8000")
@@ -71,9 +69,7 @@ def login_form():
 
             with st.form("register_form"):
                 reg_email = st.text_input("Email", key="reg_email")
-                reg_password = st.text_input(
-                    "Password", type="password", key="reg_password"
-                )
+                reg_password = st.text_input("Password", type="password", key="reg_password")
                 reg_role = st.selectbox("Role", ["user", "admin"], key="reg_role")
                 register_button = st.form_submit_button("Create Account")
 
@@ -83,9 +79,7 @@ def login_form():
                         result = client.register(reg_email, reg_password, reg_role)
 
                         if result:
-                            st.success(
-                                "✅ Account created successfully! You can now login."
-                            )
+                            st.success("✅ Account created successfully! You can now login.")
                         else:
                             st.error("❌ Registration failed")
 
@@ -201,9 +195,7 @@ def run_python_code(code: str):
         client = st.session_state.client
         if st.session_state.auth_method == "oauth2":
             client.token = (
-                oauth2_client.get_auth_headers()
-                .get("Authorization", "")
-                .replace("Bearer ", "")
+                oauth2_client.get_auth_headers().get("Authorization", "").replace("Bearer ", "")
             )
         else:
             client.token = st.session_state.access_token
@@ -339,17 +331,13 @@ def show_system_metrics():
                 st.metric("Active Users", metrics.get("active_users", 0))
 
             with col3:
-                st.metric(
-                    "Avg Response Time", f"{metrics.get('avg_response_time', 0):.2f}ms"
-                )
+                st.metric("Avg Response Time", f"{metrics.get('avg_response_time', 0):.2f}ms")
 
             # Charts if available
             if "request_history" in metrics:
                 st.subheader("📈 Request History")
                 df = pd.DataFrame(metrics["request_history"])
-                fig = px.line(
-                    df, x="timestamp", y="requests", title="API Requests Over Time"
-                )
+                fig = px.line(df, x="timestamp", y="requests", title="API Requests Over Time")
                 st.plotly_chart(fig, use_container_width=True)
 
         else:
@@ -381,9 +369,7 @@ def show_admin_panel():
                     st.write(f"🏷️ {user.get('role', 'N/A')}")
 
                 with col3:
-                    status = (
-                        "✅ Active" if user.get("is_active", False) else "❌ Inactive"
-                    )
+                    status = "✅ Active" if user.get("is_active", False) else "❌ Inactive"
                     st.write(status)
 
                 with col4:

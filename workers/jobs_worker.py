@@ -31,10 +31,14 @@ def enqueue_job(job_id: str, kind: str, payload: Dict[str, Any]):
 
         if kind == "echo":
             time.sleep(0.05)
-            result = {"echo": payload}
+            result = {"echo": payload, "payload": payload}
         elif kind == "xtb":
             # Handle XTB calculation
             result = run_xtb_calculation(payload)
+        elif kind == "psi4":
+            result = run_psi4_calculation(payload)
+        elif kind == "cj":
+            result = run_cj_calculation(payload)
         else:
             result = {"echo": payload}
 
@@ -45,9 +49,9 @@ def enqueue_job(job_id: str, kind: str, payload: Dict[str, Any]):
 
 def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Execute XTB calculation with given parameters"""
-    from ai.runners.xtb import run_xtb_job
     from api.schemas.job import JobRequest
     from api.services.storage import job_dir
+    from nox.runners.xtb import run_xtb_job
 
     # Parse the job request
     job_request_json = payload.get("job_request", "{}")
@@ -67,16 +71,58 @@ def run_xtb_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
         JR.inputs.params.model_dump(),
     )
 
+    # Include the original payload in the result
+    result["payload"] = payload
+
     # XTB success: return code 0 OR (return code 2 with valid energy results)
     has_energy = result.get("scalars", {}).get("E_total_hartree") is not None
-    success = (result.get("returncode") == 0) or (
-        result.get("returncode") == 2 and has_energy
-    )
+    success = (result.get("returncode") == 0) or (result.get("returncode") == 2 and has_energy)
 
     if not success:
-        error_msg = (
-            f"XTB calculation failed with return code {result.get('returncode')}"
-        )
+        error_msg = f"XTB calculation failed with return code {result.get('returncode')}"
         raise RuntimeError(error_msg)
 
+    return result
+
+
+def run_psi4_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
+    from ai.runners.psi4 import run_psi4_job
+    from api.schemas.psi4_job import Psi4JobRequest
+    from api.services.storage import job_dir
+
+    job_request_json = payload.get("job_request", "{}")
+    JR = Psi4JobRequest.model_validate_json(job_request_json)
+
+    job_id = payload.get("job_id", "unknown")
+    jd = job_dir(job_id)
+
+    result = run_psi4_job(
+        jd,
+        JR.inputs.xyz,
+        JR.inputs.charge,
+        JR.inputs.multiplicity,
+        JR.inputs.params.model_dump(),
+    )
+
+    # Include the original payload in the result
+    result["payload"] = payload
+
+    if result.get("returncode") != 0:
+        raise RuntimeError("Psi4 calculation failed")
+    return result
+
+
+def run_cj_calculation(payload: Dict[str, Any]) -> Dict[str, Any]:
+    from api.services.storage import job_dir
+    from nox.chemistry.cj import run_cj
+
+    jd = job_dir(payload.get("job_id", "unknown"))
+    req = payload.get("cj_request", {})
+    result = run_cj(jd, req)
+
+    # Include the original payload in the result
+    result["payload"] = payload
+
+    if result.get("returncode") != 0:
+        raise RuntimeError("CJ calculation failed")
     return result

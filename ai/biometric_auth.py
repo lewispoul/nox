@@ -39,9 +39,7 @@ try:
     from azure.cognitiveservices.vision.face import FaceClient
     from msrest.authentication import CognitiveServicesCredentials
 except ImportError:
-    logger.warning(
-        "Azure Cognitive Services SDK not available - using mock implementation"
-    )
+    logger.warning("Azure Cognitive Services SDK not available - using mock implementation")
 
 
 class BiometricType(Enum):
@@ -236,9 +234,7 @@ class BiometricAuthenticationSystem:
         """Initialize Azure Speech Services configuration."""
         if self.azure_speech_key:
             try:
-                return SpeechConfig(
-                    subscription=self.azure_speech_key, region=self.azure_region
-                )
+                return SpeechConfig(subscription=self.azure_speech_key, region=self.azure_region)
             except Exception as e:
                 logger.warning(f"Failed to initialize Azure Speech config: {e}")
 
@@ -282,9 +278,9 @@ class BiometricAuthenticationSystem:
             Biometric challenge object
         """
 
-        challenge_id = hashlib.sha256(
-            f"{user_id}:{session_id}:{time.time()}".encode()
-        ).hexdigest()[:16]
+        challenge_id = hashlib.sha256(f"{user_id}:{session_id}:{time.time()}".encode()).hexdigest()[
+            :16
+        ]
 
         challenge = BiometricChallenge(
             challenge_id=challenge_id,
@@ -312,9 +308,7 @@ class BiometricAuthenticationSystem:
                 json.dumps(challenge_data, default=str),
             )
 
-            logger.info(
-                f"Created biometric challenge {challenge_id} for user {user_id}"
-            )
+            logger.info(f"Created biometric challenge {challenge_id} for user {user_id}")
 
         except Exception as e:
             logger.error(f"Failed to store biometric challenge: {e}")
@@ -475,9 +469,7 @@ class BiometricAuthenticationSystem:
 
             best_match_score = 0.0
             for template in stored_templates:
-                match_score = await self._compare_voice_templates(
-                    voice_result, template
-                )
+                match_score = await self._compare_voice_templates(voice_result, template)
                 best_match_score = max(best_match_score, match_score)
 
             # Determine result
@@ -502,9 +494,7 @@ class BiometricAuthenticationSystem:
 
             # Update challenge progress
             if result == AuthenticationResult.SUCCESS:
-                await self._update_challenge_progress(
-                    challenge_id, BiometricType.VOICE_RECOGNITION
-                )
+                await self._update_challenge_progress(challenge_id, BiometricType.VOICE_RECOGNITION)
 
             # Log verification attempt
             await self._log_biometric_attempt(challenge.user_id, verification_result)
@@ -603,9 +593,7 @@ class BiometricAuthenticationSystem:
                 start_time,
             )
 
-    async def _detect_and_analyze_face(
-        self, image_data: bytes
-    ) -> Optional[FaceDetectionResult]:
+    async def _detect_and_analyze_face(self, image_data: bytes) -> Optional[FaceDetectionResult]:
         """Detect and analyze face in image using Azure Face API."""
 
         if not self.face_client:
@@ -649,15 +637,11 @@ class BiometricAuthenticationSystem:
             if hasattr(face.face_attributes, "occlusion"):
                 occlusion = face.face_attributes.occlusion
                 occlusion_penalty = (
-                    occlusion.eye_occluded
-                    + occlusion.forehead_occluded
-                    + occlusion.mouth_occluded
+                    occlusion.eye_occluded + occlusion.forehead_occluded + occlusion.mouth_occluded
                 ) / 3
                 quality_factors.append(1.0 - occlusion_penalty)
 
-            quality_score = (
-                sum(quality_factors) / len(quality_factors) if quality_factors else 0.7
-            )
+            quality_score = sum(quality_factors) / len(quality_factors) if quality_factors else 0.7
 
             # Mock liveness score (would use actual liveness detection in production)
             liveness_score = 0.8
@@ -713,9 +697,7 @@ class BiometricAuthenticationSystem:
 
             # Calculate text confidence
             text_confidence = (
-                0.9
-                if expected_phrase and expected_phrase.lower() in result.text.lower()
-                else 0.6
+                0.9 if expected_phrase and expected_phrase.lower() in result.text.lower() else 0.6
             )
 
             # Mock speaker verification (would use actual speaker recognition in production)
@@ -771,9 +753,7 @@ class BiometricAuthenticationSystem:
                 "avg_flight": np.mean(flight_times),
                 "std_flight": np.std(flight_times),
                 "typing_rhythm": (
-                    np.std(dwell_times) / np.mean(dwell_times)
-                    if np.mean(dwell_times) > 0
-                    else 0
+                    np.std(dwell_times) / np.mean(dwell_times) if np.mean(dwell_times) > 0 else 0
                 ),
             }
 
@@ -857,9 +837,7 @@ class BiometricAuthenticationSystem:
                 return 0.6
 
             # Calculate similarity score
-            similarity_score = self._calculate_mouse_similarity(
-                current_features, stored_profile
-            )
+            similarity_score = self._calculate_mouse_similarity(current_features, stored_profile)
 
             # Update stored profile
             await self._update_mouse_profile(user_id, current_features)
@@ -956,9 +934,7 @@ class BiometricAuthenticationSystem:
 
         return None
 
-    async def _update_challenge_progress(
-        self, challenge_id: str, completed_type: BiometricType
-    ):
+    async def _update_challenge_progress(self, challenge_id: str, completed_type: BiometricType):
         """Update challenge progress with completed biometric type."""
 
         challenge = await self._get_challenge(challenge_id)
@@ -1058,9 +1034,7 @@ class BiometricAuthenticationSystem:
 
             # Mock comparison logic
             base_score = 0.75
-            quality_factor = min(
-                face_result.quality_score, stored_template.quality_score
-            )
+            quality_factor = min(face_result.quality_score, stored_template.quality_score)
 
             # Simulate template matching
             match_score = base_score * quality_factor
@@ -1083,9 +1057,7 @@ class BiometricAuthenticationSystem:
 
             # Mock comparison logic
             base_score = voice_result.speaker_verification_score
-            quality_factor = min(
-                voice_result.quality_score, stored_template.quality_score
-            )
+            quality_factor = min(voice_result.quality_score, stored_template.quality_score)
 
             # Simulate template matching
             match_score = base_score * quality_factor
@@ -1108,9 +1080,7 @@ class BiometricAuthenticationSystem:
         decoded = base64.b64decode(encrypted_data.encode()).decode()
         return decoded
 
-    async def _log_biometric_attempt(
-        self, user_id: str, result: BiometricVerificationResult
-    ):
+    async def _log_biometric_attempt(self, user_id: str, result: BiometricVerificationResult):
         """Log biometric authentication attempt."""
 
         try:

@@ -102,9 +102,7 @@ class JobManager:
 
     def set_job_failed(self, job_id: str, error_message: str) -> bool:
         """Mark job as failed with error message"""
-        return self.update_job_state(
-            job_id, JobState.FAILED, error_message, progress=0.0
-        )
+        return self.update_job_state(job_id, JobState.FAILED, error_message, progress=0.0)
 
     def list_jobs(
         self, state_filter: Optional[JobState] = None, limit: Optional[int] = None
@@ -143,9 +141,7 @@ class JobManager:
         stats = {"total": len(all_jobs)}
 
         for state in JobState:
-            count = sum(
-                1 for job in all_jobs.values() if job.get("state") == state.value
-            )
+            count = sum(1 for job in all_jobs.values() if job.get("state") == state.value)
             stats[state.value] = count
 
         return stats

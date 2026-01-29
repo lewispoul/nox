@@ -7,9 +7,7 @@ import streamlit as st
 from client_v23 import NoxAuthClient
 
 # Configuration de la page
-st.set_page_config(
-    page_title="Nox API v2.3 - Dashboard Admin", page_icon="🚀", layout="wide"
-)
+st.set_page_config(page_title="Nox API v2.3 - Dashboard Admin", page_icon="🚀", layout="wide")
 
 # Configuration de base
 API_BASE_URL = "http://127.0.0.1:8081"
@@ -33,9 +31,7 @@ def login_form():
 
     with st.form("login_form"):
         email = st.text_input("Email", placeholder="admin@nox.local")
-        password = st.text_input(
-            "Mot de passe", type="password", placeholder="admin123"
-        )
+        password = st.text_input("Mot de passe", type="password", placeholder="admin123")
         col1, col2 = st.columns(2)
 
         with col1:
@@ -355,9 +351,7 @@ def show_metrics_tab():
                             keyword in metric_name
                             for keyword in ["nox_requests", "nox_latency", "sandbox"]
                         ):
-                            metrics_found.append(
-                                {"Métrique": metric_name, "Valeur": metric_value}
-                            )
+                            metrics_found.append({"Métrique": metric_name, "Valeur": metric_value})
 
             if metrics_found:
                 df = pd.DataFrame(metrics_found)
@@ -375,9 +369,7 @@ def show_admin_tab():
     """Onglet d'administration (admin uniquement)"""
     st.subheader("👑 Administration")
 
-    tab1, tab2, tab3 = st.tabs(
-        ["👥 Utilisateurs", "📊 Statistiques", "🗑️ Actions Admin"]
-    )
+    tab1, tab2, tab3 = st.tabs(["👥 Utilisateurs", "📊 Statistiques", "🗑️ Actions Admin"])
 
     with tab1:
         st.write("**👥 Gestion des Utilisateurs**")
@@ -407,9 +399,7 @@ def show_admin_tab():
                     try:
                         # Créer un client temporaire sans token pour l'inscription
                         temp_client = NoxAuthClient(API_BASE_URL)
-                        result, _ = temp_client.register(
-                            new_email, new_password, new_role
-                        )
+                        result, _ = temp_client.register(new_email, new_password, new_role)
                         st.success(f"✅ Utilisateur créé: {new_email}")
                     except Exception as e:
                         st.error(f"❌ Erreur création: {str(e)}")

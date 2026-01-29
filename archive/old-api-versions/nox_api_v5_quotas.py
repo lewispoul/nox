@@ -21,9 +21,7 @@ from rate_limit_and_policy import RateLimitAndPolicyMiddleware
 
 # Import des métriques Phase 2.2
 sys.path.append(
-    os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "observability"
-    )
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "observability")
 )
 from metrics_chatgpt import metrics_response, update_sandbox_metrics
 from middleware import MetricsMiddleware
@@ -169,9 +167,7 @@ async def put(
     if NOX_QUOTAS_ENABLED and request and hasattr(request.state, "user_id"):
         try:
             # Calculer l'usage de stockage actuel
-            total_size = sum(
-                f.stat().st_size for f in SANDBOX.rglob("*") if f.is_file()
-            )
+            total_size = sum(f.stat().st_size for f in SANDBOX.rglob("*") if f.is_file())
             total_files = len(list(SANDBOX.rglob("*")))
 
             await quota_db.update_storage_usage(
@@ -181,9 +177,7 @@ async def put(
             )
 
             # Mettre à jour les métriques Prometheus
-            quota_metrics.update_storage_usage(
-                request.state.user_id, total_size // (1024 * 1024)
-            )
+            quota_metrics.update_storage_usage(request.state.user_id, total_size // (1024 * 1024))
             quota_metrics.update_files_count(request.state.user_id, total_files)
         except Exception as e:
             print(f"Warning: Could not update storage metrics: {e}")
@@ -283,9 +277,7 @@ async def run_sh(
         raise HTTPException(status_code=400, detail="Empty command")
 
     if cmd_parts[0] in FORBIDDEN_COMMANDS:
-        raise HTTPException(
-            status_code=400, detail=f"Forbidden command: {cmd_parts[0]}"
-        )
+        raise HTTPException(status_code=400, detail=f"Forbidden command: {cmd_parts[0]}")
 
     start_time = time.time()
     try:

@@ -99,9 +99,7 @@ def test_job_polling(job_id: str, max_wait: int = 120) -> str:
 
             if state not in states_seen:
                 states_seen.append(state)
-                print(
-                    f"   [{i+1:02d}s] State: {state} (progress: {progress:.1f}) - {message}"
-                )
+                print(f"   [{i+1:02d}s] State: {state} (progress: {progress:.1f}) - {message}")
             elif i % 10 == 0:  # Show update every 10s
                 print(f"   [{i+1:02d}s] Still: {state} - {message}")
 
@@ -288,9 +286,7 @@ def main():
                 if workflow_success:
                     passed += 1
             else:
-                print(
-                    f"\n❌ Workflow test failed: job ended with state '{final_state}'"
-                )
+                print(f"\n❌ Workflow test failed: job ended with state '{final_state}'")
                 total += 1
         else:
             total += 1

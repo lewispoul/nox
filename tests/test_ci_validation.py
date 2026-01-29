@@ -3,6 +3,27 @@
 Simple CI validation test - validates that basic linting and testing tools work
 """
 
+import warnings
+
+import pytest
+
+# Silence noisy dependency deprecations from Bandit/Stevedore during import
+warnings.filterwarnings(
+    "ignore",
+    message=r"^The verify_requirements argument is now a no-op",
+    category=Warning,
+)
+warnings.filterwarnings(
+    "ignore",
+    message=r"^ast\.Str is deprecated",
+    category=Warning,
+)
+
+pytestmark = [
+    pytest.mark.filterwarnings("ignore:The verify_requirements argument is now a no-op.*"),
+    pytest.mark.filterwarnings("ignore:ast.Str is deprecated.*"),
+]
+
 
 def test_import_basic_modules():
     """Test that basic modules can be imported"""

@@ -26,16 +26,10 @@ class UserQuota(BaseModel):
     user_id: str
     quota_req_hour: Optional[int] = Field(default=100, description="Requêtes par heure")
     quota_req_day: Optional[int] = Field(default=1000, description="Requêtes par jour")
-    quota_cpu_seconds: Optional[int] = Field(
-        default=300, description="Secondes CPU max"
-    )
+    quota_cpu_seconds: Optional[int] = Field(default=300, description="Secondes CPU max")
     quota_mem_mb: Optional[int] = Field(default=512, description="Mémoire max en MB")
-    quota_storage_mb: Optional[int] = Field(
-        default=100, description="Stockage max en MB"
-    )
-    quota_files_max: Optional[int] = Field(
-        default=50, description="Nombre max de fichiers"
-    )
+    quota_storage_mb: Optional[int] = Field(default=100, description="Stockage max en MB")
+    quota_files_max: Optional[int] = Field(default=50, description="Nombre max de fichiers")
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -80,9 +74,7 @@ class QuotaViolation(BaseModel):
     id: str
     user_id: str
     reason: str = Field(description="Type de quota violé")
-    detail: Dict[str, Any] = Field(
-        default_factory=dict, description="Détails de la violation"
-    )
+    detail: Dict[str, Any] = Field(default_factory=dict, description="Détails de la violation")
     created_at: datetime = Field(default_factory=datetime.now)
 
     def to_dict(self) -> Dict[str, Any]:

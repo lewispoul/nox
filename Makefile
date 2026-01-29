@@ -64,9 +64,9 @@ redis:  ## Start Redis server in daemon mode
 .PHONY: help install harden caddy-lan caddy-public nginx-public repair repair-v2 validate demo logs install-logs debug
 
 # Configuration
-SCRIPT_DIR = nox-api/scripts
-DEPLOY_DIR = nox-api/deploy
-TESTS_DIR = nox-api/tests
+SCRIPT_DIR = scripts
+DEPLOY_DIR = deploy
+TESTS_DIR = tests
 
 help:  ## Display available commands
 	@echo "Makefile Nox API XTB - Available commands:"
@@ -115,17 +115,17 @@ logs:  ## Show recent logs
 	fi
 
 # Legacy NOX infrastructure targets (preserved for compatibility)
-install:  ## Install/reinstall legacy Nox API
-	@echo "Installing legacy Nox API..."
-	@./$(DEPLOY_DIR)/install_nox.sh
+install:  ## Install/reinstall Nox API
+	@echo "Installing Nox API..."
+	@./scripts/install_nox.sh
 
-repair:  ## Repair legacy installation
-	@echo "Repairing legacy Nox API..."
-	@./$(SCRIPT_DIR)/nox_repair.sh
+repair:  ## Repair installation (legacy script removed; fallback guidance)
+	@echo "Repairing Nox API..."
+	@echo "Legacy repair script removed; use scripts/rollback.sh or reinstall if needed."
 
-validate:  ## Validate legacy installation
-	@echo "Validating legacy Nox API..."
-	@./validate_nox.sh
+validate:  ## Validate installation
+	@echo "Validating Nox API..."
+	@./verify_env.sh
 
 demo:  ## Run legacy demo tests
 	@echo "Running legacy demo tests..."

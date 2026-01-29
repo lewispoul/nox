@@ -37,9 +37,7 @@ async def get_current_user_id(request: Request) -> str:
     # Chercher l'utilisateur par oauth_id
     user = await quota_db.get_user_by_oauth_id(token)
     if not user:
-        raise HTTPException(
-            status_code=404, detail="Utilisateur non trouvé pour le token"
-        )
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé pour le token")
 
     return str(user["id"])
 
@@ -157,13 +155,10 @@ async def get_my_usage(current_user_id: str = Depends(get_current_user_id)):
         result["percentages"] = {
             "req_hour": (usage.req_hour / max(quotas.quota_req_hour or 1, 1)) * 100,
             "req_day": (usage.req_day / max(quotas.quota_req_day or 1, 1)) * 100,
-            "cpu_seconds": (usage.cpu_seconds / max(quotas.quota_cpu_seconds or 1, 1))
-            * 100,
+            "cpu_seconds": (usage.cpu_seconds / max(quotas.quota_cpu_seconds or 1, 1)) * 100,
             "mem_mb": (usage.mem_peak_mb / max(quotas.quota_mem_mb or 1, 1)) * 100,
-            "storage_mb": (usage.storage_mb / max(quotas.quota_storage_mb or 1, 1))
-            * 100,
-            "files_count": (usage.files_count / max(quotas.quota_files_max or 1, 1))
-            * 100,
+            "storage_mb": (usage.storage_mb / max(quotas.quota_storage_mb or 1, 1)) * 100,
+            "files_count": (usage.files_count / max(quotas.quota_files_max or 1, 1)) * 100,
         }
 
     return result
@@ -196,9 +191,7 @@ async def initialize_quota_system():
     try:
         # Tester la connexion à la base de données
         test_stats = await quota_db.get_usage_statistics()
-        print(
-            f"✅ Quota system initialized - tracking {test_stats['total_users']} users"
-        )
+        print(f"✅ Quota system initialized - tracking {test_stats['total_users']} users")
         return True
     except Exception as e:
         print(f"❌ Failed to initialize quota system: {e}")

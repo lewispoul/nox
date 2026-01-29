@@ -126,9 +126,7 @@ class PersistenceValidator:
             print(f"   ⚠️  Exception during restart: {e}")
             return False
 
-    def compare_states(
-        self, before: Dict[str, Any], after: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def compare_states(self, before: Dict[str, Any], after: Dict[str, Any]) -> Dict[str, Any]:
         """Compare quota/usage states before and after restart"""
 
         if before["status"] != "success" or after["status"] != "success":
@@ -200,9 +198,7 @@ class PersistenceValidator:
         print(
             f"   📊 Usage: {initial_state['usage']['req_hour']} req/hour, {initial_state['usage']['req_day']} req/day"
         )
-        print(
-            f"   🎯 Quotas: {initial_state['quotas']['quota_req_hour']} req/hour limit"
-        )
+        print(f"   🎯 Quotas: {initial_state['quotas']['quota_req_hour']} req/hour limit")
 
         # Step 2: Generate some usage activity
         print("\n2️⃣ Generating usage activity...")
@@ -271,9 +267,7 @@ class PersistenceValidator:
 
         # Step 7: Results analysis
         print("\n📊 Persistence Test Results:")
-        print(
-            f"   🎯 Quotas preserved: {'✅ Yes' if comparison['quotas_preserved'] else '❌ No'}"
-        )
+        print(f"   🎯 Quotas preserved: {'✅ Yes' if comparison['quotas_preserved'] else '❌ No'}")
         print(
             f"   📈 Usage preserved: {'✅ Yes' if comparison['usage_preserved_or_increased'] else '❌ No'}"
         )
@@ -289,10 +283,7 @@ class PersistenceValidator:
                 print(f"      {key}: {diff['before']} → {diff['after']}")
 
         # Overall test result
-        test_passed = (
-            comparison["quotas_preserved"]
-            and comparison["usage_preserved_or_increased"]
-        )
+        test_passed = comparison["quotas_preserved"] and comparison["usage_preserved_or_increased"]
 
         return {
             "test_result": "passed" if test_passed else "failed",
@@ -314,9 +305,7 @@ def main():
     print("\n🏁 Final Result:")
     if result["test_result"] == "passed":
         print("   ✅ PERSISTENCE TEST PASSED")
-        print(
-            "   📋 Database successfully preserves quota and usage data across API restarts"
-        )
+        print("   📋 Database successfully preserves quota and usage data across API restarts")
     else:
         print("   ❌ PERSISTENCE TEST FAILED")
         print(

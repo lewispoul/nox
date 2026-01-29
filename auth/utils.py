@@ -63,9 +63,7 @@ class AuthUtils:
             "access_token": encoded_jwt,
             "token_type": "bearer",
             "expires_in": int(
-                expires_delta.total_seconds()
-                if expires_delta
-                else ACCESS_TOKEN_EXPIRE_MINUTES * 60
+                expires_delta.total_seconds() if expires_delta else ACCESS_TOKEN_EXPIRE_MINUTES * 60
             ),
         }
 

@@ -24,6 +24,7 @@
 - id: JOBS-002
   title: Activate Dramatiq jobs from API with state polling
   priority: high
+  status: COMPLETE
   scope:
     paths:
       - "api/routes/jobs.py"
@@ -31,6 +32,14 @@
       - "tests/jobs/"
   done_when:
     - "POST /jobs enqueues and /jobs/<id> shows states"
+    - "GET /jobs/<id>/wait polls until completion or timeout"
+  completion_notes:
+    - "✅ Fixed artifacts endpoint pending-state race (test_artifacts_not_ready passing)"
+    - "✅ Implemented GET /jobs/{id}/wait endpoint with configurable timeout (default 30s, max 300s)"
+    - "✅ Polls every 500ms until terminal state (completed/failed) or timeout"
+    - "✅ Returns JobStatus with final state or timeout message"
+    - "✅ Comprehensive test suite: 5 new polling tests, all passing"
+    - "✅ Full jobs test suite: 28 tests passing"
 
 - id: CUBE-003
   title: Generate HOMO and LUMO .cube artifacts from XTB

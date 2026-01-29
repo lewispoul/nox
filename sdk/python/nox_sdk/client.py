@@ -105,9 +105,7 @@ class NoxClient:
         self.enable_ai_security = enable_ai_security
 
         # Initialize auth manager
-        self.auth = AuthManager(
-            base_url=base_url, api_token=api_token, oauth_config=oauth_config
-        )
+        self.auth = AuthManager(base_url=base_url, api_token=api_token, oauth_config=oauth_config)
 
         # Initialize AI clients if enabled
         if enable_ai_security:
@@ -255,11 +253,7 @@ class NoxClient:
                     api_response = APIResponse(
                         success=response.status < 400,
                         data=response_data if response.status < 400 else None,
-                        error=(
-                            response_data.get("error")
-                            if response.status >= 400
-                            else None
-                        ),
+                        error=(response_data.get("error") if response.status >= 400 else None),
                         status_code=response.status,
                         headers=dict(response.headers),
                         response_time_ms=response_time,
@@ -276,23 +270,17 @@ class NoxClient:
                     elif response.status == 429:
                         # Rate limiting
                         retry_after = response.headers.get("Retry-After", "60")
-                        raise RateLimitError(
-                            f"Rate limited. Retry after {retry_after} seconds"
-                        )
+                        raise RateLimitError(f"Rate limited. Retry after {retry_after} seconds")
 
                     elif response.status >= 500:
                         # Server error - retry if we have attempts left
                         if attempt < self.retry_config.max_retries:
-                            await asyncio.sleep(
-                                self.retry_config.base_delay * (2**attempt)
-                            )
+                            await asyncio.sleep(self.retry_config.base_delay * (2**attempt))
                             continue
 
                     # AI security integration
                     if self.enable_ai_security and api_response.success:
-                        await self._process_ai_security_response(
-                            api_response, method, endpoint
-                        )
+                        await self._process_ai_security_response(api_response, method, endpoint)
 
                     return api_response
 
@@ -340,39 +328,27 @@ class NoxClient:
         return asyncio.run(self.request(method, endpoint, data, params, headers))
 
     # Convenience methods for common HTTP operations
-    async def get(
-        self, endpoint: str, params: Optional[Dict[str, Any]] = None
-    ) -> APIResponse:
+    async def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> APIResponse:
         """GET request."""
         return await self.request("GET", endpoint, params=params)
 
-    def get_sync(
-        self, endpoint: str, params: Optional[Dict[str, Any]] = None
-    ) -> APIResponse:
+    def get_sync(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> APIResponse:
         """Synchronous GET request."""
         return self.request_sync("GET", endpoint, params=params)
 
-    async def post(
-        self, endpoint: str, data: Optional[Dict[str, Any]] = None
-    ) -> APIResponse:
+    async def post(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> APIResponse:
         """POST request."""
         return await self.request("POST", endpoint, data=data)
 
-    def post_sync(
-        self, endpoint: str, data: Optional[Dict[str, Any]] = None
-    ) -> APIResponse:
+    def post_sync(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> APIResponse:
         """Synchronous POST request."""
         return self.request_sync("POST", endpoint, data=data)
 
-    async def put(
-        self, endpoint: str, data: Optional[Dict[str, Any]] = None
-    ) -> APIResponse:
+    async def put(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> APIResponse:
         """PUT request."""
         return await self.request("PUT", endpoint, data=data)
 
-    def put_sync(
-        self, endpoint: str, data: Optional[Dict[str, Any]] = None
-    ) -> APIResponse:
+    def put_sync(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> APIResponse:
         """Synchronous PUT request."""
         return self.request_sync("PUT", endpoint, data=data)
 
@@ -391,9 +367,7 @@ class NoxClient:
 
     async def list_users(self, limit: int = 50, offset: int = 0) -> APIResponse:
         """List users with pagination."""
-        return await self.get(
-            "/api/admin/users", params={"limit": limit, "offset": offset}
-        )
+        return await self.get("/api/admin/users", params={"limit": limit, "offset": offset})
 
     async def create_user(self, user_data: Dict[str, Any]) -> APIResponse:
         """Create a new user."""
@@ -522,9 +496,7 @@ def create_client(
     return NoxClient(base_url=base_url, api_token=api_token, **kwargs)
 
 
-def create_oauth_client(
-    base_url: str, client_id: str, client_secret: str, **kwargs
-) -> NoxClient:
+def create_oauth_client(base_url: str, client_id: str, client_secret: str, **kwargs) -> NoxClient:
     """
     Factory function to create OAuth2-enabled Nox API client.
 

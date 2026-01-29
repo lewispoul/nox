@@ -2,6 +2,15 @@
 
 Ce fichier référence l'ensemble de la documentation active du projet NOX. Les documents obsolètes ont été déplacés vers `docs/legacy/`.
 
+## 🚀 Démarrage Rapide - NOUVEAU!
+
+**[⭐ GUIDE DES PROCHAINES ÉTAPES](../NEXT_STEPS_GUIDE.md)** - Guide complet pour continuer le développement du projet NOX
+- Analyse de l'état actuel
+- Actions prioritaires
+- Plan d'action hebdomadaire
+- Notes d'intégration avec d'autres dépôts (IAM, XTB)
+- Commandes de référence rapide
+
 ## Documentation principale
 
 ### Vue d'ensemble

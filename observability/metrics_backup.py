@@ -87,9 +87,7 @@ class PrometheusMetricsMiddleware(BaseHTTPMiddleware):
             "nox_api_sandbox_size_bytes", "Taille totale du sandbox en bytes"
         )
 
-        self.active_tokens = Gauge(
-            "nox_api_active_tokens_count", "Nombre de tokens actifs"
-        )
+        self.active_tokens = Gauge("nox_api_active_tokens_count", "Nombre de tokens actifs")
 
         # === MÉTRIQUES APPLICATIVES ===
         self.api_info = Info("nox_api_build_info", "Informations de build de l'API")
@@ -158,9 +156,7 @@ class PrometheusMetricsMiddleware(BaseHTTPMiddleware):
     def track_rate_limit_hit(self, endpoint: str, limit_type: str, request_id: str):
         """Track un hit de rate limiting"""
         self.rate_limit_hits.labels(endpoint=endpoint, limit_type=limit_type).inc()
-        print(
-            f"RATE_LIMIT request_id={request_id} endpoint={endpoint} type={limit_type}"
-        )
+        print(f"RATE_LIMIT request_id={request_id} endpoint={endpoint} type={limit_type}")
 
     def track_auth_failure(self, reason: str, request_id: str):
         """Track un échec d'authentification"""
@@ -180,9 +176,7 @@ class PrometheusMetricsMiddleware(BaseHTTPMiddleware):
         endpoint = str(request.url.path)
 
         # Log de début de requête
-        print(
-            f"REQUEST_START request_id={request_id} method={method} endpoint={endpoint}"
-        )
+        print(f"REQUEST_START request_id={request_id} method={method} endpoint={endpoint}")
 
         try:
             # Mise à jour métriques système périodique
@@ -200,9 +194,9 @@ class PrometheusMetricsMiddleware(BaseHTTPMiddleware):
                 method=method, endpoint=endpoint, status_code=status_code
             ).inc()
 
-            self.http_request_duration_seconds.labels(
-                method=method, endpoint=endpoint
-            ).observe(duration)
+            self.http_request_duration_seconds.labels(method=method, endpoint=endpoint).observe(
+                duration
+            )
 
             # Ajout du request_id en header de réponse
             response.headers["X-Request-ID"] = request_id
@@ -222,13 +216,12 @@ class PrometheusMetricsMiddleware(BaseHTTPMiddleware):
                 method=method, endpoint=endpoint, status_code="500"
             ).inc()
 
-            self.http_request_duration_seconds.labels(
-                method=method, endpoint=endpoint
-            ).observe(duration)
+            self.http_request_duration_seconds.labels(method=method, endpoint=endpoint).observe(
+                duration
+            )
 
             print(
-                f"REQUEST_ERROR request_id={request_id} error={str(e)} "
-                f"duration={duration:.3f}s"
+                f"REQUEST_ERROR request_id={request_id} error={str(e)} " f"duration={duration:.3f}s"
             )
 
             raise

@@ -27,9 +27,7 @@ class TestResults:
         self.failed = 0
         self.start_time = time.time()
 
-    def add_test(
-        self, name: str, success: bool, message: str = "", details: Dict = None
-    ):
+    def add_test(self, name: str, success: bool, message: str = "", details: Dict = None):
         """Add a test result"""
         self.tests.append(
             {
@@ -82,9 +80,7 @@ class TestResults:
         if self.failed == 0:
             print("   🎉 ALL TESTS PASSED! Nox API is fully operational.")
         else:
-            print(
-                f"   ⚠️  {self.failed} test(s) failed. Please check the details above."
-            )
+            print(f"   ⚠️  {self.failed} test(s) failed. Please check the details above.")
 
         print("=" * 60)
         return self.failed == 0
@@ -120,9 +116,7 @@ def run_demo_tests():
         )
         print(f"   ✅ Client created: {client}")
     except Exception as e:
-        results.add_test(
-            "Client Initialization", False, str(e), {"error_type": type(e).__name__}
-        )
+        results.add_test("Client Initialization", False, str(e), {"error_type": type(e).__name__})
         print(f"   ❌ Failed to create client: {e}")
         print("   💡 Check NOX_API_TOKEN environment variable")
         results.print_summary()
@@ -147,9 +141,7 @@ def run_demo_tests():
             print(f"   ⚠️  Unexpected health status: {health_response}")
 
     except Exception as e:
-        results.add_test(
-            "Health Check", False, str(e), {"error_type": type(e).__name__}
-        )
+        results.add_test("Health Check", False, str(e), {"error_type": type(e).__name__})
         print(f"   ❌ Health check failed: {e}")
 
     # Test 3: File upload (string content)
@@ -173,9 +165,7 @@ def run_demo_tests():
             print(f"   ❌ Upload failed: {upload_response}")
 
     except Exception as e:
-        results.add_test(
-            "File Upload (String)", False, str(e), {"error_type": type(e).__name__}
-        )
+        results.add_test("File Upload (String)", False, str(e), {"error_type": type(e).__name__})
         print(f"   ❌ File upload failed: {e}")
 
     # Test 4: File upload (from local file)
@@ -185,9 +175,7 @@ def run_demo_tests():
         # Create a temporary file
         with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp:
             tmp.write("print('Hello from temporary file!')\n")
-            tmp.write(
-                f"print('File created at: {time.strftime('%Y-%m-%d %H:%M:%S')}')\n"
-            )
+            tmp.write(f"print('File created at: {time.strftime('%Y-%m-%d %H:%M:%S')}')\n")
             tmp_path = pathlib.Path(tmp.name)
 
         try:
@@ -341,9 +329,7 @@ print("Test completed successfully!")
             print(f"      📋 Stderr: {shell_response.get('stderr', '')}")
 
     except Exception as e:
-        results.add_test(
-            "Shell Command Execution", False, str(e), {"error_type": type(e).__name__}
-        )
+        results.add_test("Shell Command Execution", False, str(e), {"error_type": type(e).__name__})
         print(f"   ❌ Shell execution failed: {e}")
 
     # Test 8: Execute uploaded file
@@ -378,9 +364,7 @@ print("Test completed successfully!")
             print(f"      📋 Stderr: {exec_response.get('stderr', '')}")
 
     except Exception as e:
-        results.add_test(
-            "Execute Uploaded File", False, str(e), {"error_type": type(e).__name__}
-        )
+        results.add_test("Execute Uploaded File", False, str(e), {"error_type": type(e).__name__})
         print(f"   ❌ Uploaded file execution failed: {e}")
 
     # Test 9: Error handling (forbidden command)
@@ -466,9 +450,7 @@ print(f"Execution time: {duration:.4f} seconds")
             print(f"      📋 Exit code: {exec_response.get('returncode')}")
 
     except Exception as e:
-        results.add_test(
-            "Performance Validation", False, str(e), {"error_type": type(e).__name__}
-        )
+        results.add_test("Performance Validation", False, str(e), {"error_type": type(e).__name__})
         print(f"   ❌ Performance test failed: {e}")
 
     # Print final results
@@ -485,9 +467,7 @@ def main():
         print("❌ ERROR: NOX_API_TOKEN environment variable is required")
         print("\n💡 Setup instructions:")
         print("   export NOX_API_TOKEN='your-token-here'")
-        print(
-            "   export NOX_API_URL='http://localhost'  # Optional, defaults to http://localhost"
-        )
+        print("   export NOX_API_URL='http://localhost'  # Optional, defaults to http://localhost")
         print("   python clients/tests_demo.py")
         return False
 

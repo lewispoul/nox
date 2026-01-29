@@ -297,9 +297,7 @@ class QuotaEnforcementMiddleware(BaseHTTPMiddleware):
         if memory_mb > 10:
             quota_metrics.update_memory_peak(user_id, int(memory_mb))
 
-    async def _record_quota_violation(
-        self, user_id: str, quota_check: QuotaCheckResult
-    ):
+    async def _record_quota_violation(self, user_id: str, quota_check: QuotaCheckResult):
         """Enregistre une violation de quota"""
         await self.db.record_quota_violation(
             user_id=user_id,
@@ -328,14 +326,11 @@ class QuotaEnforcementMiddleware(BaseHTTPMiddleware):
         # Incrémenter quand même le compteur de requêtes
         await self.db.increment_request_counters(user_id)
 
-    def _create_quota_exceeded_response(
-        self, quota_check: QuotaCheckResult
-    ) -> JSONResponse:
+    def _create_quota_exceeded_response(self, quota_check: QuotaCheckResult) -> JSONResponse:
         """Crée une réponse d'erreur pour quota dépassé"""
         status_code = (
             429
-            if quota_check.quota_type
-            in [QuotaType.REQUESTS_HOUR, QuotaType.REQUESTS_DAY]
+            if quota_check.quota_type in [QuotaType.REQUESTS_HOUR, QuotaType.REQUESTS_DAY]
             else 403
         )
 

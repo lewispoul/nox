@@ -23,9 +23,7 @@ METRIC_KEYS = [
 
 
 def get_redis_connection():
-    return redis.Redis(
-        host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASS, decode_responses=True
-    )
+    return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASS, decode_responses=True)
 
 
 def fetch_redis_metrics(r):
@@ -38,9 +36,7 @@ def fetch_redis_metrics(r):
 
 def fetch_prometheus_metric(metric):
     try:
-        resp = requests.get(
-            f"{PROMETHEUS_URL}/api/v1/query", params={"query": metric}, timeout=5
-        )
+        resp = requests.get(f"{PROMETHEUS_URL}/api/v1/query", params={"query": metric}, timeout=5)
         result = resp.json()
         if result["status"] == "success" and result["data"]["result"]:
             return result["data"]["result"][0]["value"][1]

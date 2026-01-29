@@ -63,9 +63,7 @@ def validate_oauth2_state(state: str) -> Optional[Dict[str, Any]]:
 async def oauth2_login(
     provider: str,
     request: Request,
-    redirect_uri: Optional[str] = Query(
-        None, description="Optional redirect URI after login"
-    ),
+    redirect_uri: Optional[str] = Query(None, description="Optional redirect URI after login"),
 ):
     """
     Initiate OAuth2 authorization flow
@@ -75,9 +73,7 @@ async def oauth2_login(
     # Validate provider
     provider_config = get_provider_by_name(provider)
     if not provider_config:
-        raise HTTPException(
-            status_code=400, detail=f"Unsupported OAuth2 provider: {provider}"
-        )
+        raise HTTPException(status_code=400, detail=f"Unsupported OAuth2 provider: {provider}")
 
     # Generate secure state parameter
     state = generate_oauth2_state(provider, redirect_uri)
@@ -89,9 +85,7 @@ async def oauth2_login(
         "scope": " ".join(provider_config.scopes),
         "response_type": "code",
         "state": state,
-        "access_type": (
-            "offline" if provider == "google" else None
-        ),  # For refresh tokens
+        "access_type": ("offline" if provider == "google" else None),  # For refresh tokens
     }
 
     # Remove None values
@@ -101,9 +95,7 @@ async def oauth2_login(
     if provider == "microsoft":
         auth_params["prompt"] = "consent"  # Ensure refresh token
 
-    auth_url = (
-        f"{provider_config.authorization_url}?{urllib.parse.urlencode(auth_params)}"
-    )
+    auth_url = f"{provider_config.authorization_url}?{urllib.parse.urlencode(auth_params)}"
 
     return RedirectResponse(url=auth_url)
 
@@ -128,9 +120,7 @@ async def oauth2_callback(
     # Validate state parameter
     state_data = validate_oauth2_state(state)
     if not state_data:
-        raise HTTPException(
-            status_code=400, detail="Invalid or expired state parameter"
-        )
+        raise HTTPException(status_code=400, detail="Invalid or expired state parameter")
 
     if state_data["provider"] != provider:
         raise HTTPException(status_code=400, detail="State provider mismatch")
@@ -138,9 +128,7 @@ async def oauth2_callback(
     # Get provider configuration
     provider_config = get_provider_by_name(provider)
     if not provider_config:
-        raise HTTPException(
-            status_code=400, detail=f"Unsupported OAuth2 provider: {provider}"
-        )
+        raise HTTPException(status_code=400, detail=f"Unsupported OAuth2 provider: {provider}")
 
     # Exchange authorization code for access token
     token_data = await exchange_code_for_token(provider, code, provider_config)
@@ -205,9 +193,7 @@ async def oauth2_callback(
 # ===== TOKEN EXCHANGE =====
 
 
-async def exchange_code_for_token(
-    provider: str, code: str, provider_config
-) -> Dict[str, Any]:
+async def exchange_code_for_token(provider: str, code: str, provider_config) -> Dict[str, Any]:
     """Exchange OAuth2 authorization code for access token"""
     token_data = {
         "grant_type": "authorization_code",
@@ -317,9 +303,7 @@ async def refresh_oauth2_token(
 
 
 @oauth2_router.get("/profile/{provider}")
-async def get_oauth2_profile(
-    provider: str, user_id: str = Query(..., description="User ID")
-):
+async def get_oauth2_profile(provider: str, user_id: str = Query(..., description="User ID")):
     """
     Get OAuth2 profile information for user and provider
     """
@@ -351,9 +335,7 @@ async def get_oauth2_profile(
 async def oauth2_logout(
     request: Request,
     response: Response,
-    provider: Optional[str] = Query(
-        None, description="Revoke tokens for specific provider"
-    ),
+    provider: Optional[str] = Query(None, description="Revoke tokens for specific provider"),
     all_providers: bool = Query(False, description="Revoke tokens for all providers"),
 ):
     """
@@ -367,9 +349,7 @@ async def oauth2_logout(
 
     return {
         "message": "Logged out successfully",
-        "revoked_provider": (
-            provider if provider else "all" if all_providers else "none"
-        ),
+        "revoked_provider": (provider if provider else "all" if all_providers else "none"),
     }
 
 

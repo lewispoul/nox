@@ -45,9 +45,7 @@ def test_redis_cluster():
         cluster_info = cluster.cluster_info()
         print(f"📊 Cluster State: {cluster_info.get('cluster_state', 'unknown')}")
         print(f"📋 Known Nodes: {cluster_info.get('cluster_known_nodes', 0)}")
-        print(
-            f"🎯 Slots Assigned: {cluster_info.get('cluster_slots_assigned', 0)}/16384"
-        )
+        print(f"🎯 Slots Assigned: {cluster_info.get('cluster_slots_assigned', 0)}/16384")
 
         # Test basic operations
         print("\n🧪 Testing basic operations...")
@@ -61,9 +59,7 @@ def test_redis_cluster():
         if retrieved_value == test_value:
             print("✅ Set/Get operation successful")
         else:
-            print(
-                f"❌ Set/Get operation failed: expected '{test_value}', got '{retrieved_value}'"
-            )
+            print(f"❌ Set/Get operation failed: expected '{test_value}', got '{retrieved_value}'")
 
         # Hash operations test
         hash_key = "nox:user:456"

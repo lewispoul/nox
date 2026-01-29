@@ -76,9 +76,7 @@ class RedisJobsStore:
             "created_at": now,
             "updated_at": now,
         }
-        self.r.hset(
-            self._key(job_id), mapping={k: json.dumps(v) for k, v in payload.items()}
-        )
+        self.r.hset(self._key(job_id), mapping={k: json.dumps(v) for k, v in payload.items()})
         return Job(**payload)
 
     def get(self, job_id: str) -> Optional[Job]:

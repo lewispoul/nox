@@ -278,9 +278,7 @@ class ResponseBuilder:
         return response
 
     @staticmethod
-    def paginated(
-        data: List[Any], page: int, per_page: int, total: int
-    ) -> Dict[str, Any]:
+    def paginated(data: List[Any], page: int, per_page: int, total: int) -> Dict[str, Any]:
         """Build a paginated response."""
         total_pages = (total + per_page - 1) // per_page
 
@@ -314,9 +312,7 @@ class ModelConverter:
                 if isinstance(value, Enum):
                     result[key] = value.value
                 elif isinstance(value, list):
-                    result[key] = [
-                        item.value if isinstance(item, Enum) else item for item in value
-                    ]
+                    result[key] = [item.value if isinstance(item, Enum) else item for item in value]
             return result
         return obj
 
@@ -390,16 +386,12 @@ class ModelValidator:
         # Must have either script_content or script_id
         if not request.script_content and not request.script_id:
             errors.append(
-                ValidationError(
-                    "script", "Either script_content or script_id must be provided"
-                )
+                ValidationError("script", "Either script_content or script_id must be provided")
             )
 
         # Validate timeout
         if request.timeout <= 0 or request.timeout > 3600:
-            errors.append(
-                ValidationError("timeout", "Timeout must be between 1 and 3600 seconds")
-            )
+            errors.append(ValidationError("timeout", "Timeout must be between 1 and 3600 seconds"))
 
         # Validate language if script_content is provided
         if request.script_content and not request.language:
@@ -427,9 +419,7 @@ class ModelValidator:
 
         # Validate chunk size
         if request.chunk_size <= 0:
-            errors.append(
-                ValidationError("chunk_size", "Chunk size must be greater than 0")
-            )
+            errors.append(ValidationError("chunk_size", "Chunk size must be greater than 0"))
 
         return errors
 

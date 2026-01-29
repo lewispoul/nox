@@ -43,9 +43,7 @@ async def test_quota_check():
     # Check if quota should be exceeded
     is_exceeded = usage.req_hour >= quotas.quota_req_hour if usage and quotas else False
     print(f"🚫 Quota exceeded: {is_exceeded}")
-    print(
-        f"   {usage.req_hour if usage else 0} >= {quotas.quota_req_hour if quotas else 0}"
-    )
+    print(f"   {usage.req_hour if usage else 0} >= {quotas.quota_req_hour if quotas else 0}")
 
     # Test the middleware check logic directly
     middleware = QuotaEnforcementMiddleware(None, db)

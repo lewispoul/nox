@@ -271,9 +271,7 @@ def generate_tree_structure():
                 children = [
                     p
                     for p in path.iterdir()
-                    if not any(
-                        part in EXCLUDED_DIRS for part in p.relative_to(ROOT_DIR).parts
-                    )
+                    if not any(part in EXCLUDED_DIRS for part in p.relative_to(ROOT_DIR).parts)
                 ]
                 children.sort(key=lambda x: (x.is_file(), x.name.lower()))
 

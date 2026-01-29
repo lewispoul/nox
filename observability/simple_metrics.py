@@ -61,13 +61,9 @@ file_operations_total = Counter(
 )
 
 # Métriques système
-sandbox_files_count = Gauge(
-    "nox_api_sandbox_files_count", "Nombre de fichiers dans le sandbox"
-)
+sandbox_files_count = Gauge("nox_api_sandbox_files_count", "Nombre de fichiers dans le sandbox")
 
-sandbox_size_bytes = Gauge(
-    "nox_api_sandbox_size_bytes", "Taille totale du sandbox en bytes"
-)
+sandbox_size_bytes = Gauge("nox_api_sandbox_size_bytes", "Taille totale du sandbox en bytes")
 
 # Info de build
 api_info = Info("nox_api_build_info", "Informations de build de l'API")
@@ -114,18 +110,12 @@ def update_system_metrics():
 
 def track_http_request(method: str, endpoint: str, status_code: int, duration: float):
     """Track une requête HTTP"""
-    http_requests_total.labels(
-        method=method, endpoint=endpoint, status_code=str(status_code)
-    ).inc()
+    http_requests_total.labels(method=method, endpoint=endpoint, status_code=str(status_code)).inc()
 
-    http_request_duration_seconds.labels(method=method, endpoint=endpoint).observe(
-        duration
-    )
+    http_request_duration_seconds.labels(method=method, endpoint=endpoint).observe(duration)
 
 
-def track_code_execution(
-    execution_type: str, duration: float, status: str, request_id: str
-):
+def track_code_execution(execution_type: str, duration: float, status: str, request_id: str):
     """Track une exécution de code"""
     code_executions_total.labels(type=execution_type, status=status).inc()
 

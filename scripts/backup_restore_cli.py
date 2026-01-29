@@ -43,9 +43,7 @@ def main():
     print("Available backups:")
     for i, b in enumerate(backups):
         print(f"{i+1}. {b.name}")
-    choice = input(
-        'Enter backup number to restore, or "n" to create new backup: '
-    ).strip()
+    choice = input('Enter backup number to restore, or "n" to create new backup: ').strip()
     if choice.lower() == "n":
         create_app_backup()
     else:

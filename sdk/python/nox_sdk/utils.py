@@ -67,9 +67,7 @@ class RateLimiter:
             now = time.time()
             # Remove old calls outside the time window
             self.calls = [
-                call_time
-                for call_time in self.calls
-                if now - call_time < self.time_window
+                call_time for call_time in self.calls if now - call_time < self.time_window
             ]
 
             if len(self.calls) < self.max_calls:
@@ -150,9 +148,7 @@ class RetryHandler:
                     break
 
                 delay = self._calculate_delay(attempt)
-                logger.warning(
-                    f"Attempt {attempt + 1} failed, retrying in {delay:.2f}s: {e}"
-                )
+                logger.warning(f"Attempt {attempt + 1} failed, retrying in {delay:.2f}s: {e}")
                 await asyncio.sleep(delay)
 
         raise last_exception
@@ -236,9 +232,7 @@ class RequestSigner:
                 return False
 
             # Calculate expected signature
-            expected = RequestSigner.sign_request(
-                method, url, headers, body, secret_key, timestamp
-            )
+            expected = RequestSigner.sign_request(method, url, headers, body, secret_key, timestamp)
 
             expected_signature = expected.split("Signature=")[1]
             return hmac.compare_digest(signature, expected_signature)
@@ -344,9 +338,7 @@ class CacheManager:
         """Remove expired entries."""
         async with self._lock:
             now = time.time()
-            expired_keys = [
-                key for key, entry in self._cache.items() if now > entry["expires_at"]
-            ]
+            expired_keys = [key for key, entry in self._cache.items() if now > entry["expires_at"]]
 
             for key in expired_keys:
                 del self._cache[key]
@@ -440,9 +432,7 @@ class LogHandler:
         # Add custom handler if not exists
         if not logger.handlers:
             handler = logging.StreamHandler()
-            formatter = logging.Formatter(
-                "%(asctime)s - NOX-SDK - %(levelname)s - %(message)s"
-            )
+            formatter = logging.Formatter("%(asctime)s - NOX-SDK - %(levelname)s - %(message)s")
             handler.setFormatter(formatter)
             logger.addHandler(handler)
             logger.setLevel(logging.INFO)

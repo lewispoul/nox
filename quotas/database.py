@@ -226,9 +226,7 @@ class QuotaDatabase:
         finally:
             await conn.close()
 
-    async def update_storage_usage(
-        self, user_id: str, storage_mb: int, files_count: int
-    ):
+    async def update_storage_usage(self, user_id: str, storage_mb: int, files_count: int):
         """Met à jour l'usage de stockage et le nombre de fichiers"""
         conn = await self.connect()
         try:
@@ -249,9 +247,7 @@ class QuotaDatabase:
             await conn.close()
 
     # Gestion des violations de quotas
-    async def record_quota_violation(
-        self, user_id: str, reason: str, detail: Dict[str, Any]
-    ):
+    async def record_quota_violation(self, user_id: str, reason: str, detail: Dict[str, Any]):
         """Enregistre une violation de quota"""
         import json
 

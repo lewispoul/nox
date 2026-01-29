@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     xtb_bin: str = "xtb"
     sse_heartbeat_sec: int = 15
     jobs_force_local: bool = False
+    iam_use_remote: bool = False
+    iam_base_url: str = ""
 
 
 settings = Settings()

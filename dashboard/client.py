@@ -37,24 +37,18 @@ class NoxClient:
         return r.json(), r.headers
 
     def run_sh(self, cmd: str):
-        r = self.session.post(
-            f"{self.base_url}/run_sh", json={"cmd": cmd}, timeout=self.timeout
-        )
+        r = self.session.post(f"{self.base_url}/run_sh", json={"cmd": cmd}, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 
     def list_files(self, path: str = "", recursive: bool = False):
         params = {"path": path, "recursive": recursive}
-        r = self.session.get(
-            f"{self.base_url}/list", params=params, timeout=self.timeout
-        )
+        r = self.session.get(f"{self.base_url}/list", params=params, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 
     def cat_file(self, path: str):
-        r = self.session.get(
-            f"{self.base_url}/cat", params={"path": path}, timeout=self.timeout
-        )
+        r = self.session.get(f"{self.base_url}/cat", params={"path": path}, timeout=self.timeout)
         r.raise_for_status()
         return r.json(), r.headers
 

@@ -9,12 +9,8 @@ from client import NoxClient
 st.set_page_config(page_title="Nox Dashboard", layout="wide")
 
 st.sidebar.title("🔧 Configuration")
-base_url = st.sidebar.text_input(
-    "Nox API URL", os.getenv("NOX_API_URL", "http://127.0.0.1:8081")
-)
-token = st.sidebar.text_input(
-    "Nox API Token", os.getenv("NOX_API_TOKEN", ""), type="password"
-)
+base_url = st.sidebar.text_input("Nox API URL", os.getenv("NOX_API_URL", "http://127.0.0.1:8081"))
+token = st.sidebar.text_input("Nox API Token", os.getenv("NOX_API_TOKEN", ""), type="password")
 
 if not base_url:
     st.warning("⚠️ Renseigne l'URL de l'API pour activer le tableau de bord")
@@ -47,17 +43,13 @@ with tabs[0]:
 
     with col1:
         st.subheader("📤 Upload de fichier")
-        dest = st.text_input(
-            "Chemin destination", "tests/upload.txt", key="upload_dest"
-        )
+        dest = st.text_input("Chemin destination", "tests/upload.txt", key="upload_dest")
         up = st.file_uploader("Choisir un fichier")
         if up and st.button("📤 Uploader", key="upload_btn"):
             with st.spinner("Upload en cours..."):
                 try:
                     # Sauvegarder temporairement
-                    with tempfile.NamedTemporaryFile(
-                        delete=False, suffix=f"_{up.name}"
-                    ) as tmp:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{up.name}") as tmp:
                         tmp.write(up.getbuffer())
                         tmp_path = tmp.name
 
@@ -97,9 +89,7 @@ with tabs[0]:
                 if "x-request-id" in hdr:
                     st.code(f"Request-ID: {hdr['x-request-id']}")
             elif file_action == "Supprimer":
-                if st.checkbox(
-                    f"⚠️ Confirmer suppression de {file_path}", key="delete_confirm"
-                ):
+                if st.checkbox(f"⚠️ Confirmer suppression de {file_path}", key="delete_confirm"):
                     data, hdr = client.delete_file(file_path)
                     st.success(f"✅ {data}")
                     if "x-request-id" in hdr:
@@ -116,9 +106,7 @@ with tabs[1]:
         height=160,
         key="python_code",
     )
-    filename = st.text_input(
-        "Nom du fichier", "dashboard_run.py", key="python_filename"
-    )
+    filename = st.text_input("Nom du fichier", "dashboard_run.py", key="python_filename")
 
     if st.button("🚀 Run Python", key="python_run"):
         with st.spinner("Exécution en cours..."):

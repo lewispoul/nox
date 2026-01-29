@@ -29,17 +29,14 @@ def only_in_allowed_paths(patch_text: str, allowlist: Iterable[str] = ()) -> boo
                 path = path[2:]
             touched.add(path)
     return all(
-        any(p.startswith(prefix.rstrip("*").rstrip("/")) for prefix in allowlist)
-        for p in touched
+        any(p.startswith(prefix.rstrip("*").rstrip("/")) for prefix in allowlist) for p in touched
     )
 
 
 def count_added_lines(patch_text: str) -> int:
     """Count the number of lines added in a unified diff (excluding +++ headers)."""
     return sum(
-        1
-        for line in patch_text.splitlines()
-        if line.startswith("+") and not line.startswith("+++")
+        1 for line in patch_text.splitlines() if line.startswith("+") and not line.startswith("+++")
     )
 
 
