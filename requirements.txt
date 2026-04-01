@@ -6,12 +6,12 @@ fastapi==0.116.1
 uvicorn[standard]==0.35.0
 
 # Database and ORM
-asyncpg==0.30.0
-psycopg2-binary==2.9.10
+asyncpg==0.31.0
+psycopg2-binary==2.9.11
 
 # Authentication and OAuth2
 python-jose[cryptography]==3.5.0
-authlib==1.6.3
+authlib==1.6.9
 python-multipart==0.0.22
 passlib[bcrypt]==1.7.4
 
@@ -26,16 +26,16 @@ redis>=4.5.0
 cryptography>=41.0.0
 
 # Environment and configuration
-python-dotenv==1.1.1
+python-dotenv==1.2.2
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
 
 # Monitoring and metrics
-prometheus-client==0.22.1
+prometheus-client==0.24.1
 
 # Utilities
 python-dateutil==2.9.0.post0
 
 # Development and testing (optional)
 pytest==8.4.2
-pytest-asyncio==1.2.0
+pytest-asyncio==1.3.0
