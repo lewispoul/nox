@@ -19,7 +19,7 @@ pandas>=2.1.0              # Manipulation données métriques
 
 # Développement et tests
 pytest>=7.4.0      # Tests automatisés
-pytest-asyncio>=0.21.0  # Tests async FastAPI
+pytest-asyncio>=0.21.1  # Tests async FastAPI
 # Nox API Requirements - Phase 2 (Multi-user + RBAC)
 
 # FastAPI and core web framework
