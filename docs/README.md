@@ -2,7 +2,7 @@
 
 Welcome to the NOX API documentation! All guides, reports, and specifications are now organized by category for easy navigation.
 
-## 📁 Directory Structure
+## � Directory Structure
 
 **Milestone Reports:**
 * `milestone-reports/` — Completion reports for major project milestones and steps.
@@ -79,7 +79,7 @@ Contains planning documents, roadmaps, and strategic plans.
 - **M8 Docker**: `/planning/M8_DOCKER_CICD_PLAN.md`
 - **M9 UX Development**: All M9 files in `/milestone-reports/` and `/session-reports/`
 
-## 📊 Project Status Overview
+## � Project Status Overview
 
 For the most current project status, refer to:
 1. `PROJECT_STATUS_2025-08-19.md` - **LATEST** Complete project status (August 19, 2025)
