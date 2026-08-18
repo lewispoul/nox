@@ -24,7 +24,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # Redis and database imports
-from redis.cluster import RedisCluster
+from redis.cluster import ClusterNode, RedisCluster
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 
@@ -107,8 +107,8 @@ class AISecurityMonitor:
 
     def __init__(
         self,
-        redis_cluster: RedisCluster = None,
-        db_connection_params: Dict[str, Any] = None,
+        redis_cluster: Optional[RedisCluster] = None,
+        db_connection_params: Optional[Dict[str, Any]] = None,
     ):
         """
         Initialize AI Security Monitor.
@@ -122,9 +122,9 @@ class AISecurityMonitor:
         self.db_params = db_connection_params or self._load_db_params()
 
         # ML Models for different types of analysis
-        self.models = {}
-        self.scalers = {}
-        self.model_versions = {}
+        self.models: Dict[BehaviorType, IsolationForest] = {}
+        self.scalers: Dict[BehaviorType, StandardScaler] = {}
+        self.model_versions: Dict[BehaviorType, str] = {}
 
         # Behavior analysis configuration
         self.behavior_window_hours = 24  # Analysis window
@@ -135,7 +135,7 @@ class AISecurityMonitor:
         self._initialize_models()
 
         # Cache for user behavior profiles
-        self.behavior_cache = {}
+        self.behavior_cache: Dict[str, Any] = {}
         self.cache_ttl = 300  # 5 minutes cache TTL
 
         logger.info("AI Security Monitor initialized successfully")
@@ -143,9 +143,9 @@ class AISecurityMonitor:
     def _init_redis_cluster(self) -> RedisCluster:
         """Initialize Redis Cluster connection."""
         startup_nodes = [
-            {"host": "localhost", "port": 7001},
-            {"host": "localhost", "port": 7002},
-            {"host": "localhost", "port": 7003},
+            ClusterNode("localhost", 7001),
+            ClusterNode("localhost", 7002),
+            ClusterNode("localhost", 7003),
         ]
 
         return RedisCluster(

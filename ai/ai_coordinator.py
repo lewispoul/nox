@@ -21,7 +21,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # Redis and database imports
-from redis.cluster import RedisCluster
+from redis.cluster import ClusterNode, RedisCluster
 
 from .biometric_auth import BiometricAuthenticationSystem, BiometricChallenge
 from .policy_engine import AccessRequest, BiometricType, IntelligentPolicyEngine
@@ -99,8 +99,8 @@ class AISystemCoordinator:
 
     def __init__(
         self,
-        redis_cluster: RedisCluster = None,
-        db_connection_params: Dict[str, Any] = None,
+        redis_cluster: Optional[RedisCluster] = None,
+        db_connection_params: Optional[Dict[str, Any]] = None,
     ):
         """
         Initialize AI System Coordinator.
@@ -128,8 +128,8 @@ class AISystemCoordinator:
 
         # AI system configuration
         self.system_status = AISystemStatus.ACTIVE
-        self.decision_cache = {}
-        self.metrics_cache = {}
+        self.decision_cache: Dict[str, AIDecision] = {}
+        self.metrics_cache: Dict[str, AISystemMetrics] = {}
         self.cache_ttl = 300  # 5 minutes
 
         # Decision thresholds
@@ -138,7 +138,7 @@ class AISystemCoordinator:
         self.escalation_threshold = 0.3
 
         # Performance tracking
-        self.decision_history = []
+        self.decision_history: List[AIDecision] = []
         self.max_history_size = 1000
 
         logger.info("AI System Coordinator initialized successfully")
@@ -146,9 +146,9 @@ class AISystemCoordinator:
     def _init_redis_cluster(self) -> RedisCluster:
         """Initialize Redis Cluster connection."""
         startup_nodes = [
-            {"host": "localhost", "port": 7001},
-            {"host": "localhost", "port": 7002},
-            {"host": "localhost", "port": 7003},
+            ClusterNode("localhost", 7001),
+            ClusterNode("localhost", 7002),
+            ClusterNode("localhost", 7003),
         ]
 
         return RedisCluster(
