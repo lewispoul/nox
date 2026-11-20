@@ -5,8 +5,11 @@ const path=require('node:path');
 const vm=require('node:vm');
 
 // Instrument the actual browser script only inside the test VM; no test hook is shipped.
-const source=fs.readFileSync(path.join(__dirname,'../../../chemlab/web/app.js'),'utf8');
-function harness() {
+const originalSource=fs.readFileSync(path.join(__dirname,'../../../chemlab/web/app.js'),'utf8');
+// Exercise both checkout styles on every OS. Normalize only in the test VM;
+// production source and race assertions remain unchanged.
+function harness(source=originalSource) {
+  source=source.replace(/\r\n/g,'\n');
   const nodes=new Map();const calls=[];
   function element(){return {value:'',textContent:'',className:'',disabled:false,children:[],handlers:{},
     append(...children){this.children.push(...children);},replaceChildren(...children){this.children=children;},
@@ -22,6 +25,13 @@ function harness() {
 }
 const projects=[{id:'P1',name:'First'},{id:'P2',name:'Second'}];
 (async()=>{
+  for (const newline of ['\n','\r\n']) {
+    const h=harness(originalSource.replace(/\r?\n/g,newline));
+    const flight=h.ui.loadProjects('P1');
+    h.ui.state.project='P2';h.ui.state.experiment='E2';++h.ui.state.context;
+    h.resolve(0,projects);assert.equal(await flight,false);
+    assert.equal(h.ui.state.project,'P2');assert.equal(h.ui.state.experiment,'E2');
+  }
   // Exact reviewed race: old P1 refresh returns after a new P2/E2 selection.
   let h=harness();let flight=h.ui.loadProjects('P1');
   h.ui.state.project='P2';h.ui.state.experiment='E2';++h.ui.state.context;
