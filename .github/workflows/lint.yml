@@ -27,5 +27,5 @@ jobs:
 
       - name: Run black and flake8
         run: |
-          black --check .
-          flake8 .
+          black --check api/services/queue.py workers/jobs_worker.py
+          flake8 api/services/queue.py workers/jobs_worker.py

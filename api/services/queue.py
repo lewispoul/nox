@@ -86,7 +86,9 @@ def submit_job(kind: str, payload: Dict[str, Any]) -> str:
             # If runner returned a returncode, treat non-success as failure
             if isinstance(result, dict) and "returncode" in result:
                 rc = result.get("returncode")
-                has_energy = result.get("scalars", {}).get("E_total_hartree") is not None
+                has_energy = (
+                    result.get("scalars", {}).get("E_total_hartree") is not None
+                )
                 success = (rc == 0) or (rc == 2 and has_energy)
                 if not success:
                     store.set_state(
