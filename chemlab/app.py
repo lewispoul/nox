@@ -4,10 +4,11 @@ import secrets
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from fastapi.staticfiles import StaticFiles
 
 from chemlab.literature import Literature
-from chemlab.models import Device, InventoryCalculation, Note, Observation
-from chemlab.store import Conflict, Store
+from chemlab.models import Device, Experiment, InventoryCalculation, Note, Observation, Project
+from chemlab.store import Conflict, Store, UnknownProject
 
 
 def create_app(db_path=None, token=None, literature_path=None):
@@ -24,9 +25,23 @@ def create_app(db_path=None, token=None, literature_path=None):
         if not authorization or not secrets.compare_digest(authorization.encode(), expected.encode()):
             raise HTTPException(401, "Bearer token required", headers={"WWW-Authenticate": "Bearer"})
 
-    app = FastAPI(title="ChemLab local pilot", version="0.1.0",
+    app = FastAPI(title="NOx local laboratory pilot", version="0.2.0",
                   dependencies=[Depends(authorize)], docs_url=None, redoc_url=None,
                   openapi_url=None)
+
+    @app.middleware("http")
+    async def private_responses(request, call_next):
+        response = await call_next(request)
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return response
+
+    # The shell contains no data or credentials. API routes retain the common
+    # Bearer dependency; StaticFiles is deliberately mounted outside that layer.
+    web_path = Path(__file__).parent / "web"
+    if web_path.is_dir():
+        app.mount("/ui", StaticFiles(directory=web_path, html=True), name="ui")
 
     def append(kind, value):
         try:
@@ -37,6 +52,37 @@ def create_app(db_path=None, token=None, literature_path=None):
     @app.get("/health")
     def health():
         return {"status": "ok", "mode": "simulation_only", "literature_records": len(literature.records)}
+
+    @app.get("/projects")
+    def projects():
+        return store.projects()
+
+    @app.post("/projects")
+    def add_project(project: Project):
+        try:
+            return store.add_project(project)
+        except Conflict as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.get("/experiments")
+    def experiments(project_id: str | None = Query(default=None, pattern=r"^[a-zA-Z0-9_-]{1,64}$")):
+        return store.experiments(project_id)
+
+    @app.post("/experiments")
+    def add_experiment(experiment: Experiment):
+        try:
+            return store.add_experiment(experiment)
+        except Conflict as exc:
+            raise HTTPException(409, str(exc)) from exc
+        except UnknownProject as exc:
+            raise HTTPException(404, str(exc)) from exc
+
+    @app.get("/experiments/{experiment_id}")
+    def get_experiment(experiment_id: str):
+        experiment = store.experiment(experiment_id)
+        if experiment is None:
+            raise HTTPException(404, "Unknown experiment")
+        return experiment
 
     @app.get("/devices")
     def devices():
