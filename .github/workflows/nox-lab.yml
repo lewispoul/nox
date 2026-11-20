@@ -1,0 +1,42 @@
+name: NOx laboratory pilot
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/nox-workstreams]
+  pull_request:
+    paths:
+      - 'chemlab/**'
+      - 'tests/chemlab/**'
+      - 'nmr-spike/**'
+      - '.github/workflows/nox-lab.yml'
+permissions:
+  contents: read
+jobs:
+  laboratory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install isolated pilot dependencies
+        run: python -m pip install -r chemlab/requirements-pilot.txt
+      - name: Pilot and integration contracts
+        run: python -m pytest tests/chemlab -q
+      - name: UI contract checks
+        run: |
+          node tests/chemlab/ui/app.test.cjs
+          node tests/chemlab/ui/races.test.cjs
+      - name: GasCalc numerical checks
+        run: |
+          node chemlab/web/gascalc/tests.cjs
+          node chemlab/web/gascalc/integration-tests.cjs
+      - name: Install FID spike dependencies
+        run: npm ci --ignore-scripts --prefix nmr-spike
+      - name: Public fixture hash and raw decoding
+        run: |
+          npm run fetch-fixture --prefix nmr-spike
+          npm test --prefix nmr-spike

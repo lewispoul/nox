@@ -1,0 +1,15 @@
+{
+  "name": "nox-nmr-fid-spike",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bounded local parsing proof for a licensed public Bruker 1H FID",
+  "scripts": {
+    "test": "node verify.cjs",
+    "fetch-fixture": "node fetch-fixture.cjs"
+  },
+  "dependencies": {
+    "filelist-utils": "1.11.3",
+    "jszip": "3.10.1",
+    "nmr-parser": "3.0.3"
+  }
+}
