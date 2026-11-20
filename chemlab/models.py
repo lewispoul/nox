@@ -54,5 +54,7 @@ class Note(StrictModel):
 class InventoryCalculation(StrictModel):
     gross_g: Decimal = Field(ge=0, allow_inf_nan=False, max_digits=18, decimal_places=6)
     tare_g: Decimal = Field(ge=0, allow_inf_nan=False, max_digits=18, decimal_places=6)
-    density_g_ml: Decimal | None = Field(default=None, gt=0, allow_inf_nan=False, max_digits=18, decimal_places=6)
+    density_g_ml: Decimal | None = Field(
+        default=None, gt=0, allow_inf_nan=False, max_digits=18, decimal_places=6
+    )
     tare_kind: Literal["measured", "estimated"]

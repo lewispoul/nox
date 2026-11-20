@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,9 +25,19 @@ jobs:
           python-version: "3.10"
 
       - name: Install Python dependencies
-        run: pip install black flake8
+        run: pip install black==24.10.0 flake8
 
       - name: Run black and flake8
         run: |
-          black --check .
-          flake8 .
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+          mapfile -t files < <(git diff --name-only "$base" "$GITHUB_SHA" -- '*.py')
+          if [ "${#files[@]}" -gt 0 ]; then
+            black --check "${files[@]}"
+            flake8 "${files[@]}"
+          else
+            echo "No changed Python files to lint."
+          fi

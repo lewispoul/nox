@@ -3,6 +3,7 @@
 This bridge implements lexical retrieval, not thesis_ai's embedding pipeline.
 No code, model, private corpus, or generated answer is copied from thesis_ai.
 """
+
 import hashlib
 import json
 import re
@@ -28,14 +29,25 @@ class Literature:
             if not isinstance(row, dict):
                 raise ValueError(f"Invalid literature record at line {line_number}")
             text, source = row.get("text"), row.get("source_name")
-            if not isinstance(text, str) or not text.strip() or not isinstance(source, str) or not source.strip():
+            if (
+                not isinstance(text, str)
+                or not text.strip()
+                or not isinstance(source, str)
+                or not source.strip()
+            ):
                 raise ValueError(f"Missing text/source_name at line {line_number}")
             # Projection intentionally omits arbitrary metadata and local paths.
             page = row.get("page_number", row.get("page"))
             if page is not None and (type(page) is not int or page < 1):
                 raise ValueError(f"Invalid page at line {line_number}")
-            self.records.append({"citation_id": f"record-{line_number}", "source_name": source,
-                                 "page_number": page, "text": text})
+            self.records.append(
+                {
+                    "citation_id": f"record-{line_number}",
+                    "source_name": source,
+                    "page_number": page,
+                    "text": text,
+                }
+            )
 
     @staticmethod
     def terms(text):
@@ -51,7 +63,12 @@ class Literature:
             if score:
                 matches.append(dict(record, score=score, excerpt=record["text"][:1500]))
         matches.sort(key=lambda row: (-row["score"], row["citation_id"]))
-        return {"method": "lexical_term_coverage", "index_sha256": self.digest,
-                "answer_generated": False,
-                "results": [{key: value for key, value in row.items() if key != "text"}
-                            for row in matches[:limit]]}
+        return {
+            "method": "lexical_term_coverage",
+            "index_sha256": self.digest,
+            "answer_generated": False,
+            "results": [
+                {key: value for key, value in row.items() if key != "text"}
+                for row in matches[:limit]
+            ],
+        }
