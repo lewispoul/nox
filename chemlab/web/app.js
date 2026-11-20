@@ -85,6 +85,7 @@
     const request=++state.projectRequest, session=state.session, context=state.context;
     const project=state.project, experiment=state.experiment;
     const values=await api('/projects');
+    if(outbox.pending)return false;
     if(request!==state.projectRequest||session!==state.session||context!==state.context||
        project!==state.project||experiment!==state.experiment)return false;
     if(!Array.isArray(values))throw Error('Liste de projets inattendue.');
@@ -94,6 +95,7 @@
     options('project-select',values,'Choisir un projet',state.project);controls();return true;
   }
   async function loadExperiments(selected='') {
+    if(outbox.pending)return;
     clearExperiment();
     const request=state.experimentRequest, project=state.project, context=state.context, session=state.session;
     controls();if(!project)return;

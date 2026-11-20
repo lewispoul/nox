@@ -31,7 +31,9 @@ Un agent autre que l'auteur de l'interface a examiné les échanges UI/API :
 - une réponse tardive de liste des projets pouvait rétablir un projet ancien et
   laisser une expérience appartenant à un autre projet; corrigé par gardes de
   contexte/session et invalidation des sélections. La reproduction VM et les
-  tests de régression passent avant publication;
+  tests de régression passent avant publication. Le cas connexe où une note
+  devient en attente pendant un chargement de projets est également couvert :
+  le contexte reste inchangé et le même identifiant de renvoi reste utilisable;
 - aucune fuite de données confirmée dans le montage statique examiné.
 
 La revue n'équivaut pas à un audit exhaustif. Le moteur RMN ancien présente des
