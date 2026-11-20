@@ -80,3 +80,10 @@ See LICENSE file for details.
 ---
 
 *For the most current information, always refer to the organized documentation in [`docs/`](./docs/).*
+
+## ChemLab Assistant local pilot
+
+An isolated, simulation-only laboratory prototype is available in
+[`chemlab/`](chemlab/README.md): device registry, durable observations, draft notes,
+inventory arithmetic, and a local `thesis_ai` JSONL literature-export bridge.
+Run `python -m chemlab.demo` after installing the documented dependencies.
