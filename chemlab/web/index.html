@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <title>NOx · Laboratoire</title>
+  <link rel="stylesheet" href="/ui/style.css">
+  <script src="/ui/app.js" defer></script>
+</head>
+<body>
+<header><div class="brand">NOx</div><div><h1>Espace de laboratoire</h1><p>Projets, expériences et observations</p></div><span class="badge">Pilote local · simulation</span></header>
+<main>
+  <section aria-labelledby="connection-title">
+    <h2 id="connection-title">Connexion locale</h2>
+    <p>Utiliser le jeton du pilote lancé sur cet ordinateur. Il reste uniquement en mémoire pendant cette page.</p>
+    <form id="connection-form" class="connection-row">
+      <div class="grow"><label for="token">Jeton d’accès</label><input id="token" type="password" autocomplete="off" spellcheck="false" required minlength="24"></div>
+      <button id="connect" type="submit">Se connecter</button><button id="disconnect" type="button" class="secondary" disabled>Déconnecter</button>
+    </form>
+    <p id="connection-status" role="status" aria-live="polite">Déconnecté.</p>
+    <p class="hint">Version mono-utilisateur prévue sur la boucle locale. L’accès depuis un téléphone à ce serveur demande un déploiement réseau sécurisé distinct.</p>
+  </section>
+  <div class="columns">
+    <section aria-labelledby="projects-title">
+      <h2 id="projects-title">Projets</h2>
+      <label for="project-select">Projet actif</label><select id="project-select" disabled><option value="">Choisir un projet</option></select>
+      <details><summary>Créer un projet</summary><form id="project-form">
+        <label for="project-id">Identifiant</label><input id="project-id" required maxlength="64" pattern="[a-zA-Z0-9_-]+" placeholder="OLED-2026" autocomplete="off">
+        <label for="project-name">Nom</label><input id="project-name" required maxlength="120" placeholder="Émetteurs OLED">
+        <button id="create-project" type="submit" disabled>Créer le projet</button>
+      </form></details><p id="project-status" role="status" aria-live="polite"></p>
+    </section>
+    <section aria-labelledby="experiments-title">
+      <h2 id="experiments-title">Expériences</h2>
+      <label for="experiment-select">Expérience active</label><select id="experiment-select" disabled><option value="">Choisir une expérience</option></select>
+      <details><summary>Créer une expérience</summary><form id="experiment-form">
+        <label for="experiment-id">Identifiant</label><input id="experiment-id" required maxlength="64" pattern="[a-zA-Z0-9_-]+" placeholder="LPP-26-050" autocomplete="off">
+        <label for="experiment-name">Nom</label><input id="experiment-name" required maxlength="120" placeholder="Essai de purification">
+        <button id="create-experiment" type="submit" disabled>Créer dans le projet actif</button>
+      </form></details><p id="experiment-status" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+  <section aria-labelledby="notes-title">
+    <div class="section-heading"><h2 id="notes-title">Note d’expérience</h2><span id="active-experiment" class="badge">Aucune expérience</span></div>
+    <form id="note-form">
+      <label for="note-text">Observation</label><textarea id="note-text" rows="5" maxlength="10000" required placeholder="Consigner ici une observation…" disabled></textarea>
+      <p class="hint">Une note confirmée reste un brouillon local. Elle n’est pas envoyée à FindMolecule.</p>
+      <button id="save-note" type="submit" disabled>Enregistrer le brouillon local</button>
+    </form>
+    <p id="note-status" role="status" aria-live="polite">Choisir une expérience pour écrire une note.</p>
+  </section>
+  <section aria-labelledby="journal-title">
+    <div class="section-heading"><h2 id="journal-title">Journal de l’expérience</h2><button id="refresh-events" class="secondary" type="button" disabled>Actualiser</button></div>
+    <p id="journal-status" role="status" aria-live="polite">Aucune expérience sélectionnée.</p><ol id="events" class="events"></ol>
+  </section>
+  <section aria-labelledby="modules-title">
+    <h2 id="modules-title">Modules scientifiques</h2><div class="module-grid">
+      <a class="module" href="/ui/gascalc/"><strong>GasCalc</strong><span>Pression de vapeur et ébullition</span><small>Calculateur local · résultats à interpréter dans leur domaine de validité</small></a>
+      <a class="module" href="/ui/nmr/"><strong>RMN · FID</strong><span>Traitement et intégration</span><small>Preuve technique en cours · voir le statut du module</small></a>
+    </div><p class="hint">Les modules s’ouvrent séparément. Leurs résultats ne sont pas encore rattachés automatiquement à l’expérience active.</p>
+  </section>
+</main>
+<footer>NOx · Données locales · Aucun instrument réel commandé par ce pilote</footer>
+</body>
+</html>

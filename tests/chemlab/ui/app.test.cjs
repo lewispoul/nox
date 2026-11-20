@@ -1,0 +1,21 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const {makeOutbox,apiError}=require('../../../chemlab/web/app.js');
+(async()=>{
+ let ids=0;const outbox=makeOutbox(()=>`event-${++ids}`);let first;
+ await assert.rejects(outbox.send('EXP',' note ',async payload=>{first=payload;throw Error('network');}),/network/);
+ assert.equal(outbox.pending,first);assert.equal(first.text,'note');assert.equal(outbox.busy,false);
+ let release;const flight=outbox.send('OTHER','changed',async payload=>{assert.equal(payload,first);return new Promise(resolve=>{release=()=>resolve({...payload,status:'draft_local'});});});
+ await assert.rejects(outbox.send('EXP','note',async()=>{}),/déjà/);assert.equal(ids,1);release();await flight;assert.equal(outbox.pending,null);
+ await assert.rejects(outbox.send('EXP','second',async payload=>({...payload,status:'recorded_local'})),/Confirmation/);assert.equal(outbox.pending.event_id,'event-2');
+ await outbox.send('EXP','second',async payload=>({...payload,status:'draft_local'}));assert.equal(outbox.pending,null);
+ await assert.rejects(outbox.send('','bad',async()=>{}),/requises/);assert.equal(ids,2);
+ assert.match(apiError(401,{}),/Jeton/);assert.match(apiError(409,{}),/Identifiant/);
+ const root=path.join(__dirname,'../../../chemlab/web');const source=fs.readFileSync(path.join(root,'app.js'),'utf8');const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ assert(!/localStorage|sessionStorage|innerHTML/.test(source));
+ assert(!/https?:\/\//.test(html));assert(html.includes('href="/ui/gascalc/"'));assert(html.includes('href="/ui/nmr/"'));
+ for(const id of [...source.matchAll(/\$\('([^']+)'\)/g)].map(m=>m[1]))assert(html.includes(`id="${id}"`),id);
+ console.log('NOx UI: idempotent note retry, double submit, confirmation and static wiring passed.');
+})().catch(error=>{console.error(error);process.exitCode=1;});
