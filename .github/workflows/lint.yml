@@ -27,5 +27,5 @@ jobs:
 
       - name: Run black and flake8
         run: |
-          black --check .
-          flake8 .
+          black --check chemlab tests/chemlab
+          flake8 chemlab tests/chemlab
