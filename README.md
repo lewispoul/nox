@@ -13,7 +13,7 @@ affirmations de maturité ne constituent pas une validation du lot courant.
 
 ---
 
-# NOX API
+## NOX API
 
 A secure, sandboxed execution platform built on **FastAPI** for autonomous computational chemistry workflows.
 

@@ -20,11 +20,11 @@ Its Python findings include chemlab/demo.py, chemlab/store.py and pilot tests.
 These are not evidence of a passing whole-repository quality gate.
 
 Evidence:
-- https://github.com/lewispoul/nox/pull/101
-- https://github.com/lewispoul/nox/pull/111
-- https://github.com/lewispoul/nox/actions/runs/44684294038
-- https://github.com/lewispoul/nox/actions/runs/44684293924
-- https://github.com/lewispoul/nox/actions/runs/44684294070
+- <https://github.com/lewispoul/nox/pull/101>
+- <https://github.com/lewispoul/nox/pull/111>
+- <https://github.com/lewispoul/nox/actions/runs/44684294038>
+- <https://github.com/lewispoul/nox/actions/runs/44684293924>
+- <https://github.com/lewispoul/nox/actions/runs/44684294070>
 
 This session inspected GitHub source, branch ancestry, check results and failure
 logs. Local shell commands stalled, so no local tests or application launch were

@@ -42,17 +42,17 @@ npm run fetch-fixture
 npm test
 ```
 
-Les deux premières commandes nécessitent Internet; `npm test` n'utilise pas le
+Les deux premières commandes nécessitent internet; `npm test` n'utilise pas le
 réseau. Le téléchargement utilise une URL de commit fixe, vérifie l'empreinte,
 puis écrit une copie locale. Aucun fichier utilisateur n'est utilisé. Les
 `node_modules` et le ZIP téléchargé sont ignorés par Git.
 
 Fixture :
 
-- dépôt : https://github.com/cheminfo/bruker-data-test ; licence MIT, copie de la notice dans `nmr-spike/BRUKER_FIXTURE_LICENSE`;
+- dépôt : <https://github.com/cheminfo/bruker-data-test> ; licence MIT, copie de la notice dans `nmr-spike/BRUKER_FIXTURE_LICENSE`;
 - fichier : `data/zipped/aspirin-1h.zip`;
 - commit contenant le fichier : `bb9478262aa3513b64b661ddb2f2697ad86463e6`;
-- URL fixe : https://raw.githubusercontent.com/cheminfo/bruker-data-test/bb9478262aa3513b64b661ddb2f2697ad86463e6/data/zipped/aspirin-1h.zip ;
+- URL fixe : <https://raw.githubusercontent.com/cheminfo/bruker-data-test/bb9478262aa3513b64b661ddb2f2697ad86463e6/data/zipped/aspirin-1h.zip> ;
 - SHA-256 : `b919359fcac83e5d2ca82d399123a0d4c2a8fe15c7e71937bfe59a4508bab75e`.
 
 ## Moteurs et licences : distinctions nécessaires
@@ -81,7 +81,7 @@ spike fixe une ancienne chaîne MIT pour reproduire l'expérience; ce n'est pas
 une recommandation de maintenir ces versions anciennes en production.
 
 Les conditions du site `app.nmrium.com` et les licences de ses composants sont
-également distinctes. Une iframe vers ce site nécessite Internet et ne livre
+également distinctes. Une iframe vers ce site nécessite internet et ne livre
 pas un moteur local. Le site actuel documente son accès public; ne pas en déduire
 une autorisation pour des données professionnelles confidentielles.
 
@@ -116,10 +116,10 @@ numérique, données déjà FT et annulation/reprise. Le FID 2D reste hors péri
 
 ## Sources primaires
 
-- NMRium composant et licence : https://github.com/cheminfo/nmrium ; https://www.npmjs.com/package/nmrium ; https://github.com/cheminfo/nmrium/blob/main/LICENSE .
-- Parseur testé : https://github.com/cheminfo/nmr-parser ; https://github.com/cheminfo/nmr-parser/blob/main/src/fromBruker.js .
-- Données test et licence : https://github.com/cheminfo/bruker-data-test .
-- Formats/autotraitement documentés : https://docs.nmrium.org/20_1d-spectra/loading_a_spectrum/ .
-- Traitements : https://docs.nmrium.org/help/processing/ .
-- Licences des moteurs actuels : https://www.npmjs.com/package/brukerconverter ; https://www.npmjs.com/package/nmr-processing .
-- MolView API et conditions d'intégration : https://molview.com/api/ .
+- NMRium composant et licence : <https://github.com/cheminfo/nmrium> ; <https://www.npmjs.com/package/nmrium> ; <https://github.com/cheminfo/nmrium/blob/main/LICENSE> .
+- Parseur testé : <https://github.com/cheminfo/nmr-parser> ; <https://github.com/cheminfo/nmr-parser/blob/main/src/fromBruker.js> .
+- Données test et licence : <https://github.com/cheminfo/bruker-data-test> .
+- Formats/autotraitement documentés : <https://docs.nmrium.org/20_1d-spectra/loading_a_spectrum/> .
+- Traitements : <https://docs.nmrium.org/help/processing/> .
+- Licences des moteurs actuels : <https://www.npmjs.com/package/brukerconverter> ; <https://www.npmjs.com/package/nmr-processing> .
+- MolView API et conditions d'intégration : <https://molview.com/api/> .

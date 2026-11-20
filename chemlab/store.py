@@ -118,7 +118,10 @@ class Store:
         serialized = json.dumps(request, sort_keys=True, ensure_ascii=False)
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = db.execute("SELECT kind, request, payload FROM events WHERE event_id=?", (request["event_id"],)).fetchone()
+            row = db.execute(
+                "SELECT kind, request, payload FROM events WHERE event_id=?",
+                (request["event_id"],),
+            ).fetchone()
             if row:
                 if row[0] != kind or row[1] != serialized:
                     raise Conflict("Event id already used with different content")
@@ -126,7 +129,10 @@ class Store:
             payload = dict(request, kind=kind, recorded_at=datetime.now(timezone.utc).isoformat(),
                            source="simulated" if kind == "observation" else "manual",
                            status="recorded_local" if kind == "observation" else "draft_local")
-            db.execute("INSERT INTO events VALUES (?,?,?,?)", (request["event_id"], kind, serialized, json.dumps(payload, ensure_ascii=False)))
+            db.execute(
+                "INSERT INTO events VALUES (?,?,?,?)",
+                (request["event_id"], kind, serialized, json.dumps(payload, ensure_ascii=False)),
+            )
         return payload
 
     def events(self, experiment_id=None, limit=100):
