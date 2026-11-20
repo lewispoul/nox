@@ -9,6 +9,17 @@ class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
 
+class Project(StrictModel):
+    id: str = Field(pattern=r"^[a-zA-Z0-9_-]{1,64}$")
+    name: str = Field(min_length=1, max_length=120)
+
+
+class Experiment(StrictModel):
+    id: str = Field(pattern=r"^[a-zA-Z0-9_-]{1,80}$")
+    project_id: str = Field(pattern=r"^[a-zA-Z0-9_-]{1,64}$")
+    name: str = Field(min_length=1, max_length=120)
+
+
 class Device(StrictModel):
     id: str = Field(pattern=r"^[a-zA-Z0-9_-]{1,64}$")
     name: str = Field(min_length=1, max_length=120)

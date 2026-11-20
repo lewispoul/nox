@@ -1,3 +1,18 @@
+# NOx — assistant modulaire de laboratoire
+
+Le projet principal est **NOx**. Le pilote laboratoire ChemLab, GasCalc et la
+preuve RMN/FID sont des modules de ce projet.
+
+- [Plan des travaux et branches](docs/nox/WORK_PLAN.md)
+- [Lancer le pilote local et son interface](docs/nox/RUN_LOCAL.md)
+- [Validation du lot courant](docs/nox/VALIDATION.md)
+- [Preuve FID et limites de licence/traitement](docs/nox/NMR_FID_SPIKE.md)
+
+La documentation historique ci-dessous décrit d'autres étapes de NOX; ses
+affirmations de maturité ne constituent pas une validation du lot courant.
+
+---
+
 # NOX API
 
 A secure, sandboxed execution platform built on **FastAPI** for autonomous computational chemistry workflows.
