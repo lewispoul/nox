@@ -1,3 +1,4 @@
+---
 name: NOx laboratory pilot
 on:
   workflow_dispatch:
