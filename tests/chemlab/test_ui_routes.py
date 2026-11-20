@@ -28,7 +28,13 @@ def test_roundtrip_experience_and_note_survives_restart(tmp_path):
     note = {"event_id": "ui-note-1", "experiment_id": "LPP-26-050", "text": "Observation de test"}
     with TestClient(create_app(path, TOKEN), headers=headers) as client:
         assert client.post("/projects", json={"id": "P", "name": "Projet"}).status_code == 200
-        assert client.post("/experiments", json={"id": "LPP-26-050", "project_id": "P", "name": "Essai"}).status_code == 200
+        assert (
+            client.post(
+                "/experiments",
+                json={"id": "LPP-26-050", "project_id": "P", "name": "Essai"},
+            ).status_code
+            == 200
+        )
         result = client.post("/notes", json=note)
         assert result.status_code == 200
         assert result.json()["status"] == "draft_local"

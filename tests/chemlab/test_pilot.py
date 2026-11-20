@@ -23,7 +23,15 @@ def client(tmp_path):
 
 
 def device(client):
-    response = client.post("/devices", json={"id": "balance", "name": "Demo", "location": "Bench", "capability": "mass.read_stable"})
+    response = client.post(
+        "/devices",
+        json={
+            "id": "balance",
+            "name": "Demo",
+            "location": "Bench",
+            "capability": "mass.read_stable",
+        },
+    )
     assert response.status_code == 200
 
 
@@ -63,9 +71,16 @@ def test_restart_and_idempotency(tmp_path):
         assert c.get("/events?experiment_id=OTHER").json() == []
 
 
-@pytest.mark.parametrize("change", [{"unit": "degC"}, {"stable": False},
-                                   {"observed_at": "2026-01-01T12:00:00"},
-                                   {"device_id": "unknown"}, {"source": "real"}])
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"unit": "degC"},
+        {"stable": False},
+        {"observed_at": "2026-01-01T12:00:00"},
+        {"device_id": "unknown"},
+        {"source": "real"},
+    ],
+)
 def test_invalid_measurements_not_saved(client, change):
     device(client)
     payload = observation()
@@ -116,7 +131,17 @@ def test_inventory_reference_and_invalid_inputs(client):
 
 def test_thesis_export_bridge(tmp_path):
     path = tmp_path / "records.jsonl"
-    path.write_text(json.dumps({"source_name": "Demo procedure", "page_number": 2, "text": "Confirm stable mass before recording.", "source_path": "/private/secret.pdf"}) + "\n")
+    path.write_text(
+        json.dumps(
+            {
+                "source_name": "Demo procedure",
+                "page_number": 2,
+                "text": "Confirm stable mass before recording.",
+                "source_path": "/private/secret.pdf",
+            }
+        )
+        + "\n"
+    )
     with client_for(tmp_path / "db.sqlite3", literature_path=path) as c:
         result = c.get("/literature/search?q=stable%20mass").json()
         assert result["method"] == "lexical_term_coverage"
