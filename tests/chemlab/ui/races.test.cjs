@@ -14,7 +14,7 @@ function harness() {
   const document={getElementById(id){if(!nodes.has(id))nodes.set(id,element());return nodes.get(id);},createElement:element};
   const context=vm.createContext({document,crypto:{randomUUID:()=> 'note-fixed-id'},addEventListener(){},
     fetch(url,options){return new Promise((resolve,reject)=>calls.push({url,options,resolve,reject}));}});
-  const instrumented=source.replace(/  controls\(\);\n\}\)\(/,'  controls();\n  root.__ui={state, loadProjects, loadExperiments, outbox};\n})( ');
+  const instrumented=source.replace(/  controls\(\)\s*\n\}\)\(/,'  controls();\n  root.__ui={state, loadProjects, loadExperiments, outbox};\n})( ');
   assert.notEqual(instrumented,source);vm.runInContext(instrumented,context);
   const ui=context.__ui;Object.assign(ui.state,{token:'same-token',connected:true,project:'P1',experiment:'E1',session:1});
   function resolve(index,body){calls[index].resolve({ok:true,status:200,json:async()=>body});}
