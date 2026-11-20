@@ -40,6 +40,31 @@ const projects=[{id:'P1',name:'First'},{id:'P2',name:'Second'}];
   h.resolve(1,projects);assert.equal(await later,true);h.resolve(0,projects);assert.equal(await earlier,false);
   assert.equal(h.ui.state.project,'P2');assert.equal(h.ui.state.experiment,'');
 
+  // A note can become pending while a project refresh is already in flight.
+  // The late refresh must not clear E1 and leave its retry permanently disabled.
+  h=harness();flight=h.ui.loadProjects('P2');
+  h.document.getElementById('note-text').value='Unconfirmed E1 note';
+  const failedNote=h.document.getElementById('note-form').onsubmit({preventDefault(){}});
+  h.calls[1].reject(Error('Connection interrupted'));await failedNote;
+  assert.equal(h.ui.outbox.pending.experiment_id,'E1');
+  h.resolve(0,projects);assert.equal(await flight,false);
+  assert.equal(h.ui.state.project,'P1');assert.equal(h.ui.state.experiment,'E1');
+  assert.equal(h.document.getElementById('save-note').disabled,false);
+  assert.equal(h.document.getElementById('note-text').value,'Unconfirmed E1 note');
+  // A direct experiment refresh is also a no-op until pending note confirmation.
+  await h.ui.loadExperiments();assert.equal(h.calls.length,2);
+  assert.equal(h.ui.state.experiment,'E1');
+  const sameNote=h.ui.outbox.pending;
+  const retry=h.document.getElementById('note-form').onsubmit({preventDefault(){}});
+  assert.equal(JSON.parse(h.calls[2].options.body).event_id,sameNote.event_id);
+  h.resolve(2,{...sameNote,status:'draft_local'});
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(h.calls[3].url,'/events?experiment_id=E1&limit=100');
+  h.resolve(3,[]);await retry;
+  assert.equal(h.ui.outbox.pending,null);
+  assert.equal(h.ui.state.project,'P1');assert.equal(h.ui.state.experiment,'E1');
+  assert.equal(h.document.getElementById('save-note').disabled,false);
+
   // A reconnect with the identical token is still a new session.
   h=harness();flight=h.ui.loadProjects('P1');++h.ui.state.session;
   h.resolve(0,projects);await assert.rejects(flight,/session a changé/);
