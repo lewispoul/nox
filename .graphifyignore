@@ -1,0 +1,36 @@
+# Local runtime, virtual environments and dependency trees
+.venv*/
+venv/
+env/
+.run/
+graphify-out/
+node_modules/
+**/node_modules/
+**/__pycache__/
+**/.next/
+# Historical duplicates, generated reports and experimental data
+archive/
+data/
+logs/
+reports/
+docs/legacy/
+coverage.xml
+*.db
+*.sqlite*
+*.jsonl
+*.zip
+*.pdf
+*.fid
+*.cube
+# Large embedded datasets and duplicate generated application bundles
+chemlab/web/gascalc/data.json
+chemlab/web/gascalc/index.html
+docs-interactive/public/openapi.json
+**/package-lock.json
+# Credential/config stores
+.env*
+*.pem
+*.key
+*.token
+*.secret
+k8s/secrets.yaml

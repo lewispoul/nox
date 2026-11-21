@@ -1,0 +1,2 @@
+# Optional developer tool, isolated from NOx/FastAPI dependencies.
+graphifyy[sql]==0.9.114

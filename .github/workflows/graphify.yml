@@ -1,0 +1,32 @@
+name: Graphify local code graph
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.graphifyignore'
+      - 'tools/graphify/**'
+      - 'scripts/nox_graphify.py'
+      - 'tests/tools/test_graphify_policy.py'
+      - '.github/workflows/graphify.yml'
+permissions:
+  contents: read
+jobs:
+  graph:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r tools/graphify/requirements.txt
+      - run: python -m unittest discover -s tests/tools -p test_graphify_policy.py
+      - run: python scripts/nox_graphify.py build
+      - run: python scripts/nox_graphify.py query 'ChemLab Store create_app'
+      - run: python scripts/nox_graphify.py html
