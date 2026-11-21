@@ -12,7 +12,9 @@ ROOT = Path(__file__).resolve().parents[2]
 class GraphifyPolicyTests(unittest.TestCase):
     def test_local_data_and_dependencies_are_excluded(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
+            # Windows runners may expose TEMP through an 8.3 alias. Graphify
+            # resolves paths; use the same canonical root for comparisons.
+            root = Path(directory).resolve()
             (root / ".graphifyignore").write_bytes(
                 (ROOT / ".graphifyignore").read_bytes()
             )

@@ -24,6 +24,11 @@ dans les nœuds contrôlés. Black et Flake8 passent sur les deux nouveaux scrip
 Python. La CI Windows/Linux est ajoutée; consulter son résultat sur la PR.
 Guide : [docs/dev/GRAPHIFY.md](dev/GRAPHIFY.md).
 
+Le premier run CI Linux passe. Windows a exposé un chemin TEMP avec alias 8.3
+(`RUNNER~1`) : le test comparait cet alias au chemin long résolu par Graphify.
+La racine temporaire du test est désormais résolue avant comparaison; aucune
+exclusion ni assertion n'est retirée. Consulter le run du commit corrigé.
+
 Limites : graphe de navigation de code, pas extraction sémantique de documents,
 preuve d'exécution NOx ou validation scientifique. Dépendances transitives non
 verrouillées intégralement. L'HTML peut référencer des ressources externes.
