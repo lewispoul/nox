@@ -11,7 +11,11 @@
 - id: LAB-ARTIFACTS
   title: Implement immutable experiment artifacts after pilot baseline review
   priority: high
-  status: TODO
+  status: IMPLEMENTED_PENDING_REVIEW
+  completion_notes:
+    - "Private immutable artifact API, provenance, hashes and retries implemented."
+    - "58 pilot tests pass locally, including faults and concurrent recovery."
+    - "UI/GasCalc connection remains a follow-up; Copilot contacted on PR 113."
   done_when:
     - "Authenticated artifact storage passes retry, size, isolation and crash tests."
     - "Contract reviewed from PR 114; synthetic fixtures only."

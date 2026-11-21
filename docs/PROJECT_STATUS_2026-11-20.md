@@ -1,5 +1,9 @@
 # État NOx au 20 novembre 2026
 
+Lot `codex/experiment-artifacts-20261120` sur #115 : stockage/API artefacts
+implémentés; 58 tests pilote locaux passent. [Contrat](../chemlab/ARTIFACTS.md).
+Interface de fichiers et sauvegarde GasCalc restent à réaliser.
+
 Le pilote laboratoire assemblé est sur `codex/chemlab-local-foundation` (#101),
 distinct de `main`. Le premier lot et GasCalc sont intégrés à cette branche.
 Les PR de modules et de Copilot qui se recouvrent demandent une revue avant merge.
