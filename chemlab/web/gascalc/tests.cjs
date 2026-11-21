@@ -1,0 +1,4 @@
+const assert=require('node:assert/strict'),VP=require('./engine.js'),db=require('./data.json');let n=0;
+for(const c of db)for(const s of c.sets){let prev=0;for(let i=0;i<=20;i++){let t=s.Tmin+(s.Tmax-s.Tmin)*i/20,p=VP.pressure(s,t);assert(p>=prev,c.cas);prev=p;if(i>0&&i<20)assert(Math.abs(VP.temperature(s,p)-t)<1e-7);n++}assert.throws(()=>VP.pressure(s,s.Tmin-1));assert.throws(()=>VP.pressure(s,s.Tmax+1));assert.throws(()=>VP.temperature(s,0));}
+for(const [cas,bp] of [['7732-18-5',100],['64-17-5',78.37],['67-64-1',56.05],['108-88-3',110.6]])for(const s of db.find(c=>c.cas===cas).sets)assert(Math.abs(VP.temperature(s,101325)-273.15-bp)<0.6);
+const h=VP.calibrate(373.15,101325,333.15,19946);assert(Math.abs(VP.cc(373.15,101325,h,19946,true)-333.15)<1e-9);assert.throws(()=>VP.calibrate(300,100,300,200));assert.throws(()=>VP.calibrate(300,200,350,100));console.log(n+' points : OK; inversion, domaines, références et calibration : OK');
