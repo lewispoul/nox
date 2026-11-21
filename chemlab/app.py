@@ -6,6 +6,15 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
+
+from chemlab.artifacts import (
+    ArtifactStore,
+    ArtifactUnavailable,
+    MissingArtifact,
+    DEFAULT_LIMIT,
+)
+from chemlab.artifact_routes import artifact_router
 
 from chemlab.literature import Literature
 from chemlab.models import (
@@ -19,7 +28,13 @@ from chemlab.models import (
 from chemlab.store import Conflict, Store, UnknownProject
 
 
-def create_app(db_path=None, token=None, literature_path=None):
+def create_app(
+    db_path=None,
+    token=None,
+    literature_path=None,
+    artifact_root=None,
+    artifact_limit=None,
+):
     token = token or os.environ.get("CHEMLAB_TOKEN")
     if not token or len(token) < 24:
         raise RuntimeError(
@@ -29,6 +44,17 @@ def create_app(db_path=None, token=None, literature_path=None):
     selected_index = literature_path or os.environ.get("CHEMLAB_LITERATURE_INDEX")
     literature = Literature(Path(selected_index) if selected_index else None)
     store = Store(db_path)
+    artifact_root = Path(
+        artifact_root
+        or os.environ.get("CHEMLAB_ARTIFACT_ROOT")
+        or db_path.parent / (db_path.name + ".artifacts")
+    )
+    web_path = Path(__file__).parent / "web"
+    if artifact_root.resolve().is_relative_to(web_path.resolve()):
+        raise ValueError("Artifact storage must be outside the public UI directory")
+    if artifact_limit is None:
+        artifact_limit = int(os.environ.get("CHEMLAB_ARTIFACT_LIMIT", DEFAULT_LIMIT))
+    artifacts = ArtifactStore(store, artifact_root, artifact_limit)
 
     def authorize(authorization: str | None = Header(default=None)):
         expected = "Bearer " + token
@@ -47,6 +73,20 @@ def create_app(db_path=None, token=None, literature_path=None):
         redoc_url=None,
         openapi_url=None,
     )
+    app.state.artifacts = artifacts
+    app.include_router(artifact_router(artifacts))
+
+    @app.exception_handler(MissingArtifact)
+    async def missing_artifact(request, exc):
+        return JSONResponse({"detail": str(exc)}, status_code=404)
+
+    @app.exception_handler(ArtifactUnavailable)
+    async def unavailable_artifact(request, exc):
+        return JSONResponse({"detail": "Artifact storage unavailable"}, status_code=503)
+
+    @app.exception_handler(Conflict)
+    async def artifact_conflict(request, exc):
+        return JSONResponse({"detail": str(exc)}, status_code=409)
 
     @app.middleware("http")
     async def private_responses(request, call_next):

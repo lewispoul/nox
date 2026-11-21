@@ -1,5 +1,26 @@
 # Session du 20 novembre 2026 : baseline laboratoire Windows
 
+## Suite : fichiers et artefacts d'expérience
+
+Branche `codex/experiment-artifacts-20261120`, depuis `d21da6a` (#115), worktree
+isolé `C:\Users\pouli\source\nox-artifacts`. Coordination envoyée à @copilot
+sur #113 : propriété du stockage/API et demande de revue du contrat. Les messages
+antérieurs signalent des limites de quota/modèles; aucune réponse nouvelle
+n'était disponible lors de l'implémentation. Aucune fusion automatique demandée.
+
+Stockage privé immuable lié aux expériences, métadonnées/provenance versionnées,
+SHA-256, publication et récupération sérialisées par SQLite, réessais/conflits,
+pagination et téléchargement authentifié en pièce jointe. Limite 25 MiB,
+plafond 256 MiB. La racine est liée à une seule base; liens et stockage public
+refusés. Staging après crash conservé pour maintenance hors ligne, afin de ne
+pas supprimer un upload actif. Voir [ARTIFACTS.md](../chemlab/ARTIFACTS.md).
+
+Validation locale : 58 tests pilote passent, un avertissement Starlette/AnyIO.
+Black/Flake8, les deux suites UI Node, les 13 965 points GasCalc et le DOM simulé
+passent. Consulter la CI Windows/Linux du commit proposé. Interface de fichiers
+et sauvegarde GasCalc restent le lot suivant. Aucun matériel/donnée privée,
+aucune fusion ni mise en service. Les changements GasCalc existants sont préservés.
+
 La reprise locale fonctionne dans `C:\Users\pouli\source\nox-pilot-fix`.
 Base Git : `d2b1d47541f9713fe97a596caaadcd250cbd6ef5`, branche pilote de #101.
 Travail proposé sur `codex/pilot-ci-baseline-20261120`.

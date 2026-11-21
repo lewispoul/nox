@@ -1,5 +1,7 @@
 # ChemLab Assistant — pilote local NOX
 
+Fichiers d'expérience : [contrat et API artefacts](ARTIFACTS.md).
+
 Première base exécutable, distincte de l’API de calcul NOX. Le pilote ajoute un
 registre d’appareils simulés, un journal SQLite, des notes en brouillon, un calcul
 d’inventaire et un pont documentaire vers un export local `thesis_ai`.
