@@ -15,6 +15,8 @@ affirmations de maturité ne constituent pas une validation du lot courant.
 
 # NOX API
 
+Developer tooling: [local code knowledge graph with Graphify](docs/dev/GRAPHIFY.md).
+
 A secure, sandboxed execution platform built on **FastAPI** for autonomous computational chemistry workflows.
 
 ## 🚀 Overview

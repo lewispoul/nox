@@ -1,3 +1,12 @@
+- id: DEV-GRAPHIFY
+  title: Add isolated local code graph for NOx repository navigation
+  priority: medium
+  status: IMPLEMENTED_PENDING_REVIEW
+  completion_notes:
+    - "Pinned optional Graphify with SQL support; local build/query/HTML commands."
+    - "Exclusion-policy regression test and Windows/Linux smoke workflow added."
+    - "No hosted upload, LLM extraction, global skill or hook installed."
+
 - id: LAB-WINDOWS-BASELINE
   title: Reproduce laboratory pilot on Windows and protect CRLF race tests
   priority: high

@@ -1,5 +1,10 @@
 # État NOx au 20 novembre 2026
 
+Graphify est proposé sur `codex/graphify-integration-20261120`, basé sur #115 :
+outil de navigation de code local facultatif avec build/requête/export HTML,
+exclusions et CI Windows/Linux. Voir [le guide](dev/GRAPHIFY.md).
+Les dépendances applicatives restent séparées et le graphe généré n'est pas publié.
+
 Le pilote laboratoire assemblé est sur `codex/chemlab-local-foundation` (#101),
 distinct de `main`. Le premier lot et GasCalc sont intégrés à cette branche.
 Les PR de modules et de Copilot qui se recouvrent demandent une revue avant merge.
