@@ -13,7 +13,9 @@ TOKEN = "testing-token-at-least-24-characters"
 
 
 def client_for(path, **kwargs):
-    return TestClient(create_app(path, TOKEN, **kwargs), headers={"Authorization": "Bearer " + TOKEN})
+    return TestClient(
+        create_app(path, TOKEN, **kwargs), headers={"Authorization": "Bearer " + TOKEN}
+    )
 
 
 @pytest.fixture
@@ -23,22 +25,51 @@ def client(tmp_path):
 
 
 def device(client):
-    response = client.post("/devices", json={"id": "balance", "name": "Demo", "location": "Bench", "capability": "mass.read_stable"})
+    response = client.post(
+        "/devices",
+        json={
+            "id": "balance",
+            "name": "Demo",
+            "location": "Bench",
+            "capability": "mass.read_stable",
+        },
+    )
     assert response.status_code == 200
 
 
 def observation(**changes):
-    return dict(event_id="reading-1", device_id="balance", experiment_id="DEMO-001", value=12.5,
-                unit="g", stable=True, observed_at="2026-01-01T12:00:00Z", **changes)
+    return dict(
+        event_id="reading-1",
+        device_id="balance",
+        experiment_id="DEMO-001",
+        value=12.5,
+        unit="g",
+        stable=True,
+        observed_at="2026-01-01T12:00:00Z",
+        **changes
+    )
 
 
 def test_auth_all_routes_and_no_actuator(client):
-    for method, url in [("GET", "/health"), ("GET", "/devices"), ("GET", "/events"),
-                        ("POST", "/notes"), ("POST", "/observations"),
-                        ("POST", "/inventory/calculate"), ("GET", "/literature/search?q=x")]:
-        assert client.request(method, url, headers={"Authorization": "Bearer wrong"}).status_code == 401
+    for method, url in [
+        ("GET", "/health"),
+        ("GET", "/devices"),
+        ("GET", "/events"),
+        ("POST", "/notes"),
+        ("POST", "/observations"),
+        ("POST", "/inventory/calculate"),
+        ("GET", "/literature/search?q=x"),
+    ]:
+        assert (
+            client.request(
+                method, url, headers={"Authorization": "Bearer wrong"}
+            ).status_code
+            == 401
+        )
     assert client.get("/docs").status_code == 404
-    assert client.post("/devices/balance/commands", json={"heat": True}).status_code == 404
+    assert (
+        client.post("/devices/balance/commands", json={"heat": True}).status_code == 404
+    )
     assert client.get("/health").json()["mode"] == "simulation_only"
 
 
@@ -63,9 +94,16 @@ def test_restart_and_idempotency(tmp_path):
         assert c.get("/events?experiment_id=OTHER").json() == []
 
 
-@pytest.mark.parametrize("change", [{"unit": "degC"}, {"stable": False},
-                                   {"observed_at": "2026-01-01T12:00:00"},
-                                   {"device_id": "unknown"}, {"source": "real"}])
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"unit": "degC"},
+        {"stable": False},
+        {"observed_at": "2026-01-01T12:00:00"},
+        {"device_id": "unknown"},
+        {"source": "real"},
+    ],
+)
 def test_invalid_measurements_not_saved(client, change):
     device(client)
     payload = observation()
@@ -76,7 +114,12 @@ def test_invalid_measurements_not_saved(client, change):
 
 def test_devices_immutable_and_simulated(client):
     device(client)
-    payload = {"id": "balance", "name": "Changed", "location": "Bench", "capability": "mass.read_stable"}
+    payload = {
+        "id": "balance",
+        "name": "Changed",
+        "location": "Bench",
+        "capability": "mass.read_stable",
+    }
     assert client.post("/devices", json=payload).status_code == 409
     payload["adapter"] = "serial"
     assert client.post("/devices", json=payload).status_code == 422
@@ -101,22 +144,50 @@ def test_concurrent_retries_are_single_event(tmp_path):
 
 
 def test_inventory_reference_and_invalid_inputs(client):
-    payload = {"gross_g": "1240", "tare_g": "340", "density_g_ml": "0.9", "tare_kind": "estimated"}
+    payload = {
+        "gross_g": "1240",
+        "tare_g": "340",
+        "density_g_ml": "0.9",
+        "tare_kind": "estimated",
+    }
     result = client.post("/inventory/calculate", json=payload).json()
     assert Decimal(result["net_g"]) == 900
     assert Decimal(result["volume_ml"]) == 1000
     assert result["quantity_status"] == "estimated"
     assert result["uncertainty_evaluated"] is False
-    for change in ({"gross_g": "100"}, {"density_g_ml": "0"}, {"tare_g": "-1"}, {"gross_g": "NaN"}):
-        assert client.post("/inventory/calculate", json=dict(payload, **change)).status_code == 422
-    result = client.post("/inventory/calculate", json={"gross_g": "10", "tare_g": "10", "tare_kind": "measured"}).json()
+    for change in (
+        {"gross_g": "100"},
+        {"density_g_ml": "0"},
+        {"tare_g": "-1"},
+        {"gross_g": "NaN"},
+    ):
+        assert (
+            client.post(
+                "/inventory/calculate", json=dict(payload, **change)
+            ).status_code
+            == 422
+        )
+    result = client.post(
+        "/inventory/calculate",
+        json={"gross_g": "10", "tare_g": "10", "tare_kind": "measured"},
+    ).json()
     assert result["volume_ml"] is None
     assert Decimal(result["net_g"]) == 0
 
 
 def test_thesis_export_bridge(tmp_path):
     path = tmp_path / "records.jsonl"
-    path.write_text(json.dumps({"source_name": "Demo procedure", "page_number": 2, "text": "Confirm stable mass before recording.", "source_path": "/private/secret.pdf"}) + "\n")
+    path.write_text(
+        json.dumps(
+            {
+                "source_name": "Demo procedure",
+                "page_number": 2,
+                "text": "Confirm stable mass before recording.",
+                "source_path": "/private/secret.pdf",
+            }
+        )
+        + "\n"
+    )
     with client_for(tmp_path / "db.sqlite3", literature_path=path) as c:
         result = c.get("/literature/search?q=stable%20mass").json()
         assert result["method"] == "lexical_term_coverage"

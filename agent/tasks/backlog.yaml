@@ -1,3 +1,25 @@
+- id: LAB-WINDOWS-BASELINE
+  title: Reproduce laboratory pilot on Windows and protect CRLF race tests
+  priority: high
+  status: IMPLEMENTED_PENDING_REVIEW
+  completion_notes:
+    - "27 pilot Python tests, UI suites, GasCalc and raw FID checks pass locally."
+    - "CRLF instrumentation repaired; LF and CRLF regression cases pass."
+    - "Pilot CI adds Windows/Linux and pinned Black/Flake8 checks."
+    - "Global lint debt and new-commit CI results remain separate."
+
+- id: LAB-ARTIFACTS
+  title: Implement immutable experiment artifacts after pilot baseline review
+  priority: high
+  status: IMPLEMENTED_PENDING_REVIEW
+  completion_notes:
+    - "Private immutable artifact API, provenance, hashes and retries implemented."
+    - "58 pilot tests pass locally, including faults and concurrent recovery."
+    - "UI/GasCalc connection remains a follow-up; Copilot contacted on PR 113."
+  done_when:
+    - "Authenticated artifact storage passes retry, size, isolation and crash tests."
+    - "Contract reviewed from PR 114; synthetic fixtures only."
+
 - id: FILE-OPS-TEST
   title: Test file-ops system with simple enhancement
   priority: high

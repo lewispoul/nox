@@ -1,4 +1,5 @@
 """One connection per operation; transactions enforce durable idempotency."""
+
 import json
 from contextlib import contextmanager
 import sqlite3
@@ -54,30 +55,46 @@ class Store:
     def add_project(self, project: Project):
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = db.execute("SELECT payload FROM projects WHERE id=?", (project.id,)).fetchone()
+            row = db.execute(
+                "SELECT payload FROM projects WHERE id=?", (project.id,)
+            ).fetchone()
             if row:
                 if json.loads(row[0]) != project.model_dump():
                     raise Conflict("Project id already has a different configuration")
                 return json.loads(row[0])
-            db.execute("INSERT INTO projects VALUES (?,?)", (project.id, project.model_dump_json()))
+            db.execute(
+                "INSERT INTO projects VALUES (?,?)",
+                (project.id, project.model_dump_json()),
+            )
         return project.model_dump()
 
     def projects(self):
         with self.connect() as db:
-            return [json.loads(row[0]) for row in db.execute("SELECT payload FROM projects ORDER BY id")]
+            return [
+                json.loads(row[0])
+                for row in db.execute("SELECT payload FROM projects ORDER BY id")
+            ]
 
     def add_experiment(self, experiment: Experiment):
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = db.execute("SELECT payload FROM experiments WHERE id=?", (experiment.id,)).fetchone()
+            row = db.execute(
+                "SELECT payload FROM experiments WHERE id=?", (experiment.id,)
+            ).fetchone()
             if row:
                 if json.loads(row[0]) != experiment.model_dump():
-                    raise Conflict("Experiment id already has a different configuration")
+                    raise Conflict(
+                        "Experiment id already has a different configuration"
+                    )
                 return json.loads(row[0])
-            if not db.execute("SELECT id FROM projects WHERE id=?", (experiment.project_id,)).fetchone():
+            if not db.execute(
+                "SELECT id FROM projects WHERE id=?", (experiment.project_id,)
+            ).fetchone():
                 raise UnknownProject("Unknown project")
-            db.execute("INSERT INTO experiments VALUES (?,?,?)",
-                       (experiment.id, experiment.project_id, experiment.model_dump_json()))
+            db.execute(
+                "INSERT INTO experiments VALUES (?,?,?)",
+                (experiment.id, experiment.project_id, experiment.model_dump_json()),
+            )
         return experiment.model_dump()
 
     def experiments(self, project_id=None):
@@ -85,19 +102,26 @@ class Store:
             if project_id is None:
                 rows = db.execute("SELECT payload FROM experiments ORDER BY id")
             else:
-                rows = db.execute("SELECT payload FROM experiments WHERE project_id=? ORDER BY id", (project_id,))
+                rows = db.execute(
+                    "SELECT payload FROM experiments WHERE project_id=? ORDER BY id",
+                    (project_id,),
+                )
             return [json.loads(row[0]) for row in rows]
 
     def experiment(self, experiment_id):
         with self.connect() as db:
-            row = db.execute("SELECT payload FROM experiments WHERE id=?", (experiment_id,)).fetchone()
+            row = db.execute(
+                "SELECT payload FROM experiments WHERE id=?", (experiment_id,)
+            ).fetchone()
             return json.loads(row[0]) if row else None
 
     def add_device(self, device: Device):
         payload = device.model_dump_json()
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = db.execute("SELECT payload FROM devices WHERE id=?", (device.id,)).fetchone()
+            row = db.execute(
+                "SELECT payload FROM devices WHERE id=?", (device.id,)
+            ).fetchone()
             if row:
                 if json.loads(row[0]) != device.model_dump():
                     raise Conflict("Device id already has a different configuration")
@@ -107,26 +131,46 @@ class Store:
 
     def devices(self):
         with self.connect() as db:
-            return [json.loads(row[0]) for row in db.execute("SELECT payload FROM devices ORDER BY id")]
+            return [
+                json.loads(row[0])
+                for row in db.execute("SELECT payload FROM devices ORDER BY id")
+            ]
 
     def device(self, device_id):
         with self.connect() as db:
-            row = db.execute("SELECT payload FROM devices WHERE id=?", (device_id,)).fetchone()
+            row = db.execute(
+                "SELECT payload FROM devices WHERE id=?", (device_id,)
+            ).fetchone()
             return json.loads(row[0]) if row else None
 
     def append(self, kind, request):
         serialized = json.dumps(request, sort_keys=True, ensure_ascii=False)
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = db.execute("SELECT kind, request, payload FROM events WHERE event_id=?", (request["event_id"],)).fetchone()
+            row = db.execute(
+                "SELECT kind, request, payload FROM events WHERE event_id=?",
+                (request["event_id"],),
+            ).fetchone()
             if row:
                 if row[0] != kind or row[1] != serialized:
                     raise Conflict("Event id already used with different content")
                 return json.loads(row[2])
-            payload = dict(request, kind=kind, recorded_at=datetime.now(timezone.utc).isoformat(),
-                           source="simulated" if kind == "observation" else "manual",
-                           status="recorded_local" if kind == "observation" else "draft_local")
-            db.execute("INSERT INTO events VALUES (?,?,?,?)", (request["event_id"], kind, serialized, json.dumps(payload, ensure_ascii=False)))
+            payload = dict(
+                request,
+                kind=kind,
+                recorded_at=datetime.now(timezone.utc).isoformat(),
+                source="simulated" if kind == "observation" else "manual",
+                status="recorded_local" if kind == "observation" else "draft_local",
+            )
+            db.execute(
+                "INSERT INTO events VALUES (?,?,?,?)",
+                (
+                    request["event_id"],
+                    kind,
+                    serialized,
+                    json.dumps(payload, ensure_ascii=False),
+                ),
+            )
         return payload
 
     def events(self, experiment_id=None, limit=100):

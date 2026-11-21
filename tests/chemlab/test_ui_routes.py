@@ -1,4 +1,5 @@
 """Integration boundaries: public shell, private records, no cached responses."""
+
 from fastapi.testclient import TestClient
 from chemlab.app import create_app
 
@@ -25,10 +26,23 @@ def test_public_shell_has_no_data_and_api_stays_private(tmp_path):
 def test_roundtrip_experience_and_note_survives_restart(tmp_path):
     path = tmp_path / "persistent.sqlite3"
     headers = {"Authorization": "Bearer " + TOKEN}
-    note = {"event_id": "ui-note-1", "experiment_id": "LPP-26-050", "text": "Observation de test"}
+    note = {
+        "event_id": "ui-note-1",
+        "experiment_id": "LPP-26-050",
+        "text": "Observation de test",
+    }
     with TestClient(create_app(path, TOKEN), headers=headers) as client:
-        assert client.post("/projects", json={"id": "P", "name": "Projet"}).status_code == 200
-        assert client.post("/experiments", json={"id": "LPP-26-050", "project_id": "P", "name": "Essai"}).status_code == 200
+        assert (
+            client.post("/projects", json={"id": "P", "name": "Projet"}).status_code
+            == 200
+        )
+        assert (
+            client.post(
+                "/experiments",
+                json={"id": "LPP-26-050", "project_id": "P", "name": "Essai"},
+            ).status_code
+            == 200
+        )
         result = client.post("/notes", json=note)
         assert result.status_code == 200
         assert result.json()["status"] == "draft_local"

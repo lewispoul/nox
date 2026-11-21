@@ -1,5 +1,27 @@
 # NOx — validation du premier lot
 
+## Revalidation Windows du 20 novembre 2026
+
+Branche de réparation : `codex/pilot-ci-baseline-20261120`, depuis le pilote
+`d2b1d47541f9713fe97a596caaadcd250cbd6ef5`. Python 3.12.12, Node 26.13.1.
+Les 27 tests Python, les deux suites UI Node, les 13 965 points GasCalc,
+le DOM simulé, les 8 192 comparaisons FID et la démo de six opérations passent.
+Black 26.10.1 et Flake8 7.4.1 passent sur `chemlab tests/chemlab`.
+Un avertissement de dépréciation Starlette/AnyIO reste présent.
+
+Le test de courses UI échouait avant correction sur un checkout Windows CRLF :
+son instrumentation cherchait uniquement LF. Il normalise maintenant les fins
+de ligne dans la VM et vérifie explicitement LF et CRLF sans changer le script
+livré. Le workflow pilote ajoute Windows à Linux, épingle les outils de lint,
+et vérifie le style du pilote. Voir le rapport de session du 20 novembre.
+
+Ces résultats locaux ne remplacent pas les résultats CI du nouveau commit.
+Les deux anciens workflows de lint globaux restent distincts et leurs dettes
+de style ne sont pas désactivées par cette réparation. Aucun test sur téléphone,
+aucune validation du traitement RMN complet ni aucun déploiement n'est ajouté.
+
+## Validation historique du 19 novembre
+
 19 novembre 2026, America/Toronto. Base : PR #101,
 `aafce6450d91c10e87b5eb201597af62e68c880b`. Validation locale de l'assemblage,
 pas une certification du produit ou de l'ensemble historique NOX.
