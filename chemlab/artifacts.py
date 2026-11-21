@@ -1,6 +1,7 @@
 """Immutable experiment artifacts. SQLite serializes publication and recovery."""
 
 import hashlib
+from contextlib import closing
 import json
 import os
 from pathlib import Path
@@ -56,7 +57,7 @@ class ArtifactMetadata(StrictModel):
     def safe_name(cls, value):
         if not isinstance(value, str):
             return value
-        if value in {".", ".."} or any(
+        if value.strip() in {".", ".."} or any(
             unicodedata.category(c).startswith("C") or c in "/\\:" for c in value
         ):
             raise ValueError("Display name must not contain paths or controls")
@@ -111,7 +112,7 @@ class ArtifactStore:
         # Recovery is scoped to exactly one database. Misconfiguring two pilots
         # with a shared artifact root must never delete the other pilot's data.
         owner_path = check_path(self.root / "owner.sqlite3")
-        with sqlite3.connect(owner_path, timeout=10) as owner:
+        with closing(sqlite3.connect(owner_path, timeout=10)) as owner, owner:
             owner.execute(
                 "CREATE TABLE IF NOT EXISTS owner (id INTEGER PRIMARY KEY, database_path TEXT NOT NULL)"
             )
